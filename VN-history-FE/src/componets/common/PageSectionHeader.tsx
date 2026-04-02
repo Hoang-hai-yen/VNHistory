@@ -1,9 +1,13 @@
+import { Link } from "react-router";
+
 export default function PageSectionHeader({
   subtitle,
   title,
+  moreLink,
 }: {
   subtitle: string;
   title: string;
+  moreLink?: string;
 }) {
   return (
     <div className="flex items-end justify-between border-b-2 border-[#1c1c1c] pb-2.5 mb-6">
@@ -15,6 +19,14 @@ export default function PageSectionHeader({
           {title}
         </h1>
       </div>
+      {moreLink && (
+        <Link
+          to={moreLink}
+          className="text-[11.5px] text-[#8B1A1A] font-medium uppercase tracking-wider transition-opacity hover:opacity-70 border-b border-[#8B1A1A]"
+        >
+          Xem tất cả →
+        </Link>
+      )}
     </div>
   );
 }
