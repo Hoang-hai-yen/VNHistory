@@ -1,14 +1,22 @@
 import { Link } from "react-router";
 import type { Figure } from "../../types/figure.type";
 
-export default function FiguresCard({ figure }: { figure: Figure }) {
+export default function FiguresCard({
+  figure,
+  forHome = false,
+}: {
+  figure: Figure;
+  forHome?: boolean;
+}) {
   return (
     <Link
       key={figure.id}
       to={`/bai-viet/${figure.id}`}
       className="bg-white border border-[#e0dbd0] cursor-pointer group hover:border-[#B8860B] hover:shadow-lg transition-all duration-300 block"
     >
-      <div className="aspect-[3/4] bg-[#1A1208] relative overflow-hidden">
+      <div
+        className={`relative overflow-hidden ${forHome ? "aspect-[3/2]" : "aspect-[3/4]"}`}
+      >
         {/* lazy loading here */}
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-gradient-to-b from-[#2D1F0A] to-[#1A1208]">
           <div className="w-16 h-16 rounded-full border-2 border-[#C8941A]/30 flex items-center justify-center text-3xl bg-[#C8941A]/10 group-hover:scale-105 transition-transform duration-500">

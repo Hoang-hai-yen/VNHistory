@@ -1,7 +1,47 @@
 import { Link } from "react-router";
 import type { Dynasty } from "../../types/dynasty.type";
 
-export default function DynastyCard({ dyn }: { dyn: Dynasty }) {
+export default function DynastyCard({
+  dyn,
+  forHome = false,
+}: {
+  dyn: Dynasty;
+  forHome?: boolean;
+}) {
+  if (forHome) {
+    return (
+      <Link to={`/bai-viet/${dyn.id}`} className="cursor-pointer group block">
+        <div
+          className={`overflow-hidden bg-[#1A1208] relative mb-3 aspect-[16/10] `}
+        >
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1A1208] via-[#2D1F0A] to-[#1A1208]">
+            <span className="text-3xl opacity-40 group-hover:scale-110 transition-transform duration-500">
+              {"⚔"}
+            </span>
+            <span className="text-[9px] tracking-[2px] text-[#C8941A]/50 uppercase font-medium">
+              {dyn.period}
+            </span>
+          </div>
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-[#8B1A1A]/0 group-hover:bg-[#8B1A1A]/10 transition-colors duration-300" />
+        </div>
+
+        <div className="text-[9px] font-bold tracking-[2.5px] uppercase text-[#8B1A1A] mb-1.5">
+          {dyn.era}
+        </div>
+
+        <h3
+          className={`font-['Playfair_Display',serif] font-bold text-[#1c1c1c] leading-snug group-hover:text-[#8B1A1A] transition-colors mb-2 text-base`}
+        >
+          {dyn.title}
+        </h3>
+
+        <p className="font-['Source_Serif_4',serif] text-[13px] text-[#6b6b6b] leading-relaxed font-light line-clamp-2">
+          {dyn.description}
+        </p>
+      </Link>
+    );
+  }
   return (
     <Link
       key={dyn.id}
