@@ -1,0 +1,157 @@
+.timeline-page {
+  padding: 20px;
+  background-color: #FAFAF7; /* */
+  min-height: 100vh;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-left:-280px;
+}
+
+.page-title {
+  color: #C5A028; /* */
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.btn-add-event {
+  background-color: #C5302A; /* */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.timeline-container {
+  display: flex;
+  border: 1px solid #2E2510; /* */
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Sidebar Styling */
+.dynasty-sidebar {
+  width: 180px;
+  border-right: 1px solid #2E2510;
+  background-color: white;
+}
+
+.dynasty-item {
+  padding: 15px;
+  border-bottom: 1px solid #E0E0E0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dynasty-item.active {
+  background-color: #FAFAF7;
+  border-left: 4px solid #C5A028;
+}
+
+.dynasty-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #C5A028;
+}
+
+.dynasty-period {
+  font-size: 12px;
+  color: #767676; /* */
+  margin-top: 4px;
+}
+
+/* Content Area Styling */
+.event-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.content-heading {
+  color: #C5A028;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.timeline-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.timeline-table th {
+  text-align: left;
+  font-size: 12px;
+  color: #2E2510;
+  padding: 12px;
+  border-bottom: 1px solid #2E2510;
+  background-color: #FAFAF7;
+}
+
+
+.timeline-table td {
+  padding: 12px;
+  font-size: 14px;
+  border-bottom: 1px solid #F0F0F0;
+  
+}
+
+.year-cell {
+  color: #C5A028;
+  font-weight: 800;
+  font-family: Playfair Display, serif;
+}
+
+.name-cell {
+  font-weight: 500;
+  color: #5A4E28;
+}
+
+
+.category-tag {
+  border: 1px solid #5A4E28;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #5A4E28;
+}
+
+/* Status Pills */
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.pill-xuất-bản { background-color: #4A8A18; }
+.pill-bản-nháp { background-color: #5A4E28; }
+.pill-chờ-duyệt { background-color: #C5A028; }
+
+/* Buttons */
+.action-cell {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit, .btn-approve {
+  background: white;
+  border: 1px solid #3A7AB0; /* */
+  color: #3A7AB0;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-approve {
+  border-color: #4A8A18;
+  color: #4A8A18;
+}

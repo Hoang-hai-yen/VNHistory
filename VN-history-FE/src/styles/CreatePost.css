@@ -1,0 +1,169 @@
+.create-post-container {
+  padding: 20px;
+}
+
+.create-post-header h2 {
+  color: #C5A028; /* Vàng Gold */
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.create-post-content {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 25px;
+}
+
+.form-section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.section-title {
+  color: #C5A028;
+  font-size: 12px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 5px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  margin-right:20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  color: #767676;
+  margin-bottom: 6px;
+}
+
+/* Màu chữ yêu cầu cho "Cho phép bình luận" */
+.label-text-gold {
+  color: #5A4E28; /* Vàng nâu đậm */
+  font-size: 14px;
+}
+
+/* Style cho dấu sao đỏ */
+.required {
+  color: #C5302A; /* Đỏ đô từ Palette */
+  margin-left: 2px;
+  font-size: 12px;
+}
+
+.section-title {
+  color: #C5A028; /* Vàng Gold */
+  font-size: 12px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.side-title {
+  font-size: 12px;
+  color: #C5A028; /* Vàng Gold */
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+/* Input & Textarea */
+.form-group input,
+.form-group textarea, 
+.form-group select {
+  font-family: inherit;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #E0E0E0;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #FAFAF7; /* Trắng ngà nhẹ */
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #C5A028; /* Highlight vàng gold khi focus */
+}
+
+/* .form-group input, .form-group textarea, .form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  background-color: #fafafa;
+} */
+
+/* Side Panel Boxes */
+.side-box {
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.side-title {
+  font-size: 12px;
+  color: #C5A028;
+  margin-bottom: 15px;
+}
+
+/* Publish Buttons */
+.publish-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-save-draft {
+  background: white;
+  border: 1px solid #C5A028;
+  color: #C5A028;
+  padding: 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-publish-now {
+  background: #4A8A18; /* Xanh lá palette */
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Display Check List */
+.display-check ul {
+  list-style: none;
+  padding: 0;
+  font-size: 14px;
+}
+
+.display-check li {
+  margin-bottom: 8px;
+  color: #5A4E28;
+}
+
+.check { color: #C5A028; margin-right: 8px; font-weight: bold; }
+.refresh { color: #767676; margin-right: 8px; }
+
+/* Switch Toggle (Cơ bản) */
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
