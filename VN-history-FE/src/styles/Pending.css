@@ -1,0 +1,129 @@
+.pending-page {
+  padding: 20px;
+  background-color: #FAFAF7; /* Nền trắng ngà hệ thống */
+  min-height: 100vh;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.pending-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pending-title {
+  color: #C5A028;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.btn-approve-all {
+  background: white;
+  border: 1px solid #C5A028;
+  color: #C5A028;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-approve-all:hover {
+  background-color: #C5A028;
+  color: white;
+}
+
+/* Table Styling */
+.pending-table-container {
+  border: 1px solid #2E2510; /* Màu nâu đậm viền ngoài */
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pending-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pending-table th {
+  background-color: #FAFAF7;
+  text-align: left;
+  padding: 12px;
+  font-size: 12px;
+  color: #2E2510;
+  border-bottom: 1px solid #2E2510;
+  text-transform: uppercase;
+}
+
+.pending-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid #EEE;
+  font-size: 14px;
+  color: #333;
+  vertical-align: middle;
+}
+
+/* Title Cell */
+.title-cell .main-title {
+  font-weight: 500;
+  color: #2E2510;
+  margin-bottom: 4px;
+}
+
+.title-cell .sub-info {
+  font-size: 12px;
+  color: #BA7517; /* Màu cam nâu cho thông tin phụ */
+}
+
+.status-text {
+  color: #767676;
+  font-style: italic;
+}
+
+/* Action Buttons */
+.action-cell {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-publish-final {
+  background-color: white;
+  border: 1px solid #4A8A18; /* Xanh lá */
+  color: #4A8A18;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-publish-final:hover {
+  background-color: #4A8A18;
+  color: white;
+}
+
+.btn-reject-back {
+  background-color: white;
+  border: 1px solid #C5302A; /* Đỏ đô */
+  color: #C5302A;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-reject-back:hover {
+  background-color: #C5302A;
+  color: white;
+}
+
+/* Checkbox alignment */
+input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: #C5A028;
+}

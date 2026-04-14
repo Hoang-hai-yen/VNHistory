@@ -1,0 +1,332 @@
+/* Dashboard.css */
+.dashboard-page {
+  padding: 20px;
+  /* /* Màu nền nhẹ cho trang */
+  color: #333;
+}
+
+/* 1. Stat Cards */
+.stats-section {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #2E2510; /* Viền gold nhẹ */
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.stat-card .card-header h3 {
+  font-size: 12px;  
+  font-weight: bold;
+  color: #666;
+  margin: 0 0 10px 0;
+  letter-spacing: 0.5px;
+}
+
+.stat-card .card-body p {
+  margin: 0;
+}
+
+.stat-card .large-stat-value {
+  font-size: 32px;
+  font-weight: 400;
+  color: #c5a059; /* Màu gold nổi bật */
+}
+
+.stat-card .stat-value {
+  font-size: 32px;
+  font-weight: 400;
+}
+
+.stat-card .stat-subtext {
+  font-size: 12px;
+  color: #666;
+}
+
+.text-success { color: #689f38; }
+.text-danger { color: #c62828; }
+
+.progress-bar-container {
+  margin-top: 10px;
+  height: 4px;
+  background-color: #f1f1f1;
+  border-radius: 2px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #c5a059;
+  border-radius: 2px;
+}
+
+/* 2. Content Table */
+.content-table-section {
+  background: #fff;
+  border: 1px solid #2E2510;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.content-table-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.content-table-section .section-header h3 {
+  font-size: 12px;
+  font-weight: bold;
+  color: #c5a059;
+  margin: 0;
+  padding-left: 10px;;
+}
+
+.tab-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.tab-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 6px 15px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background-color: #fff;
+  border-color: #C5A028;
+  color: #C5A028;
+}
+
+.tab-btn:hover:not(.active) {
+  background-color: #f1f1f1;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.content-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.content-table th, .content-table td {
+  text-align: left;
+  padding: 12px;
+  font-size: 14px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.content-table th {
+  font-size: 12px;
+  font-weight: bold;
+  color: #666;
+  letter-spacing: 0.5px;
+}
+
+.title-cell {
+  width: 20%;
+}
+
+.title-cell p {
+  margin: 0;
+}
+
+.main-title {
+  color: #333;
+}
+
+.sub-title {
+  font-size: 12px;
+  color: #C5302A;
+  padding-top: 4px;;
+}
+
+/* Tag style */
+.tag {
+  font-size: 14px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+}
+
+.tag-event { color: #aaa; }
+.tag-person { color: #aaa; }
+
+.admin-assignee {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-icon {
+  font-size: 14px;
+  color: #c5a059;
+}
+
+/* Status tags style */
+.status-tag {
+  font-size: 14px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: #fff;
+}
+
+.status-pending { background-color: #C5A028; }
+.status-reviewing { background-color: #3A7AB0; }
+.status-published { background-color: #4A8A18; }
+.status-draft { background-color: #5A4E28; }
+.status-rejected { background-color: #C5302A; }
+
+/* Action buttons style */
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.btn {
+  background: #fff;
+  border: 1px solid currentColor;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-approve { color: #4A8A18; }
+.btn-reject { color: #C5302A; }
+.btn-edit { color: #3A7AB0; }
+.btn-edit-pub { color: #C5A028; }
+.btn-view { color: #5A4E28; }
+.btn-reason { color: #c62828; }
+
+/* 3. Bottom Section */
+.bottom-section {
+  display: flex;
+  gap: 15px;
+}
+
+.reports-column, .activity-column {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #2E2510;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.reports-column .section-header, .activity-column .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.reports-column .section-header h3, .activity-column .section-header h3 {
+  font-size: 12px;
+  font-weight: bold;
+  color: #c5a059;
+  margin: 0;
+}
+
+.view-all-link {
+  font-size: 12px;
+  color: #666;
+  text-decoration: none;
+}
+
+/* Reports List style */
+.reports-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.report-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.report-item p { margin: 0; }
+
+.report-title {
+  font-size: 16px;
+  padding-bottom: 8px;;
+}
+
+.report-subtitle {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
+  padding-bottom: 8px;;
+}
+
+.report-tags {
+  display: flex;
+  gap: 5px;
+}
+
+/* Report Tags style */
+.report-tag {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.report-tag-mới { background-color: #C5A028; color: #fff; }
+.report-tag-nghiêm-trọng { background-color: #C5302A; color: #fff; }
+.report-tag-đang-xem { background-color: #3A7AB0; color: #fff; }
+.report-tag-trung-bình { background-color: #5A4E28; color: #fff; }
+.report-tag-nhỏ { background-color: #4A8A18; color: #fff; }
+
+.report-time {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Activity Log style */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.activity-item .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 4px;
+}
+
+.activity-details p { margin: 0; }
+
+.activity-text {
+  font-size: 16px;
+  color: #333;
+  padding-bottom: 8px;;
+}
+
+.activity-subtext {
+  font-size: 12px;
+  color: #666;
+}

@@ -1,0 +1,135 @@
+/* Sử dụng các mã màu từ Palette của bạn */
+:root {
+  --primary-dark: #2E2510;
+  --gold-main: #C5A028;
+  --gold-dark: #5A4E28;
+  --accent-red: #C5302A;
+  --accent-green: #4A8A18;
+  --accent-blue: #3A7AB0;
+  --text-gray: #767676;
+  --off-white: #FAFAF7;
+}
+
+.posts-page {
+  padding: 10px 20px;
+}
+
+/* Toolbar & Tabs */
+.posts-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tabs-container {
+  display: flex;
+  gap: 10px;
+}
+
+.tab-link {
+  background: none;
+  border: 1px solid transparent;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-link.active {
+  border: 1px solid var(--gold-main);
+  color: var(--gold-main);
+  border-radius: 4px;
+}
+
+/* Nút tạo bài mới màu đỏ đô */
+.btn-create-primary {
+  background-color: #8B1A1A;
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Table Design */
+.posts-table-section {
+  border: 1px solid var(--primary-dark);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.posts-main-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.posts-main-table th {
+  background-color: var(--off-white);
+  padding: 12px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+  color: #666;
+  border-bottom: 1px solid #eee;
+}
+
+.posts-main-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Title Column */
+.title-main { font-weight: 500; }
+.title-sub { font-size: 12px; color: var(--accent-red); margin-top: 4px; }
+
+/* Badges */
+.type-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  border: 1px solid #aaa;
+}
+.type-event { color: #aaa; }
+.type-person { color: #aaa; }
+
+/* Status Tags */
+.status-tag {
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
+.status-pending { background-color: var(--gold-main); }
+.status-reviewing { background-color: var(--accent-blue); }
+.status-published { background-color: var(--accent-green); }
+.status-draft { background-color: var(--gold-dark); }
+.status-rejected { background-color: var(--accent-red); }
+
+/* Action Buttons in Table */
+.action-group {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-action {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-green-text { color: var(--accent-green); border-color: var(--accent-green); }
+.btn-red-text { color: var(--accent-red); border-color: var(--accent-red); }
+.btn-blue-text { color: var(--accent-blue); border-color: var(--accent-blue); }
+.btn-gray-text { color: var(--text-gray); border-color: #5A4E28; }
