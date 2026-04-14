@@ -1,169 +1,204 @@
 .create-post-container {
-  padding: 20px;
+  width: 100%;
+  max-width: 1400px;
 }
 
-.create-post-header h2 {
-  color: #C5A028; /* Vàng Gold */
-  font-size: 14px;
-  margin-bottom: 20px;
+.main-page-title {
+  color: #C5A028; /* Vàng Gold hệ thống */
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  text-transform: uppercase;
 }
 
 .create-post-content {
-  display: grid;
-  grid-template-columns: 1fr 320px;
+  display: flex;
   gap: 25px;
+  align-items: flex-start;
 }
 
-.form-section {
-  background: white;
-  border: 1px solid #e0e0e0;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 4px;
+/* CỘT TRÁI */
+.main-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
 .section-title {
   color: #C5A028;
   font-size: 12px;
+  font-weight: bold;
   margin-bottom: 15px;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 5px;
 }
 
 .form-group {
   margin-bottom: 15px;
-  margin-right:20px;
 }
 
 .form-group label {
   display: block;
   font-size: 12px;
   font-weight: bold;
-  color: #767676;
+  color: #767676; /* Xám ghi chú */
   margin-bottom: 6px;
-}
-
-/* Màu chữ yêu cầu cho "Cho phép bình luận" */
-.label-text-gold {
-  color: #5A4E28; /* Vàng nâu đậm */
-  font-size: 14px;
-}
-
-/* Style cho dấu sao đỏ */
-.required {
-  color: #C5302A; /* Đỏ đô từ Palette */
-  margin-left: 2px;
-  font-size: 12px;
-}
-
-.section-title {
-  color: #C5A028; /* Vàng Gold */
-  font-size: 12px;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 5px;
-  display: flex;
-  align-items: center;
-}
-
-.side-title {
-  font-size: 12px;
-  color: #C5A028; /* Vàng Gold */
-  margin-bottom: 15px;
   text-transform: uppercase;
 }
 
-/* Input & Textarea */
-.form-group input,
+.form-group input, 
 .form-group textarea, 
 .form-group select {
-  font-family: inherit;
+  font-family: Source-Sans-Pro, sans-serif;
   width: 100%;
-  padding: 10px;
-  border: 1px solid #E0E0E0;
+  padding: 8px 12px;
+  border: 1px solid #767676;
   border-radius: 4px;
   font-size: 14px;
-  background-color: #FAFAF7; /* Trắng ngà nhẹ */
-  transition: border-color 0.2s;
+  color: #2E2510;
+  background-color: #FAFAF7; /* Nền trắng ngà */
+  box-sizing: border-box;
 }
 
-.form-group input:focus {
-  outline: none;
-  border-color: #C5A028; /* Highlight vàng gold khi focus */
+.required {
+  color: #C5302A;
+  margin-left: 3px;
 }
 
-/* .form-group input, .form-group textarea, .form-group select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 13px;
-  background-color: #fafafa;
-} */
+/* CỘT PHẢI */
+.side-panel {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-/* Side Panel Boxes */
 .side-box {
   background: white;
-  border: 1px solid #e0e0e0;
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 4px;
+  border: 1px solid #767676;
+  padding: 20px;
+  border-radius: 2px;
 }
 
 .side-title {
-  font-size: 12px;
   color: #C5A028;
+  font-size: 12px;
+  font-weight: bold;
   margin-bottom: 15px;
 }
 
-/* Publish Buttons */
-.publish-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.btn-save-draft {
-  background: white;
-  border: 1px solid #C5A028;
-  color: #C5A028;
-  padding: 10px;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-publish-now {
-  background: #4A8A18; /* Xanh lá palette */
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Display Check List */
-.display-check ul {
-  list-style: none;
-  padding: 0;
-  font-size: 14px;
-}
-
-.display-check li {
-  margin-bottom: 8px;
-  color: #5A4E28;
-}
-
-.check { color: #C5A028; margin-right: 8px; font-weight: bold; }
-.refresh { color: #767676; margin-right: 8px; }
-
-/* Switch Toggle (Cơ bản) */
+/* Toggle Switch Custom */
 .toggle-group {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 18px;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #D9D9D9;
+  transition: .3s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider { background-color: #BA7517; }
+input:checked + .slider:before { transform: translateX(16px); }
+
+.label-text-gold {
+  color: #C5A028;
   font-size: 14px;
 }
+
+.publish-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Nút Lưu bản nháp: Viền vàng, chữ vàng, nền trắng/trong suốt */
+.btn-save-draft {
+  width: 100%;
+  background-color: transparent;
+  color: #C5A028; /* Màu vàng Gold đặc trưng */
+  border: 1.5px solid #C5A028;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.btn-save-draft:hover {
+  background-color: #fcf8eb; /* Màu nền vàng rất nhẹ khi hover */
+}
+
+/* Nút Xuất bản: Nền xanh lá, chữ trắng */
+.btn-publish-now {
+  width: 100%;
+  background-color: #4A8A18; /* Màu xanh lá hệ thống */
+  color: white;
+  border: none;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-transform: uppercase;
+}
+
+.btn-publish-now:hover {
+  background-color: #3d7214;
+}
+
+/* Display Info Box */
+.meta-hint {
+  font-size: 12px;
+  color: #BA7517;
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+.display-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.display-list li {
+  font-size: 14px;
+  color: #5A4E28;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-check { color: #C5A028; font-weight: bold; }
+.icon-refresh { color: #767676; font-size: 14px; }

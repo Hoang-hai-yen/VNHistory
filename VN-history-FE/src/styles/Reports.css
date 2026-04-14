@@ -1,0 +1,351 @@
+/* Tổng thể trang đồng bộ với AdminLayout */
+.reports-page {
+  display: flex;
+  height: calc(100vh - 100px);
+  background-color: #FAFAF7; /* Nền trắng ngà đồng bộ */
+  gap: 20px;
+  font-family: 'Source-Sans Pro', sans-serif;
+}
+
+/* Sidebar danh sách báo cáo */
+.reports-sidebar {
+  width: 350px;
+  background: #FFFFFF;
+  border: 1px solid #2E2510; /* Viền nâu đậm đặc trưng */
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+}
+
+.sidebar-header {
+  padding: 15px;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+.gold-text { 
+  color: #C5A028 !important; /* Vàng Gold hệ thống */
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.count-hint {
+  font-size: 12px;
+  color: #767676;
+  font-style: italic;
+}
+
+.filter-tabs {
+  display: flex;
+  background: #FAFAF7;
+  padding: 5px;
+  gap: 2px;
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #767676;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.tab.active {
+  color: #C5A028;
+  border-bottom: 2px solid #C5A028;
+}
+
+/* Container tổng thể */
+.report-item-card {
+  display: flex;
+  background-color: #FAFAF7; /* Nền vàng nhạt chuẩn */
+  border-bottom: 1px solid #D9D9D9; /* Viền nâu mỏng đứt quãng */
+  position: relative;
+  padding: 15px 15px 15px 20px; /* Thêm padding trái cho thanh indicator */
+  cursor: pointer;
+}
+
+/* Thanh indicator màu vàng bên trái */
+.active-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #BA7517; /* Màu vàng nâu đặc trưng */
+}
+
+/* Nội dung chính */
+.item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tiêu đề lỗi */
+.item-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #2E2510; /* Màu nâu đậm */
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+/* Tiêu đề bài viết liên quan */
+.item-meta {
+  font-size: 12px;
+  color: #767676; /* Màu xám ghi chú */
+  margin-bottom: 10px;
+}
+
+/* Hàng footer chứa Pills và Thời gian */
+.item-footer {
+  display: flex;
+  justify-content: space-between; /* Đẩy thời gian sang phải */
+  align-items: center;
+}
+
+/* Group chứa các tag */
+.status-pills {
+  display: flex;
+  gap: 8px; /* Khoảng cách giữa 2 tag */
+}
+
+/* Định dạng chung cho Pill */
+.status-pills span {
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 10px; /* Bo góc như mẫu */
+}
+
+/* Tag Mới: Viền vàng, chữ vàng */
+.pill-new {
+  color: #BA7517;
+  border: 1px solid #BA7517;
+}
+
+/* Tag Nghiêm trọng: Viền đỏ, chữ đỏ */
+.pill-serious {
+  color: #C5302A; /* Màu đỏ đô từ Palette */
+  border: 1px solid #C5302A;
+}
+
+/* Thời gian: Xám mờ, góc phải */
+.item-time {
+  font-size: 12px;
+  color: #A0A0A0; /* Xám mờ hơn meta để tạo chiều sâu */
+}
+
+/* Container nội dung chi tiết báo cáo */
+.report-detail {
+  flex: 1;
+  background: #FFFFFF;
+  border: 1px solid #2E2510; /* Viền nâu đậm đồng bộ Timeline */
+  padding: 30px;
+  border-radius: 2px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Tiêu đề & Nút bấm phía trên */
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+.detail-title {
+  font-size: 14px;
+  margin: 0;
+}
+
+.gold-text {
+  color: #C5A028; /* Vàng Gold hệ thống */
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Grid thông tin chung (Trạng thái, Mức độ...) */
+.info-grid, .sender-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.info-box {
+  background: #FAFAF7; /* Nền trắng ngà chuẩn */
+  padding: 12px 15px;
+  border: 1px solid #D9D9D9;
+  border-radius: 4px;
+}
+
+.info-box label {
+  display: block;
+  font-size: 12px; /* Nhỏ lại cho chuyên nghiệp */
+  font-weight: bold;
+  color: #767676;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+/* Màu sắc hiển thị trong info-box */
+.info-box .tag-new { 
+    color: #BA7517 !important; 
+    font-weight: bold; 
+}
+
+.info-box .tag-urgent { 
+    color: #C5302A !important; 
+    font-weight: bold; 
+}
+
+/* Đảm bảo span mặc định không đè mất màu của tag */
+.info-box span {
+    font-size: 14px;
+    color: #2E2510; /* Màu mặc định cho các text thông thường */
+    font-weight: 500;
+}
+.green-text { color: #4A8A18; font-weight: bold; }
+.blue-text { color: #3A7AB0; text-decoration: underline; }
+
+/* Các Section nội dung */
+.detail-section {
+  margin-bottom: 25px;
+}
+
+.detail-section label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* Card bài viết liên quan */
+.related-post-card {
+  border: 1px solid #C5A028;
+  padding: 15px;
+  background: #FCFBF7;
+  border-radius: 4px;
+}
+
+.related-post-card h4 {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #2E2510;
+}
+
+.category-tag {
+  font-size: 12px;
+  background: #E8E1D3;
+  color: #5E4F31;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+.link-text {
+  font-size: 12px;
+  color: #767676;
+  font-style: italic;
+}
+
+/* Trích dẫn lỗi */
+.error-quote {
+  border-left: 4px solid #C5302A; /* Thanh dọc đỏ */
+  padding: 15px 20px;
+  background: #FFF8F8;
+  margin: 0;
+  font-style: italic;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.highlight-red { 
+  color: #C5302A; 
+  font-weight: bold; 
+  background: rgba(197, 48, 42, 0.1);
+  padding: 0 4px;
+}
+
+.user-comment {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+  background: #F9F9F9;
+  padding: 15px;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.source-box {
+  font-size: 14px;
+  color: #2E2510;
+  padding: 10px 15px;
+  background: #FAFAF7;
+  border: 1px dashed #C5A028; /* Viền nét đứt tạo điểm nhấn */
+}
+
+/* Ghi chú nội bộ & Form */
+textarea {
+  width: 100%;
+  border: 1px solid #D9D9D9;
+  padding: 12px;
+  background: #FAFAF7;
+  font-size: 14px;
+  border-radius: 4px;
+  min-height: 100px;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #C5A028;
+}
+
+/* Footer & Chuyển moderator */
+.detail-footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #F0F0F0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.assign-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #767676;
+}
+
+.moderator-select {
+  padding: 8px 12px;
+  border: 1px solid #C5A028;
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+  color: #2E2510;
+}
+
+/* Hệ thống Button */
+.header-actions { display: flex; gap: 10px; }
+
+.btn-success { background: #4A8A18; color: white; border: none; padding: 10px 18px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; }
+.btn-danger { background: #C5302A; color: white; border: none; padding: 10px 18px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; }
+.btn-info { background: white; border: 1px solid #3A7AB0; color: #3A7AB0; padding: 10px 18px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; }
+.btn-gold { background: #C5A028; color: white; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; }
+
+.btn-success:hover { background: #3d7214; }
+.btn-danger:hover { background: #a02621; }
+.btn-gold:hover { background: #BA7517; }

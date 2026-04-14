@@ -2,7 +2,7 @@
   padding: 20px;
   background-color: #FAFAF7; /* Nền trắng ngà hệ thống */
   min-height: 100vh;
-  font-family: 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 .pending-header {
@@ -14,7 +14,7 @@
 
 .pending-title {
   color: #C5A028;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -25,7 +25,7 @@
   color: #C5A028;
   padding: 8px 16px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
@@ -53,7 +53,7 @@
   background-color: #FAFAF7;
   text-align: left;
   padding: 12px;
-  font-size: 11px;
+  font-size: 12px;
   color: #2E2510;
   border-bottom: 1px solid #2E2510;
   text-transform: uppercase;
@@ -62,7 +62,7 @@
 .pending-table td {
   padding: 15px 12px;
   border-bottom: 1px solid #EEE;
-  font-size: 13px;
+  font-size: 14px;
   color: #333;
   vertical-align: middle;
 }
@@ -75,7 +75,7 @@
 }
 
 .title-cell .sub-info {
-  font-size: 11px;
+  font-size: 12px;
   color: #BA7517; /* Màu cam nâu cho thông tin phụ */
 }
 
@@ -96,7 +96,7 @@
   color: #4A8A18;
   padding: 6px 12px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
   font-weight: 500;
 }
@@ -112,7 +112,7 @@
   color: #C5302A;
   padding: 6px 12px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
   font-weight: 500;
 }
