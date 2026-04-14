@@ -1,5 +1,5 @@
-import React from 'react';
-import '../styles/Pending.css';
+import React from "react";
+import "../../styles/Pending.css";
 
 interface Pending {
   id: number;
@@ -17,21 +17,23 @@ const Pending: React.FC = () => {
   const pendingData: Pending[] = [
     {
       id: 1,
-      title: 'Lý Thái Tổ dời đô về Thăng Long',
-      dynasty: 'Nhà Lý',
-      year: '1010',
-      category: 'Chính trị',
-      editor: 'Lê Văn C',
-      submitDate: '24/03/2026',
-      reviewer: 'Chưa phân công',
-      note: '-'
-    }
+      title: "Lý Thái Tổ dời đô về Thăng Long",
+      dynasty: "Nhà Lý",
+      year: "1010",
+      category: "Chính trị",
+      editor: "Lê Văn C",
+      submitDate: "24/03/2026",
+      reviewer: "Chưa phân công",
+      note: "-",
+    },
   ];
 
   return (
     <div className="pending-page">
       <div className="pending-header">
-        <h2 className="pending-title">CHỜ XUẤT BẢN - {pendingData.length} BÀI</h2>
+        <h2 className="pending-title">
+          CHỜ XUẤT BẢN - {pendingData.length} BÀI
+        </h2>
         <button className="btn-approve-all">DUYỆT TẤT CẢ</button>
       </div>
 
@@ -39,7 +41,6 @@ const Pending: React.FC = () => {
         <table className="pending-table">
           <thead>
             <tr>
-              
               <th>TIÊU ĐỀ</th>
               <th>EDITOR</th>
               <th>GỬI DUYỆT</th>
@@ -51,17 +52,20 @@ const Pending: React.FC = () => {
           <tbody>
             {pendingData.map((item) => (
               <tr key={item.id}>
-                
                 <td className="title-cell">
                   <div className="main-title">{item.title}</div>
-                  <div className="sub-info">{item.dynasty} - {item.year} - {item.category}</div>
+                  <div className="sub-info">
+                    {item.dynasty} - {item.year} - {item.category}
+                  </div>
                 </td>
                 <td>{item.editor}</td>
                 <td>{item.submitDate}</td>
                 <td className="status-text">{item.reviewer}</td>
                 <td>{item.note}</td>
                 <td className="action-cell">
-                  <button className="btn-publish-final">Duyệt & xuất bản</button>
+                  <button className="btn-publish-final">
+                    Duyệt & xuất bản
+                  </button>
                   <button className="btn-reject-back">Trả về</button>
                 </td>
               </tr>

@@ -1,8 +1,8 @@
-import Banner from "../componets/Home/Banner";
-import FeaturedEvents from "../componets/Home/FeaturedEvents";
-import HeroFigures from "../componets/Home/HeroFigures";
-import MoreDynasties from "../componets/Home/MoreDynasties";
-import VideoSection from "../componets/Home/VideoSection";
+import Banner from "../components/Home/Banner";
+import FeaturedEvents from "../components/Home/FeaturedEvents";
+import HeroFigures from "../components/Home/HeroFigures";
+import MoreDynasties from "../components/Home/MoreDynasties";
+import VideoSection from "../components/Home/VideoSection";
 
 const FIGURES = [
   {

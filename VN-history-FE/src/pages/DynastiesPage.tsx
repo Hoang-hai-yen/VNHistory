@@ -1,6 +1,6 @@
 import { Link } from "react-router";
-import PageSectionHeader from "../componets/common/PageSectionHeader";
-import DynastyCard from "../componets/Dynasty/DynastyCard";
+import PageSectionHeader from "../components/common/PageSectionHeader";
+import DynastyCard from "../components/Dynasty/DynastyCard";
 
 const DYNASTIES = [
   {

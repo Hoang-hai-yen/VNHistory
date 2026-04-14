@@ -1,5 +1,5 @@
-import React from 'react';
-import '../styles/Sidebar.css';
+import React from "react";
+import "../../styles/Sidebar.css";
 import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
@@ -7,11 +7,11 @@ const Sidebar: React.FC = () => {
 
   const handleLogout = () => {
     // Thêm logic xóa token/session ở đây nếu cần
-    navigate('/');
+    navigate("/login");
   };
 
   // Helper function để quản lý class active một cách sạch sẽ
-  const navLinkClass = ({ isActive }: { isActive: boolean }) => 
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     isActive ? "menu-item active" : "menu-item";
 
   return (
@@ -25,49 +25,53 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      <div className="status-badge" style={{marginLeft: 20}}>● Super Admin</div>
+      <div className="status-badge" style={{ marginLeft: 20 }}>
+        ● Super Admin
+      </div>
 
       {/* Menu Content */}
-      <nav className="menu-section" style={{ background: "#FAFAF7"}}>
+      <nav className="menu-section" style={{ background: "#FAFAF7" }}>
         <div className="menu-group-label">TỔNG QUAN</div>
-        <NavLink to="/dashboard" className={navLinkClass}>
+        <NavLink to="/admin/dashboard" className={navLinkClass}>
           Dashboard
         </NavLink>
 
         <div className="menu-group-label">NỘI DUNG</div>
-        <NavLink to="/posts" className={navLinkClass}>
-          Bài viết 
+        <NavLink to="/admin/posts" className={navLinkClass}>
+          Bài viết
           {/* <span className="badge" style={{ color: '#d4af37' }}>47</span> */}
         </NavLink>
-        
-        <NavLink to="/create-post" className={navLinkClass}>
+
+        <NavLink to="/admin/create-post" className={navLinkClass}>
           Tạo bài mới
         </NavLink>
-        
-        <NavLink to="/timeline" className={navLinkClass}>
+
+        <NavLink to="/admin/timeline" className={navLinkClass}>
           Timeline
         </NavLink>
 
         <div className="menu-group-label">XÉT DUYỆT</div>
-        <NavLink to="/reports" className={navLinkClass}>
-          Báo cáo lỗi 
+        <NavLink to="/admin/reports" className={navLinkClass}>
+          Báo cáo lỗi
           {/* <span className="badge" style={{ color: '#ff4d4d' }}>8</span> */}
         </NavLink>
-        
-        <NavLink to="/pending" className={navLinkClass}>
-          Chờ xuất bản {/* <span className="badge" style={{ color: '#4da6ff' }}>5</span> */}
+
+        <NavLink to="/admin/pending" className={navLinkClass}>
+          Chờ xuất bản{" "}
+          {/* <span className="badge" style={{ color: '#4da6ff' }}>5</span> */}
         </NavLink>
 
         <div className="menu-group-label">HỆ THỐNG</div>
-        <NavLink to="/management" className={navLinkClass}>
+        <NavLink to="/admin/management" className={navLinkClass}>
           Quản lý Admin
         </NavLink>
-        <NavLink to="/permissions" className={navLinkClass}>
+        <NavLink to="/admin/permissions" className={navLinkClass}>
           Phân quyền
         </NavLink>
-        <NavLink to="/history" className={navLinkClass}>
+        <NavLink to="/admin/history" className={navLinkClass}>
           Nhật ký
-        </NavLink><NavLink to="/settings" className={navLinkClass}>
+        </NavLink>
+        <NavLink to="/admin/settings" className={navLinkClass}>
           Cài đặt
         </NavLink>
       </nav>
@@ -77,8 +81,10 @@ const Sidebar: React.FC = () => {
         <div className="user-profile">
           <div className="avatar-circle">NM</div>
           <div>
-            <div style={{ fontSize: '14px', fontWeight: 'bold' }}>Nguyễn Minh</div>
-            <div style={{ fontSize: '11px', color: '#666' }}>Super Admin</div>
+            <div style={{ fontSize: "14px", fontWeight: "bold" }}>
+              Nguyễn Minh
+            </div>
+            <div style={{ fontSize: "11px", color: "#666" }}>Super Admin</div>
           </div>
         </div>
         <button className="logout-btn" onClick={handleLogout}>

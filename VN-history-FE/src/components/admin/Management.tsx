@@ -1,14 +1,14 @@
-import React from 'react';
-import '../styles/Management.css';
+import React from "react";
+import "../../styles/Management.css";
 
 interface AdminUser {
   id: number;
   name: string;
   email: string;
-  role: 'Super Admin' | 'Editor';
+  role: "Super Admin" | "Editor";
   postsCount: number;
   reportsHandled: number;
-  status: 'Đang hoạt động' | 'Không hoạt động' | 'Đã khóa';
+  status: "Đang hoạt động" | "Không hoạt động" | "Đã khóa";
   lastLogin: string;
 }
 
@@ -16,34 +16,34 @@ const Management: React.FC = () => {
   const adminUsers: AdminUser[] = [
     {
       id: 1,
-      name: 'Nguyễn Minh',
-      email: 'minh@lsvn.com',
-      role: 'Super Admin',
+      name: "Nguyễn Minh",
+      email: "minh@lsvn.com",
+      role: "Super Admin",
       postsCount: 342,
       reportsHandled: 28,
-      status: 'Đang hoạt động',
-      lastLogin: 'Hôm nay, 09:14'
+      status: "Đang hoạt động",
+      lastLogin: "Hôm nay, 09:14",
     },
     {
       id: 2,
-      name: 'Nguyễn Minh',
-      email: 'minh@lsvn.com',
-      role: 'Editor',
+      name: "Nguyễn Minh",
+      email: "minh@lsvn.com",
+      role: "Editor",
       postsCount: 342,
       reportsHandled: 28,
-      status: 'Không hoạt động',
-      lastLogin: 'Hôm nay, 09:14'
+      status: "Không hoạt động",
+      lastLogin: "Hôm nay, 09:14",
     },
     {
       id: 3,
-      name: 'Nguyễn Minh',
-      email: 'minh@lsvn.com',
-      role: 'Editor',
+      name: "Nguyễn Minh",
+      email: "minh@lsvn.com",
+      role: "Editor",
       postsCount: 342,
       reportsHandled: 28,
-      status: 'Đã khóa',
-      lastLogin: 'Hôm nay, 09:14'
-    }
+      status: "Đã khóa",
+      lastLogin: "Hôm nay, 09:14",
+    },
   ];
 
   return (
@@ -77,22 +77,28 @@ const Management: React.FC = () => {
                   </div>
                 </td>
                 <td>
-                  <span className={`role-badge ${user.role === 'Super Admin' ? 'bg-gold' : 'bg-blue'}`}>
+                  <span
+                    className={`role-badge ${user.role === "Super Admin" ? "bg-gold" : "bg-blue"}`}
+                  >
                     {user.role}
                   </span>
                 </td>
                 <td className="text-center">{user.postsCount}</td>
                 <td className="text-center">{user.reportsHandled}</td>
                 <td>
-                  <span className={`status-indicator status-${getStatusKey(user.status)}`}>
+                  <span
+                    className={`status-indicator status-${getStatusKey(user.status)}`}
+                  >
                     ● {user.status}
                   </span>
                 </td>
                 <td>{user.lastLogin}</td>
                 <td className="action-buttons">
                   <button className="btn-action-outline">Xem</button>
-                  {user.status === 'Đã khóa' ? (
-                    <button className="btn-action-outline btn-unlock">Mở khóa</button>
+                  {user.status === "Đã khóa" ? (
+                    <button className="btn-action-outline btn-unlock">
+                      Mở khóa
+                    </button>
                   ) : (
                     <button className="btn-action-outline">Sửa quyền</button>
                   )}
@@ -108,9 +114,9 @@ const Management: React.FC = () => {
 
 // Helper để lấy key css cho trạng thái
 const getStatusKey = (status: string) => {
-  if (status === 'Đang hoạt động') return 'active';
-  if (status === 'Không hoạt động') return 'inactive';
-  return 'locked';
+  if (status === "Đang hoạt động") return "active";
+  if (status === "Không hoạt động") return "inactive";
+  return "locked";
 };
 
 export default Management;

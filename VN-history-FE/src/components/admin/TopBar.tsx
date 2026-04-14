@@ -1,6 +1,6 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
-import '../styles/TopBar.css';
+import React from "react";
+import { useLocation } from "react-router-dom";
+import "../../styles/TopBar.css";
 
 const TopBar: React.FC = () => {
   const location = useLocation();
@@ -8,17 +8,28 @@ const TopBar: React.FC = () => {
   // Hàm chuyển đổi path thành Title
   const getTitle = (path: string) => {
     switch (path) {
-      case '/dashboard': return 'Dashboard';
-      case '/posts': return 'Quản lý bài viết';
-      case '/create-post': return 'Tạo/Sửa bài viết';
-      case '/timeline': return 'Quản lý Timeline';
-      case '/reports': return 'Báo cáo lỗi';
-      case '/pending': return 'Chờ xuất bản';
-      case '/management': return 'Quản lý Admin';
-      case '/permissions': return 'Phân quyền';
-      case '/history': return 'Nhật ký';
-      case '/settings': return 'Cài đặt hệ thống';
-      default: return 'Admin Portal';
+      case "/admin/dashboard":
+        return "Dashboard";
+      case "/admin/posts":
+        return "Quản lý bài viết";
+      case "/admin/create-post":
+        return "Tạo/Sửa bài viết";
+      case "/admin/timeline":
+        return "Quản lý Timeline";
+      case "/admin/reports":
+        return "Báo cáo lỗi";
+      case "/admin/pending":
+        return "Chờ xuất bản";
+      case "/admin/management":
+        return "Quản lý Admin";
+      case "/admin/permissions":
+        return "Phân quyền";
+      case "/admin/history":
+        return "Nhật ký";
+      case "/admin/settings":
+        return "Cài đặt hệ thống";
+      default:
+        return "Admin Portal";
     }
   };
 
@@ -33,10 +44,10 @@ const TopBar: React.FC = () => {
           {/* <span className="search-icon">🔍</span> */}
           <input type="text" placeholder="Tìm kiếm..." />
         </div>
-        
+
         <button className="btn-outline">+ BÀI VIẾT MỚI</button>
         <button className="btn-primary">XUẤT BẢN NGAY</button>
-        
+
         <div className="notification-icon">
           🔔
           {/* <span className="dot"></span> */}

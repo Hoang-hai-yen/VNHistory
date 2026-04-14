@@ -1,6 +1,6 @@
 import { Link } from "react-router";
-import PageSectionHeader from "../componets/common/PageSectionHeader";
-import GeographyCard from "../componets/Geography/GeographyCard";
+import PageSectionHeader from "../components/common/PageSectionHeader";
+import GeographyCard from "../components/Geography/GeographyCard";
 
 // -------------------mock data------------------
 const GEOGRAPHY = [

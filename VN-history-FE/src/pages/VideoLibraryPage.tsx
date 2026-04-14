@@ -1,7 +1,7 @@
 import { Link } from "react-router";
-import PageSectionHeader from "../componets/common/PageSectionHeader";
+import PageSectionHeader from "../components/common/PageSectionHeader";
 import { Filter } from "lucide-react";
-import VideoCard from "../componets/Video/VideoCard";
+import VideoCard from "../components/Video/VideoCard";
 
 const VIDEOS = [
   {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Login.css";
+import "../../styles/Login.css";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -13,7 +13,7 @@ function Login() {
     e.preventDefault();
 
     if (username === "admin" && password === "123456") {
-      navigate("/dashboard"); // 👉 chuyển trang
+      navigate("/admin/dashboard"); // 👉 chuyển trang
     } else {
       setError("Sai tài khoản hoặc mật khẩu!");
     }

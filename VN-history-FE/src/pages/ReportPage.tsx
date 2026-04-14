@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router";
 import { FileText, Info, Clock, CheckCircle2 } from "lucide-react";
 
-export default function Report() {
+export default function ReportPage() {
   const [severity, setSeverity] = useState<"low" | "medium" | "high">("medium");
   const [charCount, setCharCount] = useState(0);
   const [description, setDescription] = useState("");

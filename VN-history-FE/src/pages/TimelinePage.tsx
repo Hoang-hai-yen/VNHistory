@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import PageSectionHeader from "../componets/common/PageSectionHeader";
+import PageSectionHeader from "../components/common/PageSectionHeader";
 
 const EVENTS = [
   {

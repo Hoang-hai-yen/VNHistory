@@ -1,10 +1,10 @@
 import { Link } from "react-router";
-import ArticleHeaderWithImage from "../componets/article/ArticleHeaderWithImage";
+import ArticleHeaderWithImage from "../components/article/ArticleHeaderWithImage";
 import type { Article } from "../types/article.type";
 import { Share2, Bookmark, AlertTriangle, Printer, Heart } from "lucide-react";
 import { motion } from "motion/react";
-import QuickFactsCard from "../componets/article/QuickFactsCard";
-import ArticleRecommended from "../componets/article/ArticleRecommended";
+import QuickFactsCard from "../components/article/QuickFactsCard";
+import ArticleRecommended from "../components/article/ArticleRecommended";
 
 const article: Article = {
   id: "550e8400-e29b-41d4-a716-446655440000",

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
-import PageSectionHeader from "../componets/common/PageSectionHeader";
-import FiguresCard from "../componets/Figures/FiguresCard";
+import PageSectionHeader from "../components/common/PageSectionHeader";
+import FiguresCard from "../components/Figures/FiguresCard";
 
 // --------------mock data------------------
 const FIGURES = [
