@@ -21,22 +21,17 @@ export interface Article {
 
   // Workflow
   status: "draft" | "pending" | "published" | "rejected";
-  rejection_note?: string | null;
 
   // UI control
   is_featured: boolean;
   allow_comments: boolean;
-
-  // Metadata
-  view_count: number;
-
-  // Audit
-  created_by: string;
-  updated_by?: string | null;
-  published_by?: string | null;
-
   published_at?: string | null; // ISO datetime
 
   created_at: string;
   updated_at: string;
+
+  dynasty_name: string;
+  dynasty_slug: string;
+  category_name: string;
+  category_slug: string;
 }

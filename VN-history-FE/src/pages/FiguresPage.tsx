@@ -1,72 +1,66 @@
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
+import { useMemo } from "react";
 import PageSectionHeader from "../components/common/PageSectionHeader";
 import FiguresCard from "../components/Figures/FiguresCard";
-
-// --------------mock data------------------
-const FIGURES = [
-  {
-    id: "hai-ba-trung",
-    name: "Hai Bà Trưng",
-    role: "Anh Hùng Dân Tộc",
-    years: "14 TCN – 43 SCN",
-    era: "Bắc Thuộc",
-    short:
-      "Nữ anh hùng đầu tiên, lãnh đạo cuộc khởi nghĩa lớn nhất chống lại ách đô hộ của nhà Hán.",
-    icon: "🌺",
-  },
-  {
-    id: "ba-trieu",
-    name: "Bà Triệu",
-    role: "Nữ Tướng",
-    years: "226 – 248",
-    era: "Bắc Thuộc",
-    short:
-      "Biểu tượng bất khuất: 'Tôi muốn cưỡi cơn gió mạnh, đạp luồng sóng dữ...'",
-    icon: "⚔",
-  },
-  {
-    id: "ngo-quyen",
-    name: "Ngô Quyền",
-    role: "Vua Ngô",
-    years: "898 – 944",
-    era: "Ngô",
-    short:
-      "Người chấm dứt 1.000 năm Bắc thuộc bằng chiến thắng Bạch Đằng lừng lẫy năm 938.",
-    icon: "⚔",
-  },
-  {
-    id: "tran-hung-dao",
-    name: "Trần Hưng Đạo",
-    role: "Tướng Lĩnh",
-    years: "1228 – 1300",
-    era: "Nhà Trần",
-    short:
-      "Hưng Đạo Đại Vương — vị thánh quân sự của dân tộc, ba lần đánh bại Mông Nguyên.",
-    icon: "⚔",
-  },
-  {
-    id: "nguyen-trai",
-    name: "Nguyễn Trãi",
-    role: "Nhà Tư Tưởng",
-    years: "1380 – 1442",
-    era: "Nhà Lê",
-    short:
-      "Đại thi hào, nhà tư tưởng lớn nhất của Việt Nam trung đại. Tác giả Bình Ngô Đại Cáo.",
-    icon: "📜",
-  },
-  {
-    id: "vo-nguyen-giap",
-    name: "Võ Nguyên Giáp",
-    role: "Đại Tướng",
-    years: "1911 – 2013",
-    era: "Hiện Đại",
-    short:
-      "Đại tướng huyền thoại, thiên tài quân sự của thế kỷ XX, người anh hùng Điện Biên Phủ.",
-    icon: "🎖",
-  },
-];
+import { useArticles } from "../hooks/api/useArticles";
+import Loading from "../components/common/Loading";
 
 export default function FiguresPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const { page, limit } = useMemo(() => {
+    const pageParam = Number(searchParams.get("page") ?? "1");
+    const limitParam = Number(searchParams.get("limit") ?? "8");
+
+    return {
+      page: Number.isNaN(pageParam) || pageParam <= 0 ? 1 : pageParam,
+      limit: Number.isNaN(limitParam) || limitParam <= 0 ? 8 : limitParam,
+    };
+  }, [searchParams]);
+
+  const { data, isPending, error, isFetching } = useArticles({
+    type: "person",
+    limit,
+    page,
+  });
+
+  const updatePage = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(nextPage));
+    params.set("limit", String(limit));
+    setSearchParams(params);
+  };
+
+  if (isPending && !data) {
+    return <Loading message="Đang tải nhân vật..." fullScreen={true} />;
+  }
+
+  if (error && !data) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+        <h2 className="text-2xl font-bold text-[#1c1c1c] mb-4">
+          Đã có lỗi xảy ra
+        </h2>
+        <p className="text-[#6b6b6b] mb-6">
+          Không thể tải dữ liệu nhân vật. Vui lòng thử lại sau.
+        </p>
+        <button
+          onClick={() => updatePage(1)}
+          className="px-4 py-2 bg-[#8B1A1A] text-white rounded hover:bg-[#B8860B] transition-colors duration-300"
+        >
+          Thử Lại
+        </button>
+      </div>
+    );
+  }
+
+  const figures = data?.data || [];
+  const total = data?.total ?? 0;
+  const totalPages = total && limit ? Math.max(1, Math.ceil(total / limit)) : 1;
+
+  const canPrev = page > 1;
+  const canNext = page < totalPages;
+
   return (
     <div className="max-w-7xl mx-auto px-4 pb-20">
       {/* Breadcrumb */}
@@ -85,11 +79,44 @@ export default function FiguresPage() {
         Click vào thẻ nhân vật để đọc tiểu sử chi tiết. Ảnh chân dung sẽ được
         cập nhật khi có tư liệu.
       </p>
+
+      {isFetching && (
+        <div className="mb-4 text-xs text-[#6b6b6b] italic">
+          Đang tải thêm nhân vật...
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-        {FIGURES.map((figure) => (
+        {figures.map((figure) => (
           <FiguresCard key={figure.id} figure={figure} />
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between gap-4 border-t border-[#e0dbd0] pt-6">
+          <div className="text-xs text-[#6b6b6b]">
+            Trang <span className="font-semibold text-[#1c1c1c]">{page}</span> /{" "}
+            <span>{totalPages}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              disabled={!canPrev}
+              onClick={() => canPrev && updatePage(page - 1)}
+              className="px-3 py-1.5 text-xs border border-[#e0dbd0] rounded-full disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FAFAF7] transition-colors"
+            >
+              Trước
+            </button>
+            <button
+              disabled={!canNext}
+              onClick={() => canNext && updatePage(page + 1)}
+              className="px-3 py-1.5 text-xs border border-[#e0dbd0] rounded-full disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FAFAF7] transition-colors"
+            >
+              Sau
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
