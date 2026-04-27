@@ -29,7 +29,7 @@ async function fetchCategories(type?: CategoryArticleType) {
 
 export function useCategories(type?: CategoryArticleType) {
   return useQuery({
-    queryKey: ["categories", type ?? "all"],
+    queryKey: [`categories-${type ?? "all"}`],
     queryFn: () => fetchCategories(type),
   });
 }

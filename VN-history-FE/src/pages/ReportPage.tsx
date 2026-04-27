@@ -1,25 +1,35 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
+import { data, Link, useSearchParams } from "react-router";
 import { FileText, Info, Clock, CheckCircle2 } from "lucide-react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import {
+  useCreateReportMutation,
+  type CreateReportPayload,
+} from "../hooks/api/useReports";
 
 export default function ReportPage() {
   const [severity, setSeverity] = useState<"low" | "medium" | "high">("medium");
-  const [charCount, setCharCount] = useState(0);
-  const [description, setDescription] = useState("");
-
-  const handleDescriptionChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
-    const val = e.target.value;
-    if (val.length <= 1000) {
-      setDescription(val);
-      setCharCount(val.length);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert("Báo cáo của bạn đã được gửi thành công! Admin sẽ xem xét sớm.");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<CreateReportPayload>();
+  const params = useSearchParams();
+  const articleId = params[0].get("article_id");
+  const mutation = useCreateReportMutation();
+  const onSubmit: SubmitHandler<CreateReportPayload> = (data) => {
+    data.article_id = articleId ?? "";
+    mutation.mutate(data, {
+      onSuccess: () => {
+        alert(
+          "Báo cáo của bạn đã được gửi thành công! Cảm ơn sự đóng góp của bạn.",
+        );
+      },
+      onError: () => {
+        alert("Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại sau.");
+      },
+    });
   };
 
   return (
@@ -52,7 +62,7 @@ export default function ReportPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
           {/* Main Form */}
           <div className="border border-[#2e2510] rounded-sm p-6 lg:p-8 text-[#e8d9b0]">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               {/* Reference Box */}
               <div className="mb-6">
                 <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
@@ -90,7 +100,10 @@ export default function ReportPage() {
                 <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
                   Loại lỗi <span className="text-[#8b1a1a]">*</span>
                 </label>
-                <select className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 text-[#e8d9b0] text-[12.5px] outline-none focus:border-[#c5a028] transition-colors appearance-none cursor-pointer">
+                <select
+                  {...register("error_type", { required: true })}
+                  className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 text-[#e8d9b0] text-[12.5px] outline-none focus:border-[#c5a028] transition-colors appearance-none cursor-pointer"
+                >
                   <option value="">— Chọn loại lỗi —</option>
                   <option>Thông tin sai / không chính xác</option>
                   <option>Ngày tháng sai</option>
@@ -182,6 +195,10 @@ export default function ReportPage() {
                   className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-3 text-[#e8d9b0] text-[13px] font-['Source_Serif_4'] leading-relaxed outline-none focus:border-[#c5a028] min-h-[80px]"
                   placeholder="Trích dẫn đoạn văn bản hoặc mô tả vị trí nội dung bị sai trong bài..."
                   required
+                  {...register("description", {
+                    required: true,
+                    maxLength: 1000,
+                  })}
                 ></textarea>
               </div>
 
@@ -192,6 +209,7 @@ export default function ReportPage() {
                 </label>
                 <input
                   type="text"
+                  {...register("suggested_source")}
                   className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 px-3.5 text-[#e8d9b0] text-[12px] outline-none focus:border-[#c5a028]"
                   placeholder="Tên sách, tác giả, link tài liệu... (không bắt buộc)"
                 />
@@ -207,6 +225,7 @@ export default function ReportPage() {
                 </label>
                 <input
                   type="email"
+                  {...register("reporter_email")}
                   className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 px-3.5 text-[#e8d9b0] text-[12px] outline-none focus:border-[#c5a028]"
                   placeholder="Email của bạn (không bắt buộc — để admin phản hồi)"
                 />
@@ -233,12 +252,12 @@ export default function ReportPage() {
                 >
                   Gửi Báo Cáo
                 </button>
-                <Link
-                  to="/"
+                <button
+                  type="reset"
                   className="border border-[#2e2510] text-[#6a5a30] px-6 py-3 text-[12px] tracking-wider uppercase rounded-sm hover:border-[#c5a028] hover:text-[#c5a028] transition-all"
                 >
                   Huỷ
-                </Link>
+                </button>
               </div>
             </form>
           </div>

@@ -77,7 +77,7 @@ export default function ArticleDetailPage() {
               </div>
 
               <Link
-                to="/bao-cao-loi"
+                to={`/bao-cao-loi?article_id=${articleData.id}`}
                 className="flex items-center gap-2 text-[#8B1A1A] hover:bg-[#8B1A1A]/5 px-4 py-2 rounded-sm border border-dashed border-[#8B1A1A] text-[13px] font-bold transition-all"
               >
                 <AlertTriangle size={16} /> Báo cáo lỗi nội dung
