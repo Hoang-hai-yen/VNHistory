@@ -2,6 +2,7 @@ export interface ApiResponse<T> {
   data: T;
   total?: number;
   pagination?: PaginationResponse;
+  message?: string;
 }
 
 export interface PaginationResponse {

@@ -1,69 +1,22 @@
-import { Link } from "react-router";
+import { Link, useParams } from "react-router";
 import ArticleHeaderWithImage from "../components/article/ArticleHeaderWithImage";
-import type { Article } from "../types/article.type";
 import { Share2, Bookmark, AlertTriangle, Printer, Heart } from "lucide-react";
 import { motion } from "motion/react";
 import QuickFactsCard from "../components/article/QuickFactsCard";
 import ArticleRecommended from "../components/article/ArticleRecommended";
-
-const article: Article = {
-  id: "550e8400-e29b-41d4-a716-446655440000",
-
-  // Basic info
-  title: "Chiến thắng Bạch Đằng năm 938",
-  subtitle: "Ngô Quyền đánh bại quân Nam Hán",
-  slug: "chien-thang-bach-dang-938",
-  summary:
-    "Trận Bạch Đằng năm 938 là chiến thắng lịch sử của Ngô Quyền trước quân Nam Hán, mở ra thời kỳ độc lập lâu dài cho dân tộc Việt Nam.",
-  content: `
-## Bối cảnh
-Sau khi Kiều Công Tiễn phản bội, vua Nam Hán đem quân xâm lược nước ta.
-
-## Diễn biến
-Ngô Quyền đã cho đóng cọc gỗ dưới lòng sông Bạch Đằng...
-
-## Kết quả
-Quân Nam Hán đại bại, Hoằng Tháo tử trận.
-  `,
-  quote: "Đây là trận thủy chiến mang tính quyết định trong lịch sử Việt Nam.",
-
-  // Classification
-  type: "event",
-  category_id: "cat-001",
-  dynasty_id: "dynasty-ngo",
-
-  // Timeline
-  year_start: 938,
-  year_end: 938,
-  year_display: "Năm 938",
-
-  // Workflow
-  status: "published",
-  rejection_note: null,
-
-  // UI control
-  is_featured: true,
-  allow_comments: true,
-
-  // Metadata
-  view_count: 12543,
-
-  // Audit
-  created_by: "admin-001",
-  updated_by: "admin-002",
-  published_by: "admin-002",
-
-  published_at: "2024-01-10T08:00:00Z",
-
-  created_at: "2024-01-01T10:00:00Z",
-  updated_at: "2024-01-10T08:00:00Z",
-};
+import { useArticleBySlug } from "../hooks/api/useArticles";
 
 export default function ArticleDetailPage() {
-  // const { id } = useParams();
-  // loading
+  const { slug } = useParams();
 
-  if (!article)
+  const { data: articleData, isLoading } = useArticleBySlug(slug);
+  if (!articleData)
+    return (
+      <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center text-[#8B1A1A]">
+        Bài viết không tồn tại.
+      </div>
+    );
+  if (isLoading)
     return (
       <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center text-[#8B1A1A]">
         Đang tải...
@@ -73,7 +26,7 @@ export default function ArticleDetailPage() {
   return (
     <div className="bg-[#FDFBF7] min-h-screen text-[#2c2c2c] selection:bg-[#F5C842] selection:text-[#1c1c1c]">
       {/* Top Header Image Area */}
-      <ArticleHeaderWithImage article={article} />
+      <ArticleHeaderWithImage article={articleData} />
 
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-12 lg:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-16">
@@ -106,7 +59,7 @@ export default function ArticleDetailPage() {
             {/* Text Content */}
             <div
               className="font-['Source_Serif_4',serif] text-lg lg:text-xl text-[#2c2c2c] leading-[1.8] article-content"
-              dangerouslySetInnerHTML={{ __html: article.content || "" }}
+              dangerouslySetInnerHTML={{ __html: articleData.content || "" }}
             />
 
             {/* Bottom Actions */}
@@ -155,10 +108,10 @@ export default function ArticleDetailPage() {
           {/* Sidebar */}
           <aside className="space-y-10">
             {/* Quick Facts Card */}
-            <QuickFactsCard article={article} />
+            <QuickFactsCard article={articleData} />
 
             {/* Recommended Reading */}
-            <ArticleRecommended />
+            <ArticleRecommended article={articleData} />
 
             {/* Tags/Categories */}
             <div className="p-6 bg-[#F9F5EF] border border-[#E8D9B0] rounded-sm">

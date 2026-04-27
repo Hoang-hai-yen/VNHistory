@@ -12,12 +12,13 @@ export interface ApiConfig {
   headers?: Record<string, string>;
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
 export class HttpClient {
   private instance: AxiosInstance;
 
   constructor() {
     this.instance = axios.create({
-      baseURL: "http://localhost:3000/api",
+      baseURL: API_URL,
       timeout: 10000,
       headers: {
         "Content-Type": "application/json",
@@ -44,6 +45,8 @@ export class HttpClient {
       // Error response
       (error: AxiosError) => {
         const status = error.response?.status;
+
+        
 
         switch (status) {
           case 400:

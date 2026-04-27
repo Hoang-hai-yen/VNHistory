@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "../../lib/http";
 import type { Article } from "../../types/article.type";
+import type { ApiResponse } from "../../types/api.type";
 
 async function fetchArticleBySlug(slug: string) {
-  const res = await httpClient.get<Article>(`/articles/${slug}`);
-  return res.data;
+  const res = await httpClient.get<ApiResponse<Article>>(`/articles/${slug}`);
+  return res.data.data;
 }
 
 export function useArticleBySlug(slug: string | undefined) {

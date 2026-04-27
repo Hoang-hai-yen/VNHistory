@@ -27,7 +27,7 @@ export default function QuickFactsCard({ article }: { article: Article }) {
             Giai đoạn
           </div>
           <div className="text-[14px] font-serif">
-            {article.dynasty_id || "Đang cập nhật"}
+            {article.dynasty_name || "Đang cập nhật"}
           </div>
         </div>
         <div>
@@ -35,7 +35,7 @@ export default function QuickFactsCard({ article }: { article: Article }) {
             Danh mục
           </div>
           <div className="inline-block bg-[#8B1A1A] text-[#f5e0b0] text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider">
-            {article.type}
+            {article.category_name || "Đang cập nhật"}
           </div>
         </div>
       </div>

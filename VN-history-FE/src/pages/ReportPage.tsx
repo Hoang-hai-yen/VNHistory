@@ -51,7 +51,7 @@ export default function ReportPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
           {/* Main Form */}
-          <div className="bg-[#13100a] border border-[#2e2510] rounded-sm p-6 lg:p-8 text-[#e8d9b0]">
+          <div className="border border-[#2e2510] rounded-sm p-6 lg:p-8 text-[#e8d9b0]">
             <form onSubmit={handleSubmit}>
               {/* Reference Box */}
               <div className="mb-6">
@@ -83,18 +83,6 @@ export default function ReportPage() {
                 <p className="text-[10px] text-[#5a4e28] mt-2">
                   Trang bạn đang xem khi nhấn "Báo cáo lỗi"
                 </p>
-              </div>
-
-              {/* URL */}
-              <div className="mb-6">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  URL trang
-                </label>
-                <div className="bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 px-3.5 flex items-center gap-2 text-[11px]">
-                  <span className="text-[#5a4e28]">lsvn.vn</span>
-                  <span className="text-[#2e2510]">/</span>
-                  <span className="text-[#8a9ab0]">su-kien/bach-dang-938</span>
-                </div>
               </div>
 
               {/* Error Type */}
@@ -197,25 +185,6 @@ export default function ReportPage() {
                 ></textarea>
               </div>
 
-              {/* Detailed Description */}
-              <div className="mb-6">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  Mô tả chi tiết lỗi <span className="text-[#8b1a1a]">*</span>
-                </label>
-                <textarea
-                  className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-3 text-[#e8d9b0] text-[13px] font-['Source_Serif_4'] leading-relaxed outline-none focus:border-[#c5a028] min-h-[120px]"
-                  placeholder="Giải thích tại sao bạn cho rằng thông tin này sai, và nếu có thể, cung cấp thông tin chính xác hơn cùng nguồn tham khảo..."
-                  value={description}
-                  onChange={handleDescriptionChange}
-                  required
-                ></textarea>
-                <div
-                  className={`text-[10px] text-right mt-1 ${charCount > 900 ? "text-[#8b1a1a]" : "text-[#4a3e20]"}`}
-                >
-                  {charCount} / 1000 ký tự
-                </div>
-              </div>
-
               {/* Sources */}
               <div className="mb-6">
                 <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
@@ -252,13 +221,6 @@ export default function ReportPage() {
                   <span className="text-[11px] text-[#6a5a30] group-hover:text-[#8a7a4a] leading-tight">
                     Tôi xác nhận thông tin báo cáo này là trung thực và có cơ sở
                     lịch sử.
-                  </span>
-                </label>
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <div className="w-3.5 h-3.5 border border-[#3a2e10] bg-[#0f0c04] rounded-sm flex-shrink-0 mt-0.5" />
-                  <span className="text-[11px] text-[#6a5a30] group-hover:text-[#8a7a4a] leading-tight">
-                    Tôi đồng ý được liên hệ qua email nếu admin cần xác minh
-                    thêm.
                   </span>
                 </label>
               </div>

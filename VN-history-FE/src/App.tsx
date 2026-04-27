@@ -35,7 +35,7 @@ function App() {
         <Route path="dia-ly" element={<GeographyPage />} />
         <Route path="video" element={<VideoLibraryPage />} />
         <Route path="bao-cao-loi" element={<ReportPage />} />
-        <Route path="bai-viet/:id" element={<ArticleDetailPage />} />
+        <Route path="bai-viet/:slug" element={<ArticleDetailPage />} />
       </Route>
 
       {/* Layout có Sidebar */}
