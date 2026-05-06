@@ -44,35 +44,7 @@ export class HttpClient {
       <T>(response: AxiosResponse<T>) => response,
       // Error response
       (error: AxiosError) => {
-        const status = error.response?.status;
-
         
-
-        switch (status) {
-          case 400:
-            console.error("Bad Request");
-            break;
-
-          case 401:
-            console.error("Unauthorized");
-            // logout / redirect login here
-            break;
-
-          case 403:
-            console.error("Forbidden");
-            break;
-
-          case 404:
-            console.error("Not Found");
-            break;
-
-          case 500:
-            console.error("Server Error");
-            break;
-
-          default:
-            console.error(error.message || "Unknown Error");
-        }
 
         return Promise.reject(error);
       },

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { data, Link, useSearchParams } from "react-router";
+import { useState } from "react";
+import { Link, useSearchParams } from "react-router";
 import { FileText, Info, Clock, CheckCircle2 } from "lucide-react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import {
@@ -12,12 +12,13 @@ export default function ReportPage() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<CreateReportPayload>();
+
   const params = useSearchParams();
   const articleId = params[0].get("article_id");
   const mutation = useCreateReportMutation();
+
   const onSubmit: SubmitHandler<CreateReportPayload> = (data) => {
     data.article_id = articleId ?? "";
     mutation.mutate(data, {
@@ -101,7 +102,10 @@ export default function ReportPage() {
                   Loại lỗi <span className="text-[#8b1a1a]">*</span>
                 </label>
                 <select
-                  {...register("error_type", { required: true })}
+                  {...register("error_type", {
+                    required: "Vui lòng chọn loại lỗi.",
+                  })}
+                  aria-invalid={!!errors.error_type}
                   className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 text-[#e8d9b0] text-[12.5px] outline-none focus:border-[#c5a028] transition-colors appearance-none cursor-pointer"
                 >
                   <option value="">— Chọn loại lỗi —</option>
@@ -114,6 +118,12 @@ export default function ReportPage() {
                   <option>Nguồn tham khảo không hợp lệ</option>
                   <option>Khác</option>
                 </select>
+
+                {errors.error_type?.message && (
+                  <p className="mt-1.5 text-[10px] text-[#c5302a]">
+                    {errors.error_type.message}
+                  </p>
+                )}
               </div>
 
               {/* Severity */}
@@ -194,12 +204,23 @@ export default function ReportPage() {
                 <textarea
                   className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-3 text-[#e8d9b0] text-[13px] font-['Source_Serif_4'] leading-relaxed outline-none focus:border-[#c5a028] min-h-[80px]"
                   placeholder="Trích dẫn đoạn văn bản hoặc mô tả vị trí nội dung bị sai trong bài..."
-                  required
+                  aria-invalid={!!errors.description}
                   {...register("description", {
-                    required: true,
-                    maxLength: 1000,
+                    required: "Vui lòng nhập nội dung bị lỗi.",
+                    maxLength: {
+                      value: 1000,
+                      message: "Nội dung tối đa 1000 ký tự.",
+                    },
+                    validate: (v) =>
+                      (v?.trim?.().length ?? 0) > 0 ||
+                      "Nội dung không được để trống.",
                   })}
-                ></textarea>
+                />
+                {errors.description?.message && (
+                  <p className="mt-1.5 text-[10px] text-[#c5302a]">
+                    {errors.description.message}
+                  </p>
+                )}
               </div>
 
               {/* Sources */}
@@ -209,10 +230,24 @@ export default function ReportPage() {
                 </label>
                 <input
                   type="text"
-                  {...register("suggested_source")}
+                  {...register("suggested_source", {
+                    maxLength: {
+                      value: 255,
+                      message: "Nguồn tham khảo tối đa 255 ký tự.",
+                    },
+                    validate: (v) =>
+                      !v || v.trim().length > 0 || "Giá trị không hợp lệ.",
+                  })}
+                  aria-invalid={!!errors.suggested_source}
                   className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 px-3.5 text-[#e8d9b0] text-[12px] outline-none focus:border-[#c5a028]"
                   placeholder="Tên sách, tác giả, link tài liệu... (không bắt buộc)"
                 />
+                {errors.suggested_source?.message && (
+                  <p className="mt-1.5 text-[10px] text-[#c5302a]">
+                    {errors.suggested_source.message}
+                  </p>
+                )}
+
                 <p className="text-[10px] text-[#5a4e28] mt-1.5">
                   Ví dụ: Đại Việt Sử Ký Toàn Thư, quyển 5, trang 84
                 </p>
@@ -225,10 +260,27 @@ export default function ReportPage() {
                 </label>
                 <input
                   type="email"
-                  {...register("reporter_email")}
+                  {...register("reporter_email", {
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Email không đúng định dạng.",
+                    },
+                    maxLength: {
+                      value: 255,
+                      message: "Email tối đa 255 ký tự.",
+                    },
+                    validate: (v) =>
+                      !v || v.trim().length > 0 || "Email không hợp lệ.",
+                  })}
+                  aria-invalid={!!errors.reporter_email}
                   className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 px-3.5 text-[#e8d9b0] text-[12px] outline-none focus:border-[#c5a028]"
                   placeholder="Email của bạn (không bắt buộc — để admin phản hồi)"
                 />
+                {errors.reporter_email?.message && (
+                  <p className="mt-1.5 text-[10px] text-[#c5302a]">
+                    {errors.reporter_email.message}
+                  </p>
+                )}
               </div>
 
               {/* Consents */}
@@ -243,6 +295,13 @@ export default function ReportPage() {
                   </span>
                 </label>
               </div>
+
+              {/* (Optional) Tổng hợp lỗi */}
+              {Object.keys(errors).length > 0 && (
+                <div className="mb-6 text-[10px] text-[#c5302a]">
+                  Vui lòng kiểm tra các trường bị lỗi ở bên trên.
+                </div>
+              )}
 
               {/* Buttons */}
               <div className="flex gap-3 mt-8 pt-6 border-t border-[#2e2510]">
