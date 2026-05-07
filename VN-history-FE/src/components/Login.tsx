@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
+import axios from "axios";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -9,15 +10,32 @@ function Login() {
 
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (username === "admin" && password === "123456") {
-      navigate("/dashboard"); // 👉 chuyển trang
-    } else {
-      setError("Sai tài khoản hoặc mật khẩu!");
-    }
-  };
+  try {
+    const res = await axios.post(
+      "http://localhost:3000/api/auth/login", // ✅ sửa ở đây
+      {
+        email: username, // ⚠️ backend bạn đang dùng email, không phải username
+        password: password,
+      }
+    );
+
+    console.log(res.data);
+    console.log("TOKEN:");
+    console.log(res.data.token);
+
+    localStorage.setItem("token", res.data.token);
+    navigate("/dashboard");
+  } catch (error: any) {
+    console.error(error.response?.data || error.message);
+
+    setError(
+      error.response?.data?.message || "Sai tài khoản hoặc mật khẩu!"
+    );
+  }
+};
 
   return (
     <div className="login-container">
