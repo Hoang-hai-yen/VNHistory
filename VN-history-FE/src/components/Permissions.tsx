@@ -52,18 +52,93 @@ const Permissions: React.FC = () => {
 
   }, []);
 
-  const handleToggle = (
-    roleIndex: number,
-    permissionKey: string
-  ) => {
+  const handleToggle = async (
+  roleIndex: number,
+  permissionKey: string
+) => {
 
-    // Chỉ Super Admin mới được chỉnh
-    if (currentRole !== "super_admin") return;
+  // Chỉ Super Admin mới được chỉnh
+  if (currentRole !== "super_admin") return;
 
+  // Tìm role admin
+  const targetRole = roles[roleIndex];
+
+  if (targetRole.role !== "admin") return;
+
+  // Tìm permission hiện tại
+  const targetPermission =
+    targetRole.permissions.find(
+      (p) => p.key === permissionKey
+    );
+
+  if (
+    !targetPermission ||
+    !targetPermission.configurable
+  ) {
+    return;
+  }
+
+  // Giá trị mới
+  const newGranted =
+    !targetPermission.granted;
+
+  // Update UI trước
+  setRoles((prev) =>
+    prev.map((role, index) => {
+
+      if (
+        index !== roleIndex ||
+        role.role !== "admin"
+      ) {
+        return role;
+      }
+
+      return {
+        ...role,
+        permissions: role.permissions.map(
+          (permission) => {
+
+            if (
+              permission.key === permissionKey
+            ) {
+              return {
+                ...permission,
+                granted: newGranted,
+              };
+            }
+
+            return permission;
+          }
+        ),
+      };
+    })
+  );
+
+  try {
+
+    const token =
+      localStorage.getItem("token");
+
+    await axios.patch(
+      "http://localhost:3000/api/admin/permissions",
+      {
+        [permissionKey]: newGranted,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+    // rollback nếu lỗi
     setRoles((prev) =>
       prev.map((role, index) => {
 
-        // Chỉ chỉnh quyền của Admin
         if (
           index !== roleIndex ||
           role.role !== "admin"
@@ -73,24 +148,29 @@ const Permissions: React.FC = () => {
 
         return {
           ...role,
-          permissions: role.permissions.map((permission) => {
+          permissions: role.permissions.map(
+            (permission) => {
 
-            if (
-              permission.key === permissionKey &&
-              permission.configurable
-            ) {
-              return {
-                ...permission,
-                granted: !permission.granted,
-              };
+              if (
+                permission.key === permissionKey
+              ) {
+                return {
+                  ...permission,
+                  granted:
+                    !newGranted,
+                };
+              }
+
+              return permission;
             }
-
-            return permission;
-          }),
+          ),
         };
       })
     );
-  };
+
+    alert("Cập nhật quyền thất bại");
+  }
+};
 
   return (
     <div className="permission-page">

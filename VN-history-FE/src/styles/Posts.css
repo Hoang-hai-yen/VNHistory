@@ -130,5 +130,5 @@
 
 .btn-green-text { color: var(--accent-green); border-color: var(--accent-green); }
 .btn-red-text { color: var(--accent-red); border-color: var(--accent-red); }
-.btn-blue-text { color: var(--accent-blue); border-color: var(--accent-blue); }
-.btn-gray-text { color: var(--text-gray); border-color: #5A4E28; }
+.btn-blue-text { color: #C5A028; border-color: #C5A028; }
+.btn-gray-text { color: #5A4E28; border-color: #5A4E28; }
