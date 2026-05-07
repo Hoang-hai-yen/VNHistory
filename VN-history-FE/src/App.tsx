@@ -11,6 +11,8 @@ import Permissions from "./components/Permissions"; // 👈 thêm dòng này
 import History from "./components/History"; // 👈 thêm dòng này
 import Settings from "./components/Settings"; // 👈 thêm dòng này
 import Reports from "./components/Reports"; // 👈 thêm dòng nà  y
+import PostDetail from "./components/PostDetail"; // 👈 thêm dòng này
+import PostEdit from "./components/PostEdit"; // 👈 thêm dòng này
 
 
 function App() {
@@ -31,6 +33,8 @@ function App() {
         <Route path="permissions" element={<Permissions />} />
         <Route path="history" element={<History />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="post-detail" element={<PostDetail />} /> {/* 👈 thêm dòng này */}
+        <Route path="post-edit" element={<PostEdit />} /> {/* 👈 thêm dòng này */}
       </Route>
     </Routes>
   );

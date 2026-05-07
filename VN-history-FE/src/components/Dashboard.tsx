@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/Dashboard.css';
+import { useNavigate } from 'react-router-dom';
 
 interface ContentItem {
   id: string;
@@ -28,6 +29,8 @@ const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
   'Tất cả' | 'Sự kiện' | 'Nhân vật' | 'Di sản' | 'Khác'
 >('Tất cả');
+
+  const navigate = useNavigate();
 
   const [stats, setStats] = useState<Stats>({
     total_published: 0,
@@ -140,54 +143,125 @@ const Dashboard: React.FC = () => {
     return <span className={className}>{status}</span>;
   };
 
+    const handleViewPost = async (id: string) => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const res = await axios.get(
+          `http://localhost:3000/api/admin/articles/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        navigate('/post-detail', {
+          state: {
+            article: res.data.data,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const handleEditPost = async (id: string) => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const res = await axios.get(
+          `http://localhost:3000/api/admin/articles/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        navigate('/post-edit', {
+          state: {
+            article: res.data.data,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
   const renderActions = (item: ContentItem) => {
-    switch (item.status) {
-      case 'Chờ duyệt':
-        return (
-          <div className="action-buttons">
-            <button className="btn btn-approve">Duyệt</button>
-            <button className="btn btn-reject">Từ chối</button>
-            <button className="btn btn-edit">Sửa</button>
-          </div>
-        );
 
-      case 'Đã xuất bản':
+      // Pending
+      if (item.status === 'Chờ duyệt') {
         return (
           <div className="action-buttons">
-            <button className="btn btn-edit-pub">
-              Chỉnh sửa
+            <button className="btn btn-approve">
+              Duyệt & Xuất bản
             </button>
 
-            <button className="btn btn-view">Xem</button>
-          </div>
-        );
-
-      case 'Bản nháp':
-        return (
-          <div className="action-buttons">
-            <button className="btn btn-edit-pub">
-              Chỉnh sửa
-            </button>
-
-            <button className="btn btn-view">Xem</button>
-          </div>
-        );
-
-      case 'Từ chối':
-        return (
-          <div className="action-buttons">
-            <button className="btn btn-reason">Lý do</button>
-
-            <button className="btn btn-edit-pub">
-              Chỉnh sửa
+            <button className="btn btn-reject">
+              Từ chối
             </button>
           </div>
         );
+      }
 
-      default:
-        return null;
-    }
-  };
+      // Published
+      if (item.status === 'Đã xuất bản') {
+        return (
+          <div className="action-buttons">
+
+            <button
+              className="btn btn-view"
+              onClick={() => handleViewPost(item.id)}
+            >
+              Xem
+            </button>
+
+          </div>
+        );
+      }
+
+      // Draft
+      if (item.status === 'Bản nháp') {
+        return (
+          <div className="action-buttons">
+
+            <button
+              className="btn btn-edit-pub"
+              onClick={() => handleEditPost(item.id)}
+            >
+              Chỉnh sửa
+            </button>
+
+          </div>
+        );
+      }
+
+      // Rejected
+      if (item.status === 'Từ chối') {
+        return (
+          <div className="action-buttons">
+
+            <button className="btn btn-reason">
+              Lý do
+            </button>
+
+            <button
+              className="btn btn-edit-pub"
+              onClick={() => handleEditPost(item.id)}
+            >
+              Chỉnh sửa
+            </button>
+
+          </div>
+        );
+      }
+
+      return null;
+    };
+
+
 
   return (
     <div className="dashboard-page">
@@ -380,24 +454,46 @@ const Dashboard: React.FC = () => {
             {recentLogs.length === 0 ? (
               <p>Không có hoạt động gần đây</p>
             ) : (
-              recentLogs.map((log: any) => (
-                <div
-                  key={log.id}
-                  className="activity-item"
-                >
-                  <span className="dot"></span>
+              recentLogs
+                .slice(0, 5)
+                .map((log: any) => (
+                  <div
+                    key={log.id}
+                    className="activity-item"
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        flex: 1,
+                      }}
+                    >
+                      <span className="dot"></span>
 
-                  <div className="activity-details">
-                    <p className="activity-text">
-                      {log.action}
-                    </p>
+                      <div className="activity-details">
+                        <p className="activity-text">
+                          {log.action}
+                        </p>
 
-                    <p className="activity-subtext">
-                      {log.admin_name}
-                    </p>
+                        <p className="activity-subtext">
+                          {log.admin_name}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        color: '#999',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {new Date(log.created_at)
+                        .toLocaleString('vi-VN')}
+                    </div>
                   </div>
-                </div>
-              ))
+                ))
             )}
 
           </div>

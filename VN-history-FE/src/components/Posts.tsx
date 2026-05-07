@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Posts.css';
+
 
 type PublishTab =
   | 'Tất cả'
@@ -22,6 +24,7 @@ interface ContentItem {
 const Posts: React.FC = () => {
   const [activeTab, setActiveTab] =
     useState<PublishTab>('Tất cả');
+  const navigate = useNavigate();
 
   const [contentData, setContentData] = useState<
     ContentItem[]
@@ -65,11 +68,11 @@ const Posts: React.FC = () => {
 
           dynasty: article.dynasty_name || '-',
 
-          assignee: 'Admin',
+          assignee: article.created_by_name || '-' ,
 
           date: new Date(
-            article.published_at
-          ).toLocaleDateString('vi-VN'),
+              article.published_at || article.created_at
+            ).toLocaleDateString('vi-VN'),
 
           status:
             article.status === 'published'
@@ -146,54 +149,110 @@ const Posts: React.FC = () => {
     );
   };
 
-  const renderActions = (item: ContentItem) => {
-    if (
-      item.status === 'Đã xuất bản' ||
-      item.status === 'Bản nháp'
-    ) {
+  const handleViewPost = async (id: string) => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const res = await axios.get(
+          `http://localhost:3000/api/admin/articles/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        navigate('/post-detail', {
+          state: {
+            article: res.data.data,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const handleEditPost = async (id: string) => {
+
+      try {
+
+        const token =
+          localStorage.getItem('token');
+
+        const res = await axios.get(
+          `http://localhost:3000/api/admin/articles/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        navigate('/post-edit', {
+          state: {
+            article: res.data.data,
+          },
+        });
+
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const renderActions = (item: ContentItem) => {
+
+      // Published -> Xem
+      if (item.status === 'Đã xuất bản') {
+        return (
+          <div className="action-group">
+
+            <button
+              className="btn-action btn-gray-text"
+              onClick={() => handleViewPost(item.id)}
+            >
+              Xem
+            </button>
+
+          </div>
+        );
+      }
+
+      // Draft + Rejected -> Chỉnh sửa
+      if (
+        item.status === 'Bản nháp' ||
+        item.status === 'Từ chối'
+      ) {
+        return (
+          <div className="action-group">
+
+            <button
+              className="btn-action btn-blue-text"
+              onClick={() => handleEditPost(item.id)}
+            >
+              Chỉnh sửa
+            </button>
+
+          </div>
+        );
+      }
+
+      // Pending
       return (
         <div className="action-group">
-          <button className="btn-action btn-blue-text">
-            Chỉnh sửa
+
+          <button className="btn-action btn-green-text">
+            Duyệt & Xuất bản
           </button>
 
-          <button className="btn-action btn-gray-text">
-            Xem
-          </button>
-        </div>
-      );
-    }
-
-    if (item.status === 'Từ chối') {
-      return (
-        <div className="action-group">
           <button className="btn-action btn-red-text">
-            Lý do
+            Từ chối
           </button>
 
-          <button className="btn-action btn-blue-text">
-            Chỉnh sửa
-          </button>
         </div>
       );
-    }
+    };
 
-    return (
-      <div className="action-group">
-        <button className="btn-action btn-green-text">
-          Duyệt
-        </button>
-
-        <button className="btn-action btn-red-text">
-          Từ chối
-        </button>
-
-        <button className="btn-action btn-blue-text">
-          Sửa
-        </button>
-      </div>
-    );
-  };
+    
 
   return (
     <div className="posts-page">
@@ -257,7 +316,10 @@ const Posts: React.FC = () => {
 
         </div>
 
-        <button className="btn-create-primary">
+        <button
+          className="btn-create-primary"
+          onClick={() => navigate('/create-post')}
+        >
           + TẠO BÀI MỚI
         </button>
 
