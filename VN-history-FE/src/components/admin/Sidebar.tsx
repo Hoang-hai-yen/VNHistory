@@ -8,6 +8,7 @@ const Sidebar: React.FC = () => {
   const [user, setUser] = useState({
     name: "",
     role: "",
+    rawRole: "",
   });
 
   console.log("USER STATE:", user);
@@ -31,6 +32,7 @@ const Sidebar: React.FC = () => {
 
         setUser({
           name: res.data.data.full_name,
+          rawRole: res.data.data.role,
           role: res.data.data.role.replace("_", " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
         });
         console.log("SETTING USER");
@@ -116,19 +118,27 @@ const Sidebar: React.FC = () => {
           {/* <span className="badge" style={{ color: '#4da6ff' }}>5</span> */}
         </NavLink>
 
-        <div className="menu-group-label">HỆ THỐNG</div>
-        <NavLink to="/admin/management" className={navLinkClass}>
-          Quản lý Admin
-        </NavLink>
-        <NavLink to="/admin/permissions" className={navLinkClass}>
-          Phân quyền
-        </NavLink>
-        <NavLink to="/admin/history" className={navLinkClass}>
-          Nhật ký
-        </NavLink>
-        <NavLink to="/admin/settings" className={navLinkClass}>
-          Cài đặt
-        </NavLink>
+        {user.rawRole === "super_admin" && (
+          <>
+            <div className="menu-group-label">HỆ THỐNG</div>
+
+            <NavLink to="/management" className={navLinkClass}>
+              Quản lý Admin
+            </NavLink>
+
+            <NavLink to="/permissions" className={navLinkClass}>
+              Phân quyền
+            </NavLink>
+
+            <NavLink to="/history" className={navLinkClass}>
+              Nhật ký
+            </NavLink>
+
+            <NavLink to="/settings" className={navLinkClass}>
+              Cài đặt
+            </NavLink>
+          </>
+        )}
       </nav>
 
       {/* Footer */}
