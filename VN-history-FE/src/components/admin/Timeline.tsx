@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Timeline.css';
 
 interface Dynasty {
@@ -20,8 +21,13 @@ interface TimelineEvent {
 const Timeline: React.FC = () => {
 
   const [dynasties, setDynasties] = useState<Dynasty[]>([]);
-  const [activeDynasty, setActiveDynasty] = useState<Dynasty | null>(null);
-  const [events, setEvents] = useState<TimelineEvent[]>([]);
+  const [activeDynasty, setActiveDynasty] =
+    useState<Dynasty | null>(null);
+
+  const [events, setEvents] =
+    useState<TimelineEvent[]>([]);
+
+  const navigate = useNavigate();
 
   // =========================
   // FETCH DANH SÁCH TRIỀU ĐẠI
@@ -29,12 +35,13 @@ const Timeline: React.FC = () => {
   useEffect(() => {
 
     const fetchDynasties = async () => {
+
       try {
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('token');
 
         const res = await axios.get(
-          "http://localhost:3000/api/admin/timeline",
+          'http://localhost:3000/api/admin/timeline',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -42,12 +49,8 @@ const Timeline: React.FC = () => {
           }
         );
 
-        console.log("DYNASTIES:");
-        console.log(res.data);
-
         setDynasties(res.data.data);
 
-        // mặc định chọn triều đại đầu tiên
         if (res.data.data.length > 0) {
           setActiveDynasty(res.data.data[0]);
         }
@@ -62,7 +65,7 @@ const Timeline: React.FC = () => {
   }, []);
 
   // =========================
-  // FETCH EVENTS THEO TRIỀU ĐẠI
+  // FETCH EVENTS
   // =========================
   useEffect(() => {
 
@@ -72,7 +75,7 @@ const Timeline: React.FC = () => {
 
       try {
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('token');
 
         const res = await axios.get(
           `http://localhost:3000/api/admin/timeline/${activeDynasty.id}/events`,
@@ -83,34 +86,31 @@ const Timeline: React.FC = () => {
           }
         );
 
-        console.log("EVENTS:");
-        console.log(res.data);
+        const formattedEvents = res.data.data.map(
+          (article: any) => ({
 
-        const formattedEvents = res.data.data.map((article: any) => ({
+            id: article.article_id || article.id,
 
-          id: article.id,
+            year:
+              article.year_display || '',
 
-          // articles.year_display
-          year:
-            article.year_display || "",
+            name:
+              article.title || '',
 
-          // articles.title
-          name:
-            article.title || "",
+            category:
+              article.category_name || '',
 
-          // articles.category_name
-          category:
-            article.category_name || "",
+            status:
+              article.status === 'published'
+                ? 'Đã xuất bản'
+                : article.status === 'pending'
+                ? 'Chờ duyệt'
+                : article.status === 'draft'
+                ? 'Bản nháp'
+                : 'Từ chối',
 
-          // articles.status
-          status:
-            article.status === "published"
-              ? "Xuất bản"
-              : article.status === "pending"
-              ? "Chờ duyệt"
-              : "Bản nháp",
-
-        }));
+          })
+        );
 
         setEvents(formattedEvents);
 
@@ -122,6 +122,114 @@ const Timeline: React.FC = () => {
     fetchEvents();
 
   }, [activeDynasty]);
+
+  // =========================
+  // VIEW POST
+  // =========================
+  const handleViewPost = async (id: string) => {
+
+    try {
+
+      const token = localStorage.getItem('token');
+
+      const res = await axios.get(
+        `http://localhost:3000/api/admin/articles/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      navigate('/post-detail', {
+        state: {
+          article: res.data.data,
+        },
+      });
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // =========================
+  // ACTIONS
+  // =========================
+  const renderActions = (
+    item: TimelineEvent
+  ) => {
+
+    // Pending
+    if (item.status === 'Chờ duyệt') {
+
+      return (
+        <div className="action-buttons">
+
+          <button className="btn btn-approve">
+            Duyệt & Xuất bản
+          </button>
+
+          <button className="btn btn-reject">
+            Từ chối
+          </button>
+
+        </div>
+      );
+    }
+
+    // Published
+    if (item.status === 'Đã xuất bản') {
+
+      return (
+        <div className="action-buttons">
+
+          <button
+            className="btn btn-view"
+            onClick={() =>
+              handleViewPost(item.id)
+            }
+          >
+            Xem
+          </button>
+
+        </div>
+      );
+    }
+
+    // Draft
+    if (item.status === 'Bản nháp') {
+
+      return (
+        <div className="action-buttons">
+
+          <button className="btn btn-edit-pub">
+            Chỉnh sửa
+          </button>
+
+        </div>
+      );
+    }
+
+    // Rejected
+    if (item.status === 'Từ chối') {
+
+      return (
+        <div className="action-buttons">
+
+          <button className="btn btn-reason">
+            Lý do
+          </button>
+
+          <button className="btn btn-edit-pub">
+            Chỉnh sửa
+          </button>
+
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   return (
 
@@ -142,7 +250,7 @@ const Timeline: React.FC = () => {
 
       <div className="timeline-container">
 
-        {/* SIDEBAR TRIỀU ĐẠI */}
+        {/* SIDEBAR */}
         <aside className="dynasty-sidebar">
 
           {dynasties.map((d) => (
@@ -154,15 +262,15 @@ const Timeline: React.FC = () => {
                   ? 'active'
                   : ''
               }`}
-              onClick={() => setActiveDynasty(d)}
+              onClick={() =>
+                setActiveDynasty(d)
+              }
             >
 
-              {/* dynasties.name */}
               <div className="dynasty-name">
                 {d.name}
               </div>
 
-              {/* dynasties.year_display */}
               <div className="dynasty-period">
                 {d.year_display}
               </div>
@@ -180,12 +288,11 @@ const Timeline: React.FC = () => {
 
             {activeDynasty?.name.toUpperCase()}
 
-            {" - "}
+            {' - '}
 
-            {/* dynasties.event_count */}
             {activeDynasty?.event_count || 0}
 
-            {" SỰ KIỆN"}
+            {' SỰ KIỆN'}
 
           </h3>
 
@@ -195,13 +302,11 @@ const Timeline: React.FC = () => {
             <thead>
 
               <tr>
-
                 <th>NĂM</th>
                 <th>SỰ KIỆN</th>
                 <th>DANH MỤC</th>
                 <th>TRẠNG THÁI</th>
                 <th>HÀNH ĐỘNG</th>
-
               </tr>
 
             </thead>
@@ -212,17 +317,14 @@ const Timeline: React.FC = () => {
 
                 <tr key={event.id}>
 
-                  {/* articles.year_display */}
                   <td className="year-cell">
                     {event.year}
                   </td>
 
-                  {/* articles.title */}
                   <td className="name-cell">
                     {event.name}
                   </td>
 
-                  {/* articles.category_name */}
                   <td>
 
                     <span className="category-tag">
@@ -231,7 +333,6 @@ const Timeline: React.FC = () => {
 
                   </td>
 
-                  {/* articles.status */}
                   <td>
 
                     <span
@@ -244,19 +345,8 @@ const Timeline: React.FC = () => {
 
                   </td>
 
-                  {/* ACTION */}
-                  <td className="action-cell">
-
-                    {event.status === 'Chờ duyệt' && (
-                      <button className="btn-approve">
-                        Duyệt
-                      </button>
-                    )}
-
-                    <button className="btn-edit">
-                      Sửa
-                    </button>
-
+                  <td>
+                    {renderActions(event)}
                   </td>
 
                 </tr>

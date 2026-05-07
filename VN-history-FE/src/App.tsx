@@ -20,6 +20,8 @@ import TimelinePage from "./pages/TimelinePage";
 import GeographyPage from "./pages/CulturePage";
 import VideoLibraryPage from "./pages/VideoLibraryPage";
 import ReportPage from "./pages/ReportPage";
+import PostDetail from "./components/PostDetail";
+import PostEdit from "./components/PostEdit";
 
 function App() {
   return (
@@ -39,17 +41,19 @@ function App() {
       </Route>
 
       {/* Layout có Sidebar */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/posts" element={<Posts />} />
-        <Route path="/admin/create-post" element={<CreatePost />} />
-        <Route path="/admin/timeline" element={<Timeline />} />
-        <Route path="/admin/reports" element={<Reports />} />
-        <Route path="/admin/pending" element={<Pending />} />
-        <Route path="/admin/management" element={<Management />} />
-        <Route path="/admin/permissions" element={<Permissions />} />
-        <Route path="/admin/history" element={<History />} />
-        <Route path="/admin/settings" element={<Settings />} />
+      <Route path="/" element={<AdminLayout />}>
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="posts" element={<Posts />} />
+        <Route path="create-post" element={<CreatePost />} />
+        <Route path="timeline" element={<Timeline />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="pending" element={<Pending />} />
+        <Route path="management" element={<Management />} />
+        <Route path="permissions" element={<Permissions />} />
+        <Route path="history" element={<History />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="post-detail" element={<PostDetail />} /> {/* 👈 thêm dòng này */}
+        <Route path="post-edit" element={<PostEdit />} /> {/* 👈 thêm dòng này */}
       </Route>
     </Routes>
   );
