@@ -83,7 +83,7 @@ const History: React.FC = () => {
 
                 <td>
                   <span className="action-status">
-                    ● {log.action}
+                    {log.action}
                   </span>
                 </td>
 
