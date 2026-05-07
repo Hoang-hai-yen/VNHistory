@@ -10,7 +10,7 @@ export default function ArticleRecommended({ article }: { article: Article }) {
       </h4>
       <div className="space-y-6">
         {articleRelated.slice(0, 3).map((ev) => (
-          <Link key={ev.id} to={`/bai-viet/${ev.id}`} className="group block">
+          <Link key={ev.id} to={`/bai-viet/${ev.slug}`} className="group block">
             <div className="text-[10px] text-[#C5A028] font-bold mb-1">
               {ev.year_display} — {ev.type}
             </div>

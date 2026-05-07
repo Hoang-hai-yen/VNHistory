@@ -1,4 +1,4 @@
-import type { Article, ArticleSummary } from "../../types/article.type";
+import type { ArticleSummary } from "../../types/article.type";
 
 export default function VideoCard({
   video,

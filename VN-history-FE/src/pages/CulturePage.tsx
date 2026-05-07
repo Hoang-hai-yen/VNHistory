@@ -8,7 +8,7 @@ import CultureCard from "../components/Geography/CultureCard";
 
 
 export default function GeographyPage() {
-  const { data, isPending, error } = useArticles({ type: "culture" });
+  const { data, isPending } = useArticles({ type: "culture" });
   const cultures = data?.data || [];
   return (
     <div className="max-w-7xl mx-auto px-4 pb-20">

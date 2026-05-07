@@ -5,7 +5,6 @@ import MoreDynasties from "../components/Home/MoreDynasties";
 import VideoSection from "../components/Home/VideoSection";
 import { useArticles } from "../hooks/api/useArticles";
 import { useDynasties } from "../hooks/api/useDynasties";
-import type { Article } from "../types/article.type";
 
 export default function HomePage() {
   const { data } = useDynasties();
