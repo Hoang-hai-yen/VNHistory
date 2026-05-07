@@ -64,6 +64,65 @@ const Settings: React.FC = () => {
     fetchSettings();
   }, []);
 
+  const handleSaveWebsiteInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.patch(
+        "http://localhost:3000/api/admin/settings",
+        {
+          site_name: siteName,
+          site_description: description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Cập nhật thông tin website thành công");
+
+    } catch (error: any) {
+      console.log(error);
+
+      alert(
+        error.response?.data?.message ||
+        "Cập nhật thất bại"
+      );
+    }
+  };
+
+  const handleSavePublishSettings = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.patch(
+        "http://localhost:3000/api/admin/settings",
+        {
+          allow_comments: allowComments,
+          notify_on_report: notifyOnReport,
+          site_email: siteEmail,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Cập nhật cài đặt thành công");
+
+    } catch (error: any) {
+      console.log(error);
+
+      alert(
+        error.response?.data?.message ||
+        "Cập nhật thất bại"
+      );
+    }
+  };
+
   return (
     <div className="settings-page">
 
@@ -108,7 +167,10 @@ const Settings: React.FC = () => {
 
           </div>
 
-          <button className="btn-save-gold">
+          <button
+            className="btn-save-gold"
+            onClick={handleSaveWebsiteInfo}
+          >
             LƯU THAY ĐỔI
           </button>
 
@@ -183,7 +245,10 @@ const Settings: React.FC = () => {
 
           </div>
 
-          <button className="btn-save-gold">
+          <button
+            className="btn-save-gold"
+            onClick={handleSavePublishSettings}
+          >
             LƯU THAY ĐỔI
           </button>
 
