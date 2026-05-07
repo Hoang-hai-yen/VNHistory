@@ -17,7 +17,7 @@ import ArticleDetailPage from "./pages/ArticleDetailPage";
 import DynastiesPage from "./pages/DynastiesPage";
 import FiguresPage from "./pages/FiguresPage";
 import TimelinePage from "./pages/TimelinePage";
-import GeographyPage from "./pages/GeographyPage";
+import GeographyPage from "./pages/CulturePage";
 import VideoLibraryPage from "./pages/VideoLibraryPage";
 import ReportPage from "./pages/ReportPage";
 
@@ -32,7 +32,7 @@ function App() {
         <Route path="trieu-dai" element={<DynastiesPage />} />
         <Route path="nhan-vat" element={<FiguresPage />} />
         <Route path="dong-thoi-gian" element={<TimelinePage />} />
-        <Route path="dia-ly" element={<GeographyPage />} />
+        <Route path="van-hoa" element={<GeographyPage />} />
         <Route path="video" element={<VideoLibraryPage />} />
         <Route path="bao-cao-loi" element={<ReportPage />} />
         <Route path="bai-viet/:slug" element={<ArticleDetailPage />} />

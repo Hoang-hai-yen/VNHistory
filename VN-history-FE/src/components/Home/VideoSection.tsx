@@ -1,8 +1,8 @@
-import type { Video } from "../../types/video.type";
+import type { ArticleSummary } from "../../types/article.type";
 import PageSectionHeader from "../common/PageSectionHeader";
 import VideoCard from "../Video/VideoCard";
 
-export default function VideoSection({ VIDEOS }: { VIDEOS: Video[] }) {
+export default function VideoSection({ VIDEOS }: { VIDEOS: ArticleSummary[] }) {
   return (
     <section className="bg-[#1A1208] py-10">
       <div className="max-w-7xl mx-auto px-4">

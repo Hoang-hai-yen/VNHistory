@@ -1,28 +1,29 @@
 import { Link } from "react-router";
+import type { ArticleSummary } from "../../types/article.type";
 
 export function ArticleCard({
   item,
   lg = false,
   horizontal = false,
 }: {
-  item: any;
+  item: ArticleSummary;
   lg?: boolean;
   horizontal?: boolean;
 }) {
   if (horizontal) {
     return (
       <Link
-        to={`/bai-viet/${item.id}`}
+        to={`/bai-viet/${item.slug}`}
         className="flex gap-3.5 cursor-pointer group py-3.5 border-b border-[#e0dbd0] last:border-none"
       >
         <div className="w-22 h-16 shrink-0 bg-[#1A1208] overflow-hidden relative">
           <div className="absolute inset-0 flex items-center justify-center text-xl opacity-30">
-            {item.icon || "📜"}
+            {item.published_at}
           </div>
         </div>
         <div className="flex-1">
           <div className="text-[9px] font-bold tracking-[2.5px] uppercase text-[#8B1A1A] mb-1">
-            {item.year || item.category}
+            {item.year_display}
           </div>
           <h4 className="font-['Playfair_Display',serif] text-[13px] font-bold leading-tight group-hover:text-[#8B1A1A] transition-colors">
             {item.title}
@@ -33,7 +34,7 @@ export function ArticleCard({
   }
 
   return (
-    <Link to={`/bai-viet/${item.id}`} className="cursor-pointer group block">
+    <Link to={`/bai-viet/${item.slug}`} className="cursor-pointer group block">
       <div
         className={`overflow-hidden bg-[#1A1208] relative mb-3 aspect-[16/10] ${lg ? "aspect-video" : ""}`}
       >
@@ -42,7 +43,7 @@ export function ArticleCard({
             {"⚔"}
           </span>
           <span className="text-[9px] tracking-[2px] text-[#C8941A]/50 uppercase font-medium">
-            {item.year}
+            {item.year_display}
           </span>
         </div>
         {/* Hover overlay */}
@@ -50,7 +51,7 @@ export function ArticleCard({
       </div>
 
       <div className="text-[9px] font-bold tracking-[2.5px] uppercase text-[#8B1A1A] mb-1.5">
-        {item.category}
+        {item.category_id}
       </div>
 
       <h3
@@ -60,7 +61,7 @@ export function ArticleCard({
       </h3>
 
       <p className="font-['Source_Serif_4',serif] text-[13px] text-[#6b6b6b] leading-relaxed font-light line-clamp-2">
-        {item.description}
+        {item.summary}
       </p>
     </Link>
   );

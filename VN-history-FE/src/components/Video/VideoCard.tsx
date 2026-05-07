@@ -1,10 +1,10 @@
-import type { Video } from "../../types/video.type";
+import type { Article, ArticleSummary } from "../../types/article.type";
 
 export default function VideoCard({
   video,
   dark = false,
 }: {
-  video: Video;
+  video: ArticleSummary;
   dark?: boolean;
 }) {
   return (
@@ -13,7 +13,7 @@ export default function VideoCard({
         <div
           className={`absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#1A1208] via-[#3D1A0A] to-[#1A0808]`}
         >
-          <span className="text-3xl opacity-30">{video.icon || "▶"}</span>
+          <span className="text-3xl opacity-30">{video.type || "▶"}</span>
         </div>
 
         {/* Play Button Overlay */}
@@ -24,7 +24,7 @@ export default function VideoCard({
         </div>
 
         <span className="absolute bottom-2 right-2 z-10 bg-black/75 text-white text-[10.5px] px-1.5 py-0.5 font-medium">
-          {video.duration}
+          {video.status}
         </span>
       </div>
 
@@ -41,7 +41,7 @@ export default function VideoCard({
       <p
         className={`font-['Source_Serif_4',serif] text-[11.5px] font-light mt-1 line-clamp-1 ${dark ? "text-white/45" : "text-[#6b6b6b]"}`}
       >
-        {video.desc}
+        {video.subtitle}
       </p>
     </div>
   );

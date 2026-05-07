@@ -17,7 +17,7 @@ const navLinks = [
   { path: "/trieu-dai", label: "Triều Đại", icon: History },
   { path: "/nhan-vat", label: "Nhân Vật", icon: Users },
   { path: "/dong-thoi-gian", label: "Dòng Thời Gian", icon: Calendar },
-  { path: "/dia-ly", label: "Địa Lý & Di Tích", icon: MapPin },
+  { path: "/van-hoa", label: "Văn hóa", icon: MapPin },
   { path: "/video", label: "Video", icon: Play },
 ];
 

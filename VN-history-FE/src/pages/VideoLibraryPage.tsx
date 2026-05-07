@@ -2,35 +2,16 @@ import { Link } from "react-router";
 import PageSectionHeader from "../components/common/PageSectionHeader";
 import { Filter } from "lucide-react";
 import VideoCard from "../components/Video/VideoCard";
+import { useArticles } from "../hooks/api/useArticles";
+import { EmptyState } from "../components/Error";
 
-const VIDEOS = [
-  {
-    id: "v1",
-    title: "Trận Bạch Đằng 938 — Bí Mật Cọc Nhọn",
-    desc: "Ngô Quyền cùng quân sĩ dùng cọc nhọn tiêu diệt toàn bộ thủy quân Nam Hán.",
-    duration: "12:34",
-    category: "Trận Đánh",
-    icon: "🌊",
-  },
-  {
-    id: "v2",
-    title: "Hịch Tướng Sĩ — Lời Hiệu Triệu Lịch Sử",
-    desc: "Trần Quốc Tuấn khơi dậy tinh thần chiến đấu toàn quân chống Mông Nguyên.",
-    duration: "18:20",
-    category: "Văn Hóa",
-    icon: "⚔",
-  },
-  {
-    id: "v3",
-    title: "Quang Trung — 5 Ngày Thần Tốc Kỳ Diệu",
-    desc: "Hành quân từ Phú Xuân ra Thăng Long đại phá 29 vạn quân Thanh.",
-    duration: "22:15",
-    category: "Thiên Tài Quân Sự",
-    icon: "🌟",
-  },
-];
+
 
 export default function VideoLibraryPage() {
+  const { data } = useArticles({
+    type: "video",
+  })
+  const VIDEOS = data?.data || [];
   return (
     <div className="max-w-7xl mx-auto px-4 pb-20">
       {/* Breadcrumb */}
@@ -64,9 +45,11 @@ export default function VideoLibraryPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-        {VIDEOS.concat(VIDEOS).map((video, i) => (
+        {VIDEOS.length > 0 ? (VIDEOS.map((video, i) => (
           <VideoCard key={i} video={video} />
-        ))}
+        ))) : (
+            <EmptyState title="Không có dữ liệu" description="Khong có dữ liệu" />
+        )}
       </div>
     </div>
   );

@@ -1,9 +1,8 @@
-import type { Figure } from "../../types/figure.type";
-
+import type { Article, ArticleSummary } from "../../types/article.type";
 import PageSectionHeader from "../common/PageSectionHeader";
 import FiguresCard from "../Figures/FiguresCard";
 
-export default function HeroFigures({ FIGURES }: { FIGURES: Figure[] }) {
+export default function HeroFigures({ FIGURES }: { FIGURES: ArticleSummary[] }) {
   return (
     <div>
       <PageSectionHeader

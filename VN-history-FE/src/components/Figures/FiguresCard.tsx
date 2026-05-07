@@ -1,11 +1,11 @@
 import { Link } from "react-router";
-import type { Article } from "../../types/article.type";
+import type { Article, ArticleSummary } from "../../types/article.type";
 
 export default function FiguresCard({
   figure,
   forHome = false,
 }: {
-  figure: Article;
+  figure: ArticleSummary;
   forHome?: boolean;
 }) {
   return (

@@ -9,13 +9,12 @@ import QueryStateWrapper from "../components/States/QueryStateWrapper";
 
 export default function ArticleDetailPage() {
   const { slug } = useParams();
-
   const {
     data: articleData,
     isLoading,
     error,
     refetch,
-  } = useArticleBySlug(slug);
+  } = useArticleBySlug(slug || "");
 
   return (
     <QueryStateWrapper
@@ -61,7 +60,7 @@ export default function ArticleDetailPage() {
               {/* Text Content */}
               <div
                 className="font-['Source_Serif_4',serif] text-lg lg:text-xl text-[#2c2c2c] leading-[1.8] article-content"
-                dangerouslySetInnerHTML={{ __html: articleData!.content || "" }}
+                dangerouslySetInnerHTML={{ __html: articleData?.content || "" }}
               />
 
               {/* Bottom Actions */}
@@ -81,7 +80,7 @@ export default function ArticleDetailPage() {
                 </div>
 
                 <Link
-                  to={`/bao-cao-loi?article_id=${articleData!.id}`}
+                  to={`/bao-cao-loi?article_id=${articleData?.id}`}
                   className="flex items-center gap-2 text-[#8B1A1A] hover:bg-[#8B1A1A]/5 px-4 py-2 rounded-sm border border-dashed border-[#8B1A1A] text-[13px] font-bold transition-all"
                 >
                   <AlertTriangle size={16} /> Báo cáo lỗi nội dung

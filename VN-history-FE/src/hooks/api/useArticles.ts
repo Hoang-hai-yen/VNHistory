@@ -4,18 +4,22 @@ import type { Article } from "../../types/article.type";
 import type { ApiResponse } from "../../types/api.type";
 
 async function fetchArticleBySlug(slug: string) {
+  console.log("fetchArticleBySlug called with slug:", slug);
   const res = await httpClient.get<ApiResponse<Article>>(`/articles/${slug}`);
+  console.log("fetchArticleBySlug", res.data);
+
   return res.data.data;
 }
 
-export function useArticleBySlug(slug: string | undefined) {
+export function useArticleBySlug(slug: string) {
   return useQuery({
     queryKey: ["article", slug],
     queryFn: () => {
       if (!slug) throw new Error("slug is required");
+      console.log("start");
+
       return fetchArticleBySlug(slug);
     },
-    enabled: !!slug,
   });
 }
 
