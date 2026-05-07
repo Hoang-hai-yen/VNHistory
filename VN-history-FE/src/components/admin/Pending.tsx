@@ -43,7 +43,7 @@ const Pending: React.FC = () => {
 
           // dynasty.name
           dynasty:
-            article.dynasty?.name || "Không rõ",
+            article.dynasty_name || "Không rõ",
 
           // articles.year_display
           year:
@@ -51,7 +51,7 @@ const Pending: React.FC = () => {
 
           // category.name
           category:
-            article.category?.name || "Không rõ",
+            article.category_name || "Không rõ",
 
           // created_by
           editor:
@@ -98,8 +98,8 @@ const Pending: React.FC = () => {
             <tr>
 
               <th>TIÊU ĐỀ</th>
-              <th>EDITOR</th>
-              <th>GỬI DUYỆT</th>
+              <th>NGƯỜI VIẾT</th>
+              <th>NGÀY VIẾT</th>
               <th>HÀNH ĐỘNG</th>
 
             </tr>
