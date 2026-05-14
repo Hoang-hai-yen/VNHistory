@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { FileText, Info, Clock, CheckCircle2 } from "lucide-react";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import type { ReportSeverity } from "../types";
 import {
   useCreateReportMutation,
   type CreateReportPayload,
 } from "../hooks/api/useReports";
 
 export default function ReportPage() {
-  const [severity, setSeverity] = useState<"low" | "medium" | "high">("medium");
+  const [severity, setSeverity] = useState<ReportSeverity>("medium");
   const {
     register,
     handleSubmit,
@@ -21,6 +22,7 @@ export default function ReportPage() {
 
   const onSubmit: SubmitHandler<CreateReportPayload> = (data) => {
     data.article_id = articleId ?? "";
+    data.severity = severity;
     mutation.mutate(data, {
       onSuccess: () => {
         alert(
@@ -158,8 +160,7 @@ export default function ReportPage() {
                     <button
                       key={opt.id}
                       type="button"
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      onClick={() => setSeverity(opt.id as any)}
+                      onClick={() => setSeverity(opt.id as ReportSeverity)}
                       className={`flex flex-col items-center p-2.5 border rounded-sm transition-all ${
                         severity === opt.id
                           ? `border-[${opt.activeBorder}] bg-[${opt.activeBg}]`

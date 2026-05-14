@@ -1,8 +1,12 @@
 import { Link } from "react-router";
-import type { Article, Related } from "../../types/article.type";
+import type { ArticleDetail, RelatedArticle } from "../../types";
 
-export default function ArticleRecommended({ article }: { article: Article }) {
-  const articleRelated: Related[] = article.related || [];
+export default function ArticleRecommended({
+  article,
+}: {
+  article: ArticleDetail;
+}) {
+  const articleRelated: RelatedArticle[] = article.related || [];
   return (
     <div>
       <h4 className="text-[13px] font-bold text-[#1c1c1c] uppercase tracking-widest mb-6 border-b border-[#E8D9B0] pb-2">

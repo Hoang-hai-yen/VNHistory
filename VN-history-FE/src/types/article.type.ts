@@ -1,3 +1,13 @@
+export type ArticleType = "event" | "person" | "place" | "video" | "culture";
+
+export type ArticleStatus = "draft" | "pending" | "published" | "rejected";
+
+export type ReportSeverity = "low" | "medium" | "high";
+
+export type RelationType = "previous" | "next" | "related";
+
+export type ArticleMediaType = "image" | "video" | "audio" | "document";
+
 export interface ArticleSummary {
   id: string;
   title: string;
@@ -12,41 +22,45 @@ export interface ArticleSummary {
   year_end: number;
   year_display: string;
   dynasty_id: string;
-
   category_id: string;
-
+  cover_image_url: string;
   is_featured: boolean;
   allow_comments: boolean;
-  rejection_note: string;
-  published_at: string;
+  rejection_note: string | null;
+  published_at: string | null;
   created_at: string;
   updated_at: string;
 }
 
-type ArticleType = "event" | "person" | "place" | "video" | "culture";
-type ArticleStatus = "draft" | "pending" | "published" | "rejected";
-
-export interface Article extends ArticleSummary {
+export interface ArticleDetail extends ArticleSummary {
   dynasty_name: string;
   category_name: string;
-  media: Medum[];
-  persons: any[];
+  media: Media[];
+  persons: ArticlePerson[];
   places: Place[];
   sources: Source[];
-  related: Related[];
+  related: RelatedArticle[];
 }
 
-export interface Medum {
+export interface Media {
   id: string;
   article_id: string;
-  media_type: string;
+  media_type: ArticleMediaType;
   url: string;
-  thumbnail_url: any;
+  thumbnail_url: string | null;
   caption: string;
-  duration_sec: any;
-  is_cover: number;
+  duration_sec: number | null;
+  is_cover: 0 | 1;
   sort_order: number;
   created_at: string;
+}
+
+export interface ArticlePerson {
+  id: string;
+  full_name: string;
+  slug: string;
+  role: string | null;
+  year_display: string | null;
 }
 
 export interface Place {
@@ -57,7 +71,7 @@ export interface Place {
   place_type: string;
   latitude: string;
   longitude: string;
-  unesco_status: number;
+  unesco_status: 0 | 1;
 }
 
 export interface Source {
@@ -67,16 +81,16 @@ export interface Source {
   author: string;
   year: string;
   publisher: string;
-  url: any;
+  url: string | null;
   sort_order: number;
   created_at: string;
 }
 
-export interface Related {
+export interface RelatedArticle {
   id: string;
   title: string;
   slug: string;
-  type: string;
+  type: ArticleType;
   year_display: string;
-  relation_type: string;
+  relation_type: RelationType;
 }

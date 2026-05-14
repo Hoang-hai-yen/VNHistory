@@ -1,10 +1,10 @@
 import { Calendar, Clock, MapPin, User } from "lucide-react";
-import type { Article } from "../../types/article.type";
+import type { ArticleDetail } from "../../types";
 
 export default function ArticleHeaderWithImage({
   article,
 }: {
-  article: Article;
+  article: ArticleDetail;
 }) {
   return (
     <div className="relative h-[400px] w-full overflow-hidden bg-[#1c1c1c]">

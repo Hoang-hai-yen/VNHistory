@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import type { ArticleSummary } from "../../types/article.type";
+import type { ArticleSummary } from "../../types";
 
 export function ArticleCard({
   item,
@@ -16,7 +16,8 @@ export function ArticleCard({
         to={`/bai-viet/${item.slug}`}
         className="flex gap-3.5 cursor-pointer group py-3.5 border-b border-[#e0dbd0] last:border-none"
       >
-        <div className="w-22 h-16 shrink-0 bg-[#1A1208] overflow-hidden relative">
+        <div className="w-22 h-16 shrink-0  overflow-hidden relative">
+          <img src={item.cover_image_url} alt={item.slug} />
           <div className="absolute inset-0 flex items-center justify-center text-xl opacity-30">
             {item.published_at}
           </div>

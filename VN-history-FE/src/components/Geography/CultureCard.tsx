@@ -1,6 +1,6 @@
 import { Info, Calendar } from "lucide-react";
 import { Link } from "react-router";
-import type { ArticleSummary } from "../../types/article.type";
+import type { ArticleSummary } from "../../types";
 
 export default function CultureCard({ item }: { item: ArticleSummary }) {
   return (

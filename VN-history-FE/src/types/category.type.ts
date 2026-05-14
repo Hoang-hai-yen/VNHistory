@@ -1,3 +1,5 @@
+import type { ArticleType } from "./article.type";
+
 export interface Category {
   id: string;
   name: string;
@@ -5,4 +7,3 @@ export interface Category {
   article_type: ArticleType;
   sort_order: number;
 }
-export type ArticleType = "event" | "person" | "place" | "video" | "culture";

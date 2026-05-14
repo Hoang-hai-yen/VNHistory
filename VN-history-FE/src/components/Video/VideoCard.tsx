@@ -1,4 +1,4 @@
-import type { ArticleSummary } from "../../types/article.type";
+import type { ArticleSummary } from "../../types";
 
 export default function VideoCard({
   video,
@@ -10,11 +10,7 @@ export default function VideoCard({
   return (
     <div className="group cursor-pointer">
       <div className="relative overflow-hidden aspect-video bg-[#1A1208] mb-3">
-        <div
-          className={`absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#1A1208] via-[#3D1A0A] to-[#1A0808]`}
-        >
-          <span className="text-3xl opacity-30">{video.type || "▶"}</span>
-        </div>
+        <img src={video.cover_image_url} alt={video.slug} />
 
         {/* Play Button Overlay */}
         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors flex items-center justify-center">

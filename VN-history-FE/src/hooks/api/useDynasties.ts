@@ -1,13 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "../../lib/http";
-import type { Dynasty } from "../../types/dynasty.type";
-import type { ApiResponse } from "../../types/api.type";
+import type { ApiListResponse, ApiResponse, Dynasty } from "../../types";
 
 export const useDynasties = () => {
-  return useQuery<ApiResponse<Dynasty[]>>({
+  return useQuery<ApiListResponse<Dynasty>>({
     queryKey: ["dynasties"],
     queryFn: async () => {
-      const res = await httpClient.get<ApiResponse<Dynasty[]>>("/dynasties");
+      const res = await httpClient.get<ApiListResponse<Dynasty>>("/dynasties");
       return res.data;
     },
     staleTime: 60 * 1000,

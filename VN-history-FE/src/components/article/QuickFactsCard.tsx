@@ -1,7 +1,7 @@
 import { BookOpen } from "lucide-react";
-import type { Article } from "../../types/article.type";
+import type { ArticleDetail } from "../../types";
 
-export default function QuickFactsCard({ article }: { article: Article }) {
+export default function QuickFactsCard({ article }: { article: ArticleDetail }) {
   return (
     <div className="bg-[#13100a] text-[#e8d9b0] rounded-sm p-6 border border-[#2e2510]">
       <h4 className="text-[10px] font-bold text-[#C5A028] tracking-[0.2em] uppercase mb-6 flex items-center gap-2">

@@ -1,4 +1,4 @@
-import type { ArticleSummary } from "../../types/article.type";
+import type { ArticleSummary } from "../../types";
 import PageSectionHeader from "../common/PageSectionHeader";
 import FiguresCard from "../Figures/FiguresCard";
 

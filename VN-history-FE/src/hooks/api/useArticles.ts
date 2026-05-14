@@ -1,11 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "../../lib/http";
-import type { Article } from "../../types/article.type";
-import type { ApiResponse } from "../../types/api.type";
+import type {
+  ApiListResponse,
+  ApiResponse,
+  ArticleDetail,
+  ArticleSummary,
+  ArticleType,
+} from "../../types";
 
 async function fetchArticleBySlug(slug: string) {
   console.log("fetchArticleBySlug called with slug:", slug);
-  const res = await httpClient.get<ApiResponse<Article>>(`/articles/${slug}`);
+  const res = await httpClient.get<ApiResponse<ArticleDetail>>(
+    `/articles/${slug}`,
+  );
   console.log("fetchArticleBySlug", res.data);
 
   return res.data.data;
@@ -24,7 +31,7 @@ export function useArticleBySlug(slug: string) {
 }
 
 // List articles
-export type ArticleTypeFilter = Article["type"];
+export type ArticleTypeFilter = ArticleType;
 
 export interface UseArticlesParams {
   type?: ArticleTypeFilter;
@@ -38,11 +45,6 @@ export interface UseArticlesParams {
   limit?: number; // default 20 on API
 }
 
-interface ArticlesResponse {
-  data: Article[];
-  total: number;
-}
-
 async function fetchArticles(params: UseArticlesParams = {}) {
   // normalize: bỏ undefined/null/"" và stringify number/boolean
   const entries = Object.entries(params).flatMap(([key, value]) => {
@@ -54,7 +56,7 @@ async function fetchArticles(params: UseArticlesParams = {}) {
   const searchParams = new URLSearchParams(entries);
   const query = searchParams.toString();
 
-  const res = await httpClient.get<ArticlesResponse>(
+  const res = await httpClient.get<ApiListResponse<ArticleSummary>>(
     `/articles${query ? `?${query}` : ""}`,
   );
   return res.data;

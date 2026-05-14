@@ -1,4 +1,6 @@
 
+import type { ArticleStatus, ArticleType } from "./article.type";
+
 export interface Timeline {
     id: string
     name: string
@@ -20,8 +22,8 @@ export interface Event {
   sort_order: number;
   title: string;
   slug: string;
-  type: string;
-  status: string;
+  type: ArticleType;
+  status: ArticleStatus;
   article_year: number;
   year_display: string;
   category_name: string;

@@ -1,10 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { httpClient } from "../../lib/http";
+import type { ReportSeverity } from "../../types";
 
 export interface CreateReportPayload {
   article_id: string;
   error_type: string;
-  severity: "low" | "medium" | "high";
+  severity: ReportSeverity;
   description?: string;
   quoted_text?: string;
   suggested_source?: string;
