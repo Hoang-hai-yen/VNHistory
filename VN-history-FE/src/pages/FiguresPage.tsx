@@ -5,13 +5,23 @@ import { useArticles } from "../hooks/api/useArticles";
 import QueryStateWrapper from "../components/States/QueryStateWrapper";
 import { InlineLoader } from "../components/Loading";
 import { usePaginationUrl } from "../hooks/usePaginationUrl";
+import { useCategories } from "../hooks/api/useCategories";
+import { useDynasties } from "../hooks/api/useDynasties";
+import { useArchiveFilters } from "../hooks/useArchiveFilters";
+import ArchiveFilterPanel from "../components/common/ArchiveFilterPanel";
 
 export default function FiguresPage() {
+  const { categoryId, dynastyId, setCategoryId, setDynastyId, clearFilters } =
+    useArchiveFilters();
   const { page, limit, totalPages, goToPage, nextPage, prevPage, changeLimit } =
     usePaginationUrl(0, 10);
 
+  const { data: categoriesData } = useCategories("person");
+  const { data: dynastiesData } = useDynasties();
   const { data, isPending, error, isFetching, refetch } = useArticles({
     type: "person",
+    category_id: categoryId || undefined,
+    dynasty_id: dynastyId || undefined,
     limit,
     page,
   });
@@ -21,8 +31,7 @@ export default function FiguresPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 pb-20">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-[11.5px] text-[#6b6b6b] py-4 lg:py-5">
+      <div className="flex items-center gap-1.5 py-4 text-[11.5px] text-[#6b6b6b] lg:py-5">
         <Link to="/" className="hover:text-[#8B1A1A]">
           Trang Chủ
         </Link>
@@ -30,14 +39,26 @@ export default function FiguresPage() {
         <span>Nhân Vật</span>
       </div>
 
-      {/* Section Header */}
-      <PageSectionHeader subtitle="Tiểu sử" title="Nhân vật lịch sử" />
+      <PageSectionHeader subtitle="Tiểu Sử" title="Nhân vật lịch sử" />
+
+      <ArchiveFilterPanel
+        title="Kho nhân vật lịch sử"
+        description="Lọc theo chuyên mục và triều đại để xem đúng tập nhân vật mà bạn đang nghiên cứu."
+        total={total}
+        categoryOptions={categoriesData?.data || []}
+        dynastyOptions={dynastiesData?.data || []}
+        categoryId={categoryId}
+        dynastyId={dynastyId}
+        onCategoryChange={setCategoryId}
+        onDynastyChange={setDynastyId}
+        onClear={clearFilters}
+      />
 
       <QueryStateWrapper
         isLoading={isPending && !data}
         error={error && !data ? error : null}
         data={figures}
-        emptyMessage="Không có nhân vật nào"
+        emptyMessage="Không có nhân vật nào phù hợp bộ lọc hiện tại"
         loadingMessage="Đang tải nhân vật..."
         onRetry={refetch}
         pagination={{
@@ -51,21 +72,16 @@ export default function FiguresPage() {
           onLimitChange: changeLimit,
         }}
       >
-        <p className=" text-[13.5px] text-[#6b6b6b] mb-8 font-light italic">
-          Click vào thẻ nhân vật để đọc tiểu sử chi tiết. Ảnh chân dung sẽ được
-          cập nhật khi có tư liệu.
-        </p>
-
         {isFetching && (
           <div className="mb-4 flex items-center gap-2">
             <InlineLoader size="sm" />
-            <span className="text-xs text-[#6b6b6b] italic">
-              Đang tải thêm nhân vật...
+            <span className="text-xs italic text-[#6b6b6b]">
+              Đang cập nhật danh sách nhân vật...
             </span>
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {figures.map((figure) => (
             <FiguresCard key={figure.id} figure={figure} />
           ))}

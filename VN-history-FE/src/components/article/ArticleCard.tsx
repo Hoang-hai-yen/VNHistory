@@ -1,12 +1,12 @@
 import { Link } from "react-router";
-import type { ArticleSummary } from "../../types";
+import type { NormalizedArticleSummary } from "../../types";
 
 export function ArticleCard({
   item,
   lg = false,
   horizontal = false,
 }: {
-  item: ArticleSummary;
+  item: NormalizedArticleSummary;
   lg?: boolean;
   horizontal?: boolean;
 }) {
@@ -16,11 +16,8 @@ export function ArticleCard({
         to={`/bai-viet/${item.slug}`}
         className="flex gap-3.5 cursor-pointer group py-3.5 border-b border-[#e0dbd0] last:border-none"
       >
-        <div className="w-22 h-16 shrink-0  overflow-hidden relative">
+        <div className="w-22 h-16 shrink-0 overflow-hidden relative">
           <img src={item.cover_image_url} alt={item.slug} />
-          <div className="absolute inset-0 flex items-center justify-center text-xl opacity-30">
-            {item.published_at}
-          </div>
         </div>
         <div className="flex-1">
           <div className="text-[9px] font-bold tracking-[2.5px] uppercase text-[#8B1A1A] mb-1">
@@ -41,18 +38,17 @@ export function ArticleCard({
       >
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1A1208] via-[#2D1F0A] to-[#1A1208]">
           <span className="text-3xl opacity-40 group-hover:scale-110 transition-transform duration-500">
-            {"⚔"}
+            {"\u2694"}
           </span>
           <span className="text-[9px] tracking-[2px] text-[#C8941A]/50 uppercase font-medium">
             {item.year_display}
           </span>
         </div>
-        {/* Hover overlay */}
         <div className="absolute inset-0 bg-[#8B1A1A]/0 group-hover:bg-[#8B1A1A]/10 transition-colors duration-300" />
       </div>
 
       <div className="text-[9px] font-bold tracking-[2.5px] uppercase text-[#8B1A1A] mb-1.5">
-        {item.category_id}
+        {item.display.type_label}
       </div>
 
       <h3

@@ -1,21 +1,37 @@
 import { Link } from "react-router";
 import PageSectionHeader from "../components/common/PageSectionHeader";
-import { Filter } from "lucide-react";
 import VideoCard from "../components/Video/VideoCard";
 import { useArticles } from "../hooks/api/useArticles";
-import { EmptyState } from "../components/Error";
-
-
+import QueryStateWrapper from "../components/States/QueryStateWrapper";
+import { useCategories } from "../hooks/api/useCategories";
+import { useDynasties } from "../hooks/api/useDynasties";
+import { useArchiveFilters } from "../hooks/useArchiveFilters";
+import ArchiveFilterPanel from "../components/common/ArchiveFilterPanel";
+import { usePaginationUrl } from "../hooks/usePaginationUrl";
+import { InlineLoader } from "../components/Loading";
 
 export default function VideoLibraryPage() {
-  const { data } = useArticles({
+  const { categoryId, dynastyId, setCategoryId, setDynastyId, clearFilters } =
+    useArchiveFilters();
+  const { page, limit, totalPages, goToPage, nextPage, prevPage, changeLimit } =
+    usePaginationUrl(0, 12);
+
+  const { data: categoriesData } = useCategories("video");
+  const { data: dynastiesData } = useDynasties();
+  const { data, isPending, error, isFetching, refetch } = useArticles({
     type: "video",
-  })
-  const VIDEOS = data?.data || [];
+    category_id: categoryId || undefined,
+    dynasty_id: dynastyId || undefined,
+    limit,
+    page,
+  });
+
+  const videos = data?.data || [];
+  const total = data?.total ?? 0;
+
   return (
     <div className="max-w-7xl mx-auto px-4 pb-20">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-[11.5px] text-[#6b6b6b] py-4 lg:py-5">
+      <div className="flex items-center gap-1.5 py-4 text-[11.5px] text-[#6b6b6b] lg:py-5">
         <Link to="/" className="hover:text-[#8B1A1A]">
           Trang Chủ
         </Link>
@@ -23,34 +39,54 @@ export default function VideoLibraryPage() {
         <span>Thư Viện Video</span>
       </div>
 
-      {/* Section Header */}
       <PageSectionHeader subtitle="Màn Ảnh" title="Video Tư Liệu Lịch Sử" />
 
-      {/* Filters Simulation */}
-      <div className="flex flex-wrap items-center gap-4 mb-8">
-        {["Tất cả", "Triều đại", "Kháng chiến", "Văn hóa", "Danh nhân"].map(
-          (filter, i) => (
-            <button
-              key={i}
-              className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all ${i === 0 ? "bg-[#8B1A1A] text-white shadow-md" : "bg-white border border-[#e0dbd0] text-[#6b6b6b] hover:border-[#8B1A1A] hover:text-[#8B1A1A]"}`}
-            >
-              {filter}
-            </button>
-          ),
-        )}
-        <div className="ml-auto flex items-center gap-2 text-[12px] text-[#6b6b6b] cursor-pointer hover:text-[#8B1A1A]">
-          <Filter size={14} />
-          Lọc theo thời đại
-        </div>
-      </div>
+      <ArchiveFilterPanel
+        title="Kho video lịch sử"
+        description="Xem các video tư liệu theo chuyên mục và triều đại để theo dõi mạch nội dung nhất quán với phần bài viết."
+        total={total}
+        categoryOptions={categoriesData?.data || []}
+        dynastyOptions={dynastiesData?.data || []}
+        categoryId={categoryId}
+        dynastyId={dynastyId}
+        onCategoryChange={setCategoryId}
+        onDynastyChange={setDynastyId}
+        onClear={clearFilters}
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-        {VIDEOS.length > 0 ? (VIDEOS.map((video, i) => (
-          <VideoCard key={i} video={video} />
-        ))) : (
-            <EmptyState title="Không có dữ liệu" description="Khong có dữ liệu" />
+      <QueryStateWrapper
+        isLoading={isPending && !data}
+        error={error && !data ? error : null}
+        data={videos}
+        emptyMessage="Không có video nào phù hợp bộ lọc hiện tại"
+        loadingMessage="Đang tải thư viện video..."
+        onRetry={refetch}
+        pagination={{
+          page,
+          limit,
+          totalPages,
+          total,
+          onNextPage: nextPage,
+          onPrevPage: prevPage,
+          onGoToPage: goToPage,
+          onLimitChange: changeLimit,
+        }}
+      >
+        {isFetching && (
+          <div className="mb-4 flex items-center gap-2">
+            <InlineLoader size="sm" />
+            <span className="text-xs italic text-[#6b6b6b]">
+              Đang cập nhật thư viện video...
+            </span>
+          </div>
         )}
-      </div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {videos.map((video) => (
+            <VideoCard key={video.id} video={video} />
+          ))}
+        </div>
+      </QueryStateWrapper>
     </div>
   );
 }

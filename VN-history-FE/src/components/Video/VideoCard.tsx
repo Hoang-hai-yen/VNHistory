@@ -1,10 +1,10 @@
-import type { ArticleSummary } from "../../types";
+import type { VideoArticle } from "../../types";
 
 export default function VideoCard({
   video,
   dark = false,
 }: {
-  video: ArticleSummary;
+  video: VideoArticle;
   dark?: boolean;
 }) {
   return (
@@ -12,7 +12,6 @@ export default function VideoCard({
       <div className="relative overflow-hidden aspect-video bg-[#1A1208] mb-3">
         <img src={video.cover_image_url} alt={video.slug} />
 
-        {/* Play Button Overlay */}
         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors flex items-center justify-center">
           <div className="w-13 h-13 bg-white/15 border-2 border-white/60 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:bg-[#8B1A1A] group-hover:border-[#8B1A1A] group-hover:scale-110 transition-all">
             <div className="w-0 h-0 border-y-[9px] border-y-transparent border-l-[16px] border-l-white ml-1" />
@@ -20,7 +19,7 @@ export default function VideoCard({
         </div>
 
         <span className="absolute bottom-2 right-2 z-10 bg-black/75 text-white text-[10.5px] px-1.5 py-0.5 font-medium">
-          {video.status}
+          {video.display.status_label}
         </span>
       </div>
 

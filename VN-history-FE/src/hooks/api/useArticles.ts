@@ -3,19 +3,21 @@ import { httpClient } from "../../lib/http";
 import type {
   ApiListResponse,
   ApiResponse,
-  ArticleDetail,
-  ArticleSummary,
+  ArticleDetailOfType,
+  ArticleSummaryOfType,
   ArticleType,
 } from "../../types";
+import {
+  normalizeArticleDetail,
+  normalizeArticleListResponse,
+} from "../../utils/article.utils";
 
 async function fetchArticleBySlug(slug: string) {
-  console.log("fetchArticleBySlug called with slug:", slug);
-  const res = await httpClient.get<ApiResponse<ArticleDetail>>(
+  const res = await httpClient.get<ApiResponse<ArticleDetailOfType>>(
     `/articles/${slug}`,
   );
-  console.log("fetchArticleBySlug", res.data);
 
-  return res.data.data;
+  return normalizeArticleDetail(res.data.data);
 }
 
 export function useArticleBySlug(slug: string) {
@@ -23,30 +25,30 @@ export function useArticleBySlug(slug: string) {
     queryKey: ["article", slug],
     queryFn: () => {
       if (!slug) throw new Error("slug is required");
-      console.log("start");
 
       return fetchArticleBySlug(slug);
     },
+    enabled: !!slug,
   });
 }
 
-// List articles
 export type ArticleTypeFilter = ArticleType;
 
-export interface UseArticlesParams {
-  type?: ArticleTypeFilter;
+export interface UseArticlesParams<T extends ArticleType = ArticleType> {
+  type?: T;
   dynasty_id?: string;
   category_id?: string;
   is_featured?: boolean;
   year_from?: number;
   year_to?: number;
   q?: string;
-  page?: number; // default 1 on API
-  limit?: number; // default 20 on API
+  page?: number;
+  limit?: number;
 }
 
-async function fetchArticles(params: UseArticlesParams = {}) {
-  // normalize: bỏ undefined/null/"" và stringify number/boolean
+async function fetchArticles<T extends ArticleType = ArticleType>(
+  params: UseArticlesParams<T> = {},
+) {
   const entries = Object.entries(params).flatMap(([key, value]) => {
     if (value === undefined || value === null) return [];
     if (typeof value === "string" && value.trim() === "") return [];
@@ -56,14 +58,16 @@ async function fetchArticles(params: UseArticlesParams = {}) {
   const searchParams = new URLSearchParams(entries);
   const query = searchParams.toString();
 
-  const res = await httpClient.get<ApiListResponse<ArticleSummary>>(
+  const res = await httpClient.get<ApiListResponse<ArticleSummaryOfType<T>>>(
     `/articles${query ? `?${query}` : ""}`,
   );
-  return res.data;
+
+  return normalizeArticleListResponse(res.data);
 }
 
-export function useArticles(params: UseArticlesParams = {}) {
-  // queryKey ổn định hơn: dùng array primitive thay vì object (tránh object identity)
+export function useArticles<T extends ArticleType = ArticleType>(
+  params: UseArticlesParams<T> = {},
+) {
   const queryKey = [
     "articles",
     params.type ?? "",

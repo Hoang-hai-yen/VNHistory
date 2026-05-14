@@ -1,9 +1,9 @@
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import PageSectionHeader from "../components/common/PageSectionHeader";
 import { useTimeline } from "../hooks/api/useTimeline";
 import QueryStateWrapper from "../components/States/QueryStateWrapper";
 import { motion, useScroll, useSpring } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
   BookOpen,
@@ -18,9 +18,10 @@ import {
 
 export default function TimelinePage() {
   const { data, error, isLoading, refetch } = useTimeline();
-  console.log("Timeline data:", data, "Error:", error, "Loading:", isLoading);
-
+  const [searchParams] = useSearchParams();
+  const selectedDynastySlug = searchParams.get("dynasty");
   const [activeDynasty, setActiveDynasty] = useState<string | null>(null);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -35,10 +36,28 @@ export default function TimelinePage() {
 
   const timelineData = data?.data || [];
 
+  useEffect(() => {
+    if (!selectedDynastySlug || timelineData.length === 0) return;
+
+    const matchedDynasty = timelineData.find(
+      (dynasty) => dynasty.slug === selectedDynastySlug,
+    );
+
+    if (!matchedDynasty) return;
+
+    setActiveDynasty(matchedDynasty.id);
+
+    requestAnimationFrame(() => {
+      document.getElementById(matchedDynasty.id)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, [selectedDynastySlug, timelineData]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 pb-20">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-[11.5px] text-[#6b6b6b] py-4 lg:py-5">
+      <div className="flex items-center gap-1.5 py-4 text-[11.5px] text-[#6b6b6b] lg:py-5">
         <Link to="/" className="hover:text-[#8B1A1A]">
           Trang Chủ
         </Link>
@@ -46,7 +65,6 @@ export default function TimelinePage() {
         <span>Dòng Thời Gian</span>
       </div>
 
-      {/* Section Header */}
       <PageSectionHeader subtitle="Dữ Liệu" title="Dòng Thời Gian Lịch Sử" />
 
       <QueryStateWrapper
@@ -58,39 +76,38 @@ export default function TimelinePage() {
         onRetry={refetch}
       >
         <motion.div
-          className="fixed top-14 left-0 right-0 h-1 bg-[#B8860B] z-50 origin-left"
+          className="fixed top-14 left-0 right-0 z-50 h-1 origin-left bg-[#B8860B]"
           style={{ scaleX }}
         />
 
         <div
-          className="bg-[#F4F1EA] min-h-screen font-['Source_Serif_4',serif]"
+          className="min-h-screen bg-[#F4F1EA] font-['Source_Serif_4',serif]"
           ref={containerRef}
         >
-          {/* Hero Section with Parallax Effect */}
-          <div className="relative h-[40vh] overflow-hidden bg-[#1A1208] flex items-center justify-center border-b-4 border-[#B8860B]">
+          <div className="relative flex h-[40vh] items-center justify-center overflow-hidden border-b-4 border-[#B8860B] bg-[#1A1208]">
             <div className="absolute inset-0 opacity-40">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/handmade-paper.png')] pointer-events-none" />
+              <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/handmade-paper.png')]" />
               <motion.div
                 initial={{ scale: 1.1, opacity: 0 }}
                 animate={{ scale: 1, opacity: 0.3 }}
                 transition={{ duration: 2 }}
-                className="w-full h-full bg-[url('https://images.unsplash.com/photo-1599708153386-62cd3f0216fc?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center"
+                className="h-full w-full bg-[url('https://images.unsplash.com/photo-1599708153386-62cd3f0216fc?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center"
               />
             </div>
-            <div className="relative z-10 text-center px-4">
+            <div className="relative z-10 px-4 text-center">
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <div className="text-[#B8860B] text-[10px] font-bold tracking-[6px] uppercase mb-4">
+                <div className="mb-4 text-[10px] font-bold uppercase tracking-[6px] text-[#B8860B]">
                   Chronicle of Civilizations
                 </div>
-                <h1 className="font-['Playfair_Display',serif] text-4xl md:text-6xl text-[#FAFAF7] font-bold mb-4 drop-shadow-lg">
+                <h1 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-[#FAFAF7] drop-shadow-lg md:text-6xl">
                   Dòng Thời Gian Lịch Sử
                 </h1>
-                <div className="w-24 h-1 bg-[#B8860B] mx-auto mb-6" />
-                <p className="text-white/70 max-w-xl mx-auto text-sm md:text-base italic font-light leading-relaxed">
+                <div className="mx-auto mb-6 h-1 w-24 bg-[#B8860B]" />
+                <p className="mx-auto max-w-xl text-sm italic leading-relaxed text-white/70 md:text-base">
                   "Lịch sử là túi đựng những sự kiện mà qua đó chúng ta tìm thấy
                   bản sắc của chính mình."
                 </p>
@@ -98,49 +115,51 @@ export default function TimelinePage() {
             </div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 relative">
-            {/* Sidebar Navigation */}
-            <aside className="hidden lg:block lg:col-span-3 sticky top-32 h-fit">
-              <div className="bg-white/50 backdrop-blur-sm border border-[#D4A017]/30 p-6 rounded-sm shadow-sm">
-                <h3 className="font-['Playfair_Display',serif] text-lg font-bold text-[#8B1A1A] mb-6 border-b border-[#D4A017]/20 pb-2 flex items-center gap-2">
+          <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 py-16 lg:grid-cols-12">
+            <aside className="sticky top-32 hidden h-fit lg:col-span-3 lg:block">
+              <div className="rounded-sm border border-[#D4A017]/30 bg-white/50 p-6 shadow-sm backdrop-blur-sm">
+                <h3 className="mb-6 flex items-center gap-2 border-b border-[#D4A017]/20 pb-2 font-['Playfair_Display',serif] text-lg font-bold text-[#8B1A1A]">
                   <History size={18} />
                   Các Thời Kỳ
                 </h3>
                 <nav className="flex flex-col gap-1">
-                  {data &&
-                    timelineData.map((dynasty) => (
-                      <button
-                        key={dynasty.id}
-                        onClick={() => {
-                          document.getElementById(dynasty.id)?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          });
-                          setActiveDynasty(dynasty.id);
-                        }}
-                        className={`text-left px-3 py-2 text-[13px] transition-all rounded-sm flex items-center justify-between group ${
+                  {timelineData.map((dynasty) => (
+                    <button
+                      key={dynasty.id}
+                      onClick={() => {
+                        document.getElementById(dynasty.id)?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                        setActiveDynasty(dynasty.id);
+                      }}
+                      className={`group flex items-center justify-between rounded-sm px-3 py-2 text-left text-[13px] transition-all ${
+                        activeDynasty === dynasty.id
+                          ? "bg-[#8B1A1A] text-white"
+                          : "text-[#6b6b6b] hover:bg-[#B8860B]/10 hover:text-[#1c1c1c]"
+                      }`}
+                    >
+                      <span className="truncate pr-2">{dynasty.name}</span>
+                      <ChevronRight
+                        size={14}
+                        className={`shrink-0 transition-transform ${
                           activeDynasty === dynasty.id
-                            ? "bg-[#8B1A1A] text-white"
-                            : "text-[#6b6b6b] hover:bg-[#B8860B]/10 hover:text-[#1c1c1c]"
+                            ? "rotate-90"
+                            : "group-hover:translate-x-1"
                         }`}
-                      >
-                        <span className="truncate pr-2">{dynasty.name}</span>
-                        <ChevronRight
-                          size={14}
-                          className={`shrink-0 transition-transform ${activeDynasty === dynasty.id ? "rotate-90" : "group-hover:translate-x-1"}`}
-                        />
-                      </button>
-                    ))}
+                      />
+                    </button>
+                  ))}
                 </nav>
 
-                <div className="mt-8 pt-6 border-t border-[#D4A017]/20">
+                <div className="mt-8 border-t border-[#D4A017]/20 pt-6">
                   <Link
                     to="/bao-cao-loi"
-                    className="flex items-center gap-3 p-3 bg-[#8B1A1A]/5 border border-[#8B1A1A]/20 rounded-sm hover:bg-[#8B1A1A]/10 transition-colors group"
+                    className="group flex items-center gap-3 rounded-sm border border-[#8B1A1A]/20 bg-[#8B1A1A]/5 p-3 transition-colors hover:bg-[#8B1A1A]/10"
                   >
                     <ShieldAlert size={18} className="text-[#8B1A1A]" />
                     <div>
-                      <div className="text-[11px] font-bold text-[#8B1A1A] uppercase tracking-wider">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-[#8B1A1A]">
                         Góp Ý Tư Liệu
                       </div>
                       <div className="text-[10px] text-[#6b6b6b]">
@@ -152,29 +171,26 @@ export default function TimelinePage() {
               </div>
             </aside>
 
-            {/* Main Timeline Thread */}
             <div className="lg:col-span-9">
               <div className="relative">
-                {/* Vertical line connector */}
-                <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#B8860B] via-[#8B1A1A] to-[#B8860B] opacity-20 hidden md:block" />
+                <div className="absolute left-4 top-0 bottom-0 hidden w-[2px] bg-gradient-to-b from-[#B8860B] via-[#8B1A1A] to-[#B8860B] opacity-20 md:left-1/2 md:block" />
 
                 <div className="space-y-24">
                   {timelineData.map((dynasty) => (
                     <section
                       key={dynasty.id}
                       id={dynasty.id}
-                      className="relative"
+                      className="relative scroll-mt-24"
                     >
-                      {/* Dynasty Header */}
-                      <div className="flex flex-col items-center mb-12 relative z-10">
+                      <div className="relative z-10 mb-12 flex flex-col items-center">
                         <motion.div
                           initial={{ scale: 0.8, opacity: 0 }}
                           whileInView={{ scale: 1, opacity: 1 }}
                           viewport={{ once: true }}
-                          className="bg-[#1A1208] text-[#D4A017] px-6 py-2 border-2 border-[#B8860B] rounded-full shadow-xl mb-6 flex items-center gap-3"
+                          className="mb-6 flex items-center gap-3 rounded-full border-2 border-[#B8860B] bg-[#1A1208] px-6 py-2 text-[#D4A017] shadow-xl"
                         >
                           <Calendar size={18} />
-                          <span className="text-sm font-bold tracking-[3px] uppercase">
+                          <span className="text-sm font-bold uppercase tracking-[3px]">
                             {dynasty.year_display}
                           </span>
                         </motion.div>
@@ -183,7 +199,7 @@ export default function TimelinePage() {
                           initial={{ y: 20, opacity: 0 }}
                           whileInView={{ y: 0, opacity: 1 }}
                           viewport={{ once: true }}
-                          className="font-['Playfair_Display',serif] text-3xl md:text-5xl font-bold text-[#1c1c1c] mb-4 text-center"
+                          className="mb-4 text-center font-['Playfair_Display',serif] text-3xl font-bold text-[#1c1c1c] md:text-5xl"
                         >
                           {dynasty.name}
                         </motion.h2>
@@ -193,18 +209,17 @@ export default function TimelinePage() {
                             initial={{ opacity: 0 }}
                             whileInView={{ opacity: 1 }}
                             viewport={{ once: true }}
-                            className="text-[#6b6b6b] text-center max-w-2xl text-[15px] italic leading-relaxed"
+                            className="max-w-2xl text-center text-[15px] italic leading-relaxed text-[#6b6b6b]"
                           >
                             {dynasty.description}
                           </motion.p>
                         )}
                       </div>
 
-                      {/* Events within Dynasty */}
                       <div className="space-y-12">
                         {dynasty.events.length > 0 ? (
-                          dynasty.events.map((event, eIndex) => {
-                            const isEven = eIndex % 2 === 0;
+                          dynasty.events.map((event, index) => {
+                            const isEven = index % 2 === 0;
                             return (
                               <motion.div
                                 key={event.id}
@@ -212,40 +227,54 @@ export default function TimelinePage() {
                                 whileInView={{ x: 0, opacity: 1 }}
                                 viewport={{ once: true, margin: "-100px" }}
                                 transition={{ duration: 0.6, ease: "easeOut" }}
-                                className={`flex flex-col md:flex-row items-center gap-8 md:gap-0 ${isEven ? "md:flex-row" : "md:flex-row-reverse"}`}
+                                className={`flex flex-col items-center gap-8 md:gap-0 ${
+                                  isEven
+                                    ? "md:flex-row"
+                                    : "md:flex-row-reverse"
+                                }`}
                               >
-                                {/* Content Card */}
                                 <div
-                                  className={`w-full md:w-[45%] ${isEven ? "md:pr-12 md:text-right" : "md:pl-12 md:text-left"}`}
+                                  className={`w-full md:w-[45%] ${
+                                    isEven
+                                      ? "md:pr-12 md:text-right"
+                                      : "md:pl-12 md:text-left"
+                                  }`}
                                 >
                                   <Link
-                                    to={`/bai-viet/${event.id}`}
+                                    to={`/bai-viet/${event.slug}`}
                                     className="group block"
                                   >
-                                    <div className="bg-white p-6 rounded-sm shadow-sm hover:shadow-xl border-b-4 border-transparent hover:border-[#8B1A1A] transition-all duration-500 relative overflow-hidden">
-                                      {/* Subtle texture overlay */}
-                                      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-20 pointer-events-none" />
+                                    <div className="relative overflow-hidden rounded-sm border-b-4 border-transparent bg-white p-6 shadow-sm transition-all duration-500 hover:border-[#8B1A1A] hover:shadow-xl">
+                                      <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-20" />
 
                                       <div
-                                        className={`flex items-center gap-3 mb-3 ${isEven ? "md:justify-end" : "md:justify-start"}`}
+                                        className={`mb-3 flex items-center gap-3 ${
+                                          isEven
+                                            ? "md:justify-end"
+                                            : "md:justify-start"
+                                        }`}
                                       >
-                                        <span className="text-[10px] font-bold text-[#B8860B] uppercase tracking-widest bg-[#B8860B]/5 px-2 py-0.5 rounded-sm">
+                                        <span className="rounded-sm bg-[#B8860B]/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#B8860B]">
                                           {event.category_name}
                                         </span>
-                                        <span className="text-[11px] text-[#6b6b6b] font-medium">
+                                        <span className="text-[11px] font-medium text-[#6b6b6b]">
                                           {event.year_display}
                                         </span>
                                       </div>
 
-                                      <h3 className="font-['Playfair_Display',serif] text-xl font-bold text-[#1c1c1c] mb-3 group-hover:text-[#8B1A1A] transition-colors">
+                                      <h3 className="mb-3 font-['Playfair_Display',serif] text-xl font-bold text-[#1c1c1c] transition-colors group-hover:text-[#8B1A1A]">
                                         {event.title}
                                       </h3>
-                                      <p className="text-[14px] text-[#6b6b6b] leading-relaxed mb-4 line-clamp-3 font-light">
+                                      <p className="mb-4 line-clamp-3 text-[14px] font-light leading-relaxed text-[#6b6b6b]">
                                         {event.note}
                                       </p>
 
                                       <div
-                                        className={`flex items-center gap-2 text-[12px] font-bold text-[#8B1A1A] uppercase tracking-wider group-hover:gap-4 transition-all ${isEven ? "md:justify-end" : "md:justify-start"}`}
+                                        className={`flex items-center gap-2 text-[12px] font-bold uppercase tracking-wider text-[#8B1A1A] transition-all group-hover:gap-4 ${
+                                          isEven
+                                            ? "md:justify-end"
+                                            : "md:justify-start"
+                                        }`}
                                       >
                                         Đọc Chi Tiết <ArrowUpRight size={14} />
                                       </div>
@@ -253,37 +282,35 @@ export default function TimelinePage() {
                                   </Link>
                                 </div>
 
-                                {/* Center Dot */}
-                                <div className="relative z-10 w-12 flex justify-center">
-                                  <div className="w-10 h-10 rounded-full bg-[#FAFAF7] border-2 border-[#B8860B] shadow-inner flex items-center justify-center group cursor-pointer hover:bg-[#B8860B] transition-colors duration-300">
-                                    <div className="w-3 h-3 rounded-full bg-[#B8860B] group-hover:bg-[#FAFAF7]" />
+                                <div className="relative z-10 flex w-12 justify-center">
+                                  <div className="group flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-[#B8860B] bg-[#FAFAF7] shadow-inner transition-colors duration-300 hover:bg-[#B8860B]">
+                                    <div className="h-3 w-3 rounded-full bg-[#B8860B] group-hover:bg-[#FAFAF7]" />
                                   </div>
                                 </div>
 
-                                {/* Decorative Placeholder for image or icon */}
                                 <div
-                                  className={`w-full md:w-[45%] ${isEven ? "md:pl-12" : "md:pr-12"}`}
+                                  className={`w-full md:w-[45%] ${
+                                    isEven ? "md:pl-12" : "md:pr-12"
+                                  }`}
                                 >
-                                  <div className="aspect-[16/9] rounded-sm bg-[#1A1208] overflow-hidden group shadow-lg border border-[#D4A017]/20 relative">
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-[#1A1208] to-transparent z-10 opacity-60" />
-                                    <div className="w-full h-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-700">
+                                  <div className="group relative aspect-[16/9] overflow-hidden rounded-sm border border-[#D4A017]/20 bg-[#1A1208] shadow-lg">
+                                    <div className="absolute inset-0 z-10 bg-gradient-to-tr from-[#1A1208] to-transparent opacity-60" />
+                                    <div className="flex h-full w-full items-center justify-center transition-transform duration-700 group-hover:scale-110">
                                       {event.type === "person" && (
-                                        <Users className="text-[#D4A017]/30 w-16 h-16" />
+                                        <Users className="h-16 w-16 text-[#D4A017]/30" />
                                       )}
                                       {event.type === "event" && (
-                                        <Calendar className="text-[#D4A017]/30 w-16 h-16" />
+                                        <Calendar className="h-16 w-16 text-[#D4A017]/30" />
                                       )}
                                       {event.type === "place" && (
-                                        <MapPin className="text-[#D4A017]/30 w-16 h-16" />
+                                        <MapPin className="h-16 w-16 text-[#D4A017]/30" />
                                       )}
                                       {event.type === "video" && (
-                                        <Play className="text-[#D4A017]/30 w-16 h-16" />
+                                        <Play className="h-16 w-16 text-[#D4A017]/30" />
                                       )}
                                     </div>
-                                    <div className="absolute bottom-4 left-4 z-20">
-                                      <div className="text-[10px] text-[#D4A017] uppercase tracking-[2px] font-bold">
-                                        Tư Liệu Hình Ảnh
-                                      </div>
+                                    <div className="absolute bottom-4 left-4 z-20 text-[10px] font-bold uppercase tracking-[2px] text-[#D4A017]">
+                                      Tư Liệu Hình Ảnh
                                     </div>
                                   </div>
                                 </div>
@@ -291,12 +318,12 @@ export default function TimelinePage() {
                             );
                           })
                         ) : (
-                          <div className="text-center py-12 border-2 border-dashed border-[#D4A017]/20 rounded-sm">
+                          <div className="rounded-sm border-2 border-dashed border-[#D4A017]/20 py-12 text-center">
                             <BookOpen
-                              className="mx-auto text-[#B8860B]/30 mb-4"
+                              className="mx-auto mb-4 text-[#B8860B]/30"
                               size={32}
                             />
-                            <p className="text-[#6b6b6b] text-sm italic">
+                            <p className="text-sm italic text-[#6b6b6b]">
                               Dữ liệu sự kiện đang được biên soạn cho giai đoạn
                               này...
                             </p>
@@ -308,26 +335,25 @@ export default function TimelinePage() {
                 </div>
               </div>
 
-              {/* Bottom Call to Action */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="mt-32 p-12 bg-[#1A1208] border-t-4 border-[#B8860B] rounded-sm text-center relative overflow-hidden"
+                className="relative mt-32 overflow-hidden rounded-sm border-t-4 border-[#B8860B] bg-[#1A1208] p-12 text-center"
               >
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/handmade-paper.png')] opacity-10 pointer-events-none" />
+                <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/handmade-paper.png')] opacity-10" />
                 <div className="relative z-10">
-                  <h3 className="font-['Playfair_Display',serif] text-3xl text-white font-bold mb-6">
+                  <h3 className="mb-6 font-['Playfair_Display',serif] text-3xl font-bold text-white">
                     Bạn đóng góp cho kho sử liệu?
                   </h3>
-                  <p className="text-white/60 max-w-2xl mx-auto mb-8 font-light italic">
+                  <p className="mx-auto mb-8 max-w-2xl font-light italic text-white/60">
                     Chúng tôi luôn trân trọng những đóng góp về tư liệu, hình
                     ảnh và đính chính sai sót để xây dựng một bộ bách khoa toàn
                     thư lịch sử chính xác nhất.
                   </p>
                   <Link
                     to="/bao-cao-loi"
-                    className="inline-flex items-center gap-3 bg-[#B8860B] hover:bg-[#D4A017] text-[#1A1208] px-8 py-3.5 rounded-sm font-bold uppercase tracking-widest text-[13px] transition-all shadow-lg hover:shadow-[#D4A017]/20"
+                    className="inline-flex items-center gap-3 rounded-sm bg-[#B8860B] px-8 py-3.5 text-[13px] font-bold uppercase tracking-widest text-[#1A1208] shadow-lg transition-all hover:bg-[#D4A017] hover:shadow-[#D4A017]/20"
                   >
                     <ShieldAlert size={18} />
                     Gửi Báo Cáo & Góp Ý

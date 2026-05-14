@@ -32,6 +32,13 @@ export interface ArticleSummary {
   updated_at: string;
 }
 
+export type ArticleSummaryOfType<T extends ArticleType = ArticleType> = Omit<
+  ArticleSummary,
+  "type"
+> & {
+  type: T;
+};
+
 export interface ArticleDetail extends ArticleSummary {
   dynasty_name: string;
   category_name: string;
@@ -41,6 +48,13 @@ export interface ArticleDetail extends ArticleSummary {
   sources: Source[];
   related: RelatedArticle[];
 }
+
+export type ArticleDetailOfType<T extends ArticleType = ArticleType> = Omit<
+  ArticleDetail,
+  "type"
+> & {
+  type: T;
+};
 
 export interface Media {
   id: string;
@@ -94,3 +108,41 @@ export interface RelatedArticle {
   year_display: string;
   relation_type: RelationType;
 }
+
+export type RelatedArticleOfType<T extends ArticleType = ArticleType> = Omit<
+  RelatedArticle,
+  "type"
+> & {
+  type: T;
+};
+
+export interface ArticleDisplay {
+  type_label: string;
+  status_label: string;
+  published_at_label: string | null;
+}
+
+export interface ArticleDetailDisplay extends ArticleDisplay {
+  location_label: string | null;
+  period_label: string | null;
+  category_label: string | null;
+  dynasty_label: string | null;
+}
+
+export type NormalizedRelatedArticle<T extends ArticleType = ArticleType> =
+  RelatedArticleOfType<T> & {
+    display: Pick<ArticleDisplay, "type_label">;
+  };
+
+export type NormalizedArticleSummary<T extends ArticleType = ArticleType> =
+  ArticleSummaryOfType<T> & {
+    display: ArticleDisplay;
+  };
+
+export type NormalizedArticleDetail<T extends ArticleType = ArticleType> =
+  Omit<ArticleDetailOfType<T>, "related"> & {
+    related: NormalizedRelatedArticle[];
+    display: ArticleDetailDisplay;
+  };
+
+export type VideoArticle = NormalizedArticleSummary<"video">;

@@ -1,13 +1,17 @@
-import type { ArticleSummary } from "../../types";
+import type { NormalizedArticleSummary } from "../../types";
 import PageSectionHeader from "../common/PageSectionHeader";
 import FiguresCard from "../Figures/FiguresCard";
 
-export default function HeroFigures({ FIGURES }: { FIGURES: ArticleSummary[] }) {
+export default function HeroFigures({
+  FIGURES,
+}: {
+  FIGURES: NormalizedArticleSummary<"person">[];
+}) {
   return (
     <div>
       <PageSectionHeader
-        subtitle="Nhân Vật"
-        title="Anh Hùng Dân Tộc"
+        subtitle="Nh\u00e2n V\u1eadt"
+        title="Anh H\u00f9ng D\u00e2n T\u1ed9c"
         moreLink="/nhan-vat"
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">

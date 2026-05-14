@@ -1,11 +1,11 @@
 import { Link } from "react-router";
-import type { ArticleSummary } from "../../types";
+import type { NormalizedArticleSummary } from "../../types";
 
 export default function FiguresCard({
   figure,
   forHome = false,
 }: {
-  figure: ArticleSummary;
+  figure: NormalizedArticleSummary<"person">;
   forHome?: boolean;
 }) {
   return (
@@ -17,7 +17,6 @@ export default function FiguresCard({
       <div
         className={`relative overflow-hidden ${forHome ? "aspect-[3/2]" : "aspect-[3/4]"}`}
       >
-        {/* lazy loading here */}
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-gradient-to-b from-[#2D1F0A] to-[#1A1208]">
           <div className="w-16 h-16 rounded-full border-2 border-[#C8941A]/30 flex items-center justify-center text-3xl bg-[#C8941A]/10 group-hover:scale-105 transition-transform duration-500">
             image here
@@ -27,7 +26,7 @@ export default function FiguresCard({
           </div>
         </div>
         <div className="absolute top-2.5 left-2.5 bg-[#8B1A1A] text-white text-[8.5px] font-bold tracking-[1.5px] uppercase px-2 py-0.5">
-          {figure.dynasty_id}
+          {figure.display.type_label}
         </div>
       </div>
 

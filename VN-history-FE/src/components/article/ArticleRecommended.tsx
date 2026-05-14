@@ -1,22 +1,26 @@
 import { Link } from "react-router";
-import type { ArticleDetail, RelatedArticle } from "../../types";
+import type {
+  NormalizedArticleDetail,
+  NormalizedRelatedArticle,
+} from "../../types";
 
 export default function ArticleRecommended({
   article,
 }: {
-  article: ArticleDetail;
+  article: NormalizedArticleDetail;
 }) {
-  const articleRelated: RelatedArticle[] = article.related || [];
+  const articleRelated: NormalizedRelatedArticle[] = article.related || [];
+
   return (
     <div>
       <h4 className="text-[13px] font-bold text-[#1c1c1c] uppercase tracking-widest mb-6 border-b border-[#E8D9B0] pb-2">
-        Bài viết gợi ý
+        B\u00e0i vi\u1ebft g\u1ee3i \u00fd
       </h4>
       <div className="space-y-6">
         {articleRelated.slice(0, 3).map((ev) => (
           <Link key={ev.id} to={`/bai-viet/${ev.slug}`} className="group block">
             <div className="text-[10px] text-[#C5A028] font-bold mb-1">
-              {ev.year_display} — {ev.type}
+              {ev.year_display} {"\u2014"} {ev.display.type_label}
             </div>
             <h5 className="text-[15px] font-['Playfair_Display',serif] font-bold leading-tight group-hover:text-[#8B1A1A] transition-colors">
               {ev.title}

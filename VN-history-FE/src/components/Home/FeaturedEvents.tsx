@@ -1,17 +1,15 @@
-import { useArticles } from "../../hooks/api/useArticles";
+import type { NormalizedArticleSummary, VideoArticle } from "../../types";
 import { ArticleCard } from "../article/ArticleCard";
 import PageSectionHeader from "../common/PageSectionHeader";
 import VideoCard from "../Video/VideoCard";
 
-export default function FeaturedEvents() {
-  const { data: eventsData } = useArticles({
-    type: "event",
-    is_featured: true,
-  });
-  const { data: videosData } = useArticles({
-    type: "video",
-    is_featured: true,
-  });
+export default function FeaturedEvents({
+  events,
+  videos,
+}: {
+  events: NormalizedArticleSummary<"event">[];
+  videos: VideoArticle[];
+}) {
   return (
     <div>
       <PageSectionHeader
@@ -20,26 +18,37 @@ export default function FeaturedEvents() {
         moreLink="/dong-thoi-gian"
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5 mb-10">
-        {eventsData?.data[0] && <ArticleCard lg item={eventsData?.data[0]} />}
+      {events.length > 0 ? (
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5 mb-10">
+          <ArticleCard lg item={events[0]} />
 
-        <div className="flex flex-col">
-          {eventsData?.data.slice(1, 4).map((event) => (
-            <ArticleCard key={event.id} horizontal item={event} />
-          ))}
+          <div className="flex flex-col">
+            {events.slice(1, 4).map((event) => (
+              <ArticleCard key={event.id} horizontal item={event} />
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mb-10 rounded-sm border border-dashed border-[#d9ccb8] bg-[#faf7f0] p-8 text-center text-[14px] text-[#6b6b6b]">
+          Chưa có sự kiện nổi bật để hiển thị.
+        </div>
+      )}
 
-      {/* video */}
-      <div className="my-8 p-6 bg-white border border-[#e0dbd0] border-l-3 border-[#8B1A1A]">
-        <div className="text-[9px] font-bold tracking-[3px] uppercase text-[#8B1A1A] mb-3.5">
-          ▶ Video Liên Quan
+      <div className="my-8 rounded-sm border border-[#e0dbd0] border-l-4 border-l-[#8B1A1A] bg-white p-6">
+        <div className="mb-3.5 text-[9px] font-bold uppercase tracking-[3px] text-[#8B1A1A]">
+          Video liên quan
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-          {videosData?.data.map((video) => (
-            <VideoCard key={video.id} video={video} />
-          ))}
-        </div>
+        {videos.length > 0 ? (
+          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
+            {videos.map((video) => (
+              <VideoCard key={video.id} video={video} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-sm bg-[#faf7f0] px-4 py-6 text-[13px] text-[#6b6b6b]">
+            Chưa có video nổi bật trong thời điểm này.
+          </div>
+        )}
       </div>
     </div>
   );

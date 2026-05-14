@@ -28,9 +28,6 @@ export default function ArticleDetailPage() {
     refetch,
   } = useArticleBySlug(slug || "");
 
-  // Get cover image
-
-  // Get previous and next articles from related
   const prevArticle = articleData?.related?.find(
     (r) => r.relation_type === "previous",
   );
@@ -43,31 +40,29 @@ export default function ArticleDetailPage() {
       isLoading={isLoading}
       error={error}
       data={articleData}
-      emptyMessage="Bài viết không tồn tại"
-      loadingMessage="Đang tải bài viết..."
+      emptyMessage="B\u00e0i vi\u1ebft kh\u00f4ng t\u1ed3n t\u1ea1i"
+      loadingMessage="\u0110ang t\u1ea3i b\u00e0i vi\u1ebft..."
       onRetry={refetch}
     >
       <div className="bg-[#FDFBF7] min-h-screen text-[#2c2c2c] selection:bg-[#F5C842] selection:text-[#1c1c1c]">
-        {/* Top Header Image Area */}
         <ArticleHeaderWithImage article={articleData!} />
 
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-12 lg:py-20">
-          {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-[11.5px] text-[#6b6b6b] mb-8 lg:mb-12">
             <Link to="/" className="hover:text-[#8B1A1A]">
-              Trang Chủ
+              Trang Ch\u1ee7
             </Link>
-            <span className="opacity-40">›</span>
+            <span className="opacity-40">{"\u203a"}</span>
             <Link to="/bai-viet" className="hover:text-[#8B1A1A]">
-              Bài Viết
+              B\u00e0i Vi\u1ebft
             </Link>
-            <span className="opacity-40">›</span>
-            {articleData?.category_name && (
+            <span className="opacity-40">{"\u203a"}</span>
+            {articleData?.display.category_label && (
               <>
                 <span className="hover:text-[#8B1A1A] cursor-pointer">
-                  {articleData.category_name}
+                  {articleData.display.category_label}
                 </span>
-                <span className="opacity-40">›</span>
+                <span className="opacity-40">{"\u203a"}</span>
               </>
             )}
             <span className="text-[#1c1c1c] font-medium line-clamp-1">
@@ -75,67 +70,56 @@ export default function ArticleDetailPage() {
             </span>
           </div>
 
-          {/* Article Meta Info */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-12 pb-12 border-b border-[#E8D9B0]">
-            {/* Publication Date */}
             <div className="flex flex-col">
               <span className="text-[10px] text-[#B8860B] font-bold uppercase tracking-widest mb-2">
-                Ngày Đăng
+                Ng\u00e0y \u0110\u0103ng
               </span>
               <div className="flex items-center gap-2 text-[#1c1c1c]">
                 <Calendar size={16} className="text-[#8B1A1A]" />
                 <span className="text-[13px] font-medium">
-                  {articleData?.published_at
-                    ? new Date(articleData.published_at).toLocaleDateString(
-                        "vi-VN",
-                      )
-                    : "N/A"}
+                  {articleData?.display.published_at_label || "N/A"}
                 </span>
               </div>
             </div>
 
-            {/* Time Period */}
-            {(articleData?.year_start || articleData?.year_end) && (
+            {articleData?.display.period_label && (
               <div className="flex flex-col">
                 <span className="text-[10px] text-[#B8860B] font-bold uppercase tracking-widest mb-2">
-                  Thời Kỳ
+                  Th\u1eddi K\u1ef3
                 </span>
                 <div className="flex items-center gap-2 text-[#1c1c1c]">
                   <Calendar size={16} className="text-[#8B1A1A]" />
                   <span className="text-[13px] font-medium">
-                    {articleData.year_start && articleData.year_end
-                      ? `${articleData.year_start} - ${articleData.year_end}`
-                      : articleData.year_start || articleData.year_end || "N/A"}
+                    {articleData.display.period_label}
                   </span>
                 </div>
               </div>
             )}
 
-            {/* Dynasty */}
-            {articleData?.dynasty_name && (
+            {articleData?.display.dynasty_label && (
               <div className="flex flex-col">
                 <span className="text-[10px] text-[#B8860B] font-bold uppercase tracking-widest mb-2">
-                  Triều Đại
+                  Tri\u1ec1u \u0110\u1ea1i
                 </span>
                 <div className="flex items-center gap-2 text-[#1c1c1c]">
                   <Book size={16} className="text-[#8B1A1A]" />
                   <span className="text-[13px] font-medium">
-                    {articleData.dynasty_name}
+                    {articleData.display.dynasty_label}
                   </span>
                 </div>
               </div>
             )}
 
-            {/* Category */}
-            {articleData?.category_name && (
+            {articleData?.display.category_label && (
               <div className="flex flex-col">
                 <span className="text-[10px] text-[#B8860B] font-bold uppercase tracking-widest mb-2">
-                  Chuyên Mục
+                  Chuy\u00ean M\u1ee5c
                 </span>
                 <div className="flex items-center gap-2 text-[#1c1c1c]">
                   <AlertTriangle size={16} className="text-[#8B1A1A]" />
                   <span className="text-[13px] font-medium">
-                    {articleData.category_name}
+                    {articleData.display.category_label}
                   </span>
                 </div>
               </div>
@@ -143,20 +127,18 @@ export default function ArticleDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-16">
-            {/* Main Content Area */}
             <motion.article
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="prose prose-stone max-w-none"
             >
-              {/* Reading Tools Bar */}
               <div className="flex items-center justify-between border-y border-[#E8D9B0] py-4 mb-12 sticky top-4 z-10 bg-[#FDFBF7]/90 backdrop-blur-sm">
                 <div className="flex items-center gap-4">
                   <button className="flex items-center gap-2 text-[12px] font-bold text-[#1c1c1c] uppercase tracking-wider hover:text-[#8B1A1A] transition-colors">
-                    <Heart size={16} /> Lưu bài viết
+                    <Heart size={16} /> L\u01b0u b\u00e0i vi\u1ebft
                   </button>
                   <button className="flex items-center gap-2 text-[12px] font-bold text-[#1c1c1c] uppercase tracking-wider hover:text-[#8B1A1A] transition-colors">
-                    <Share2 size={16} /> Chia sẻ
+                    <Share2 size={16} /> Chia s\u1ebb
                   </button>
                 </div>
                 <div className="flex items-center gap-3">
@@ -169,7 +151,6 @@ export default function ArticleDetailPage() {
                 </div>
               </div>
 
-              {/* Text Content */}
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -188,11 +169,10 @@ export default function ArticleDetailPage() {
                 {articleData?.content || ""}
               </ReactMarkdown>
 
-              {/* Places Section */}
               {articleData?.places && articleData.places.length > 0 && (
                 <div className="mt-16 pt-12 border-t border-[#E8D9B0]">
                   <h3 className="text-xl font-['Playfair_Display',serif] font-bold text-[#1c1c1c] mb-6">
-                    Địa Điểm Liên Quan
+                    \u0110\u1ecba \u0110i\u1ec3m Li\u00ean Quan
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {articleData.places.map((place) => (
@@ -210,11 +190,11 @@ export default function ArticleDetailPage() {
                               {place.place_name}
                             </h4>
                             <p className="text-[12px] text-[#6b6b6b] mt-1">
-                              {place.province} • {place.place_type}
+                              {place.province} {"\u2022"} {place.place_type}
                             </p>
                             {place.unesco_status && (
                               <p className="text-[11px] text-[#B8860B] font-medium mt-2">
-                                ✓ Di sản UNESCO
+                                {"\u2713"} Di s\u1ea3n UNESCO
                               </p>
                             )}
                           </div>
@@ -226,7 +206,7 @@ export default function ArticleDetailPage() {
                             rel="noopener noreferrer"
                             className="text-[11px] text-[#8B1A1A] font-medium hover:underline"
                           >
-                            Xem trên bản đồ →
+                            Xem tr\u00ean b\u1ea3n \u0111\u1ed3 {"\u2192"}
                           </a>
                         )}
                       </div>
@@ -235,11 +215,10 @@ export default function ArticleDetailPage() {
                 </div>
               )}
 
-              {/* Sources Section */}
               {articleData?.sources && articleData.sources.length > 0 && (
                 <div className="mt-16 pt-12 border-t border-[#E8D9B0]">
                   <h3 className="text-xl font-['Playfair_Display',serif] font-bold text-[#1c1c1c] mb-6">
-                    Tài Liệu Tham Khảo
+                    T\u00e0i Li\u1ec7u Tham Kh\u1ea3o
                   </h3>
                   <div className="space-y-4">
                     {articleData.sources.map((source) => (
@@ -265,13 +244,13 @@ export default function ArticleDetailPage() {
                               )}
                               {source.publisher && (
                                 <>
-                                  <span>•</span>
+                                  <span>{"\u2022"}</span>
                                   <span>{source.publisher}</span>
                                 </>
                               )}
                               {source.year && (
                                 <>
-                                  <span>•</span>
+                                  <span>{"\u2022"}</span>
                                   <span>{source.year}</span>
                                 </>
                               )}
@@ -283,7 +262,7 @@ export default function ArticleDetailPage() {
                                 rel="noopener noreferrer"
                                 className="text-[11px] text-[#8B1A1A] font-medium hover:underline mt-2 inline-block"
                               >
-                                Xem nguồn →
+                                Xem ngu\u1ed3n {"\u2192"}
                               </a>
                             )}
                           </div>
@@ -294,7 +273,6 @@ export default function ArticleDetailPage() {
                 </div>
               )}
 
-              {/* Bottom Actions */}
               <div className="mt-20 pt-10 border-t border-[#E8D9B0] flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-[#8B1A1A] text-[#FDFBF7] rounded-full flex items-center justify-center font-bold text-xl">
@@ -302,23 +280,31 @@ export default function ArticleDetailPage() {
                   </div>
                   <div>
                     <div className="text-[12px] text-[#6b6b6b]">
-                      Biên tập bởi
+                      Bi\u00ean t\u1eadp b\u1edfi
                     </div>
                     <div className="text-[14px] font-bold text-[#1c1c1c]">
-                      Ban biên tập Lịch Sử Việt Nam
+                      Ban bi\u00ean t\u1eadp L\u1ecbch S\u1eed Vi\u1ec7t Nam
                     </div>
                   </div>
                 </div>
 
                 <Link
-                  to={`/bao-cao-loi?article_id=${articleData?.id}`}
+                  to={`/bao-cao-loi?article_id=${articleData?.id}&article_slug=${articleData?.slug}`}
+                  state={{
+                    article: {
+                      id: articleData?.id,
+                      slug: articleData?.slug,
+                      title: articleData?.title,
+                      typeLabel: articleData?.display.type_label,
+                      categoryLabel: articleData?.display.category_label,
+                    },
+                  }}
                   className="flex items-center gap-2 text-[#8B1A1A] hover:bg-[#8B1A1A]/5 px-4 py-2 rounded-sm border border-dashed border-[#8B1A1A] text-[13px] font-bold transition-all"
                 >
-                  <AlertTriangle size={16} /> Báo cáo lỗi nội dung
+                  <AlertTriangle size={16} /> B\u00e1o c\u00e1o l\u1ed7i n\u1ed9i dung
                 </Link>
               </div>
 
-              {/* Related/Navigation */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
                 {prevArticle ? (
                   <Link
@@ -326,7 +312,7 @@ export default function ArticleDetailPage() {
                     className="p-6 border border-[#E8D9B0] rounded-sm hover:border-[#8B1A1A] transition-all text-left group"
                   >
                     <div className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mb-1">
-                      ← Bài trước đó
+                      {"\u2190"} B\u00e0i tr\u01b0\u1edbc \u0111\u00f3
                     </div>
                     <div className="text-lg font-['Playfair_Display',serif] group-hover:text-[#8B1A1A]">
                       {prevArticle.title}
@@ -335,10 +321,10 @@ export default function ArticleDetailPage() {
                 ) : (
                   <div className="p-6 border border-[#E8D9B0]/30 rounded-sm bg-[#F9F5EF]/50 opacity-50">
                     <div className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mb-1">
-                      ← Bài trước đó
+                      {"\u2190"} B\u00e0i tr\u01b0\u1edbc \u0111\u00f3
                     </div>
                     <div className="text-lg font-['Playfair_Display',serif] text-[#6b6b6b]">
-                      Không có bài viết trước
+                      Kh\u00f4ng c\u00f3 b\u00e0i vi\u1ebft tr\u01b0\u1edbc
                     </div>
                   </div>
                 )}
@@ -349,7 +335,7 @@ export default function ArticleDetailPage() {
                     className="p-6 border border-[#E8D9B0] rounded-sm hover:border-[#8B1A1A] transition-all text-right group"
                   >
                     <div className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mb-1">
-                      Tiếp theo →
+                      Ti\u1ebfp theo {"\u2192"}
                     </div>
                     <div className="text-lg font-['Playfair_Display',serif] group-hover:text-[#8B1A1A]">
                       {nextArticle.title}
@@ -358,62 +344,47 @@ export default function ArticleDetailPage() {
                 ) : (
                   <div className="p-6 border border-[#E8D9B0]/30 rounded-sm bg-[#F9F5EF]/50 opacity-50">
                     <div className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mb-1">
-                      Tiếp theo →
+                      Ti\u1ebfp theo {"\u2192"}
                     </div>
                     <div className="text-lg font-['Playfair_Display',serif] text-[#6b6b6b]">
-                      Không có bài viết tiếp theo
+                      Kh\u00f4ng c\u00f3 b\u00e0i vi\u1ebft ti\u1ebfp theo
                     </div>
                   </div>
                 )}
               </div>
             </motion.article>
 
-            {/* Sidebar */}
             <aside className="space-y-10">
-              {/* Quick Facts Card */}
               <QuickFactsCard article={articleData!} />
-
-              {/* Recommended Reading */}
               <ArticleRecommended article={articleData!} />
 
-              {/* Tags/Categories */}
-              {articleData?.category_name && (
+              {articleData?.display.category_label && (
                 <div className="p-6 bg-[#F9F5EF] border border-[#E8D9B0] rounded-sm">
                   <h4 className="text-[11px] font-bold text-[#1c1c1c] uppercase tracking-widest mb-4">
-                    Chuyên Mục
+                    Chuy\u00ean M\u1ee5c
                   </h4>
                   <div className="space-y-2">
                     <span className="inline-block text-[13px] bg-[#8B1A1A] text-white px-3 py-1.5 rounded-full font-medium hover:bg-[#B8860B] transition-colors">
-                      {articleData.category_name}
+                      {articleData.display.category_label}
                     </span>
                   </div>
                 </div>
               )}
 
-              {/* Article Type Badge */}
               <div className="p-6 bg-[#F9F5EF] border border-[#E8D9B0] rounded-sm">
                 <h4 className="text-[11px] font-bold text-[#1c1c1c] uppercase tracking-widest mb-4">
-                  Loại Bài Viết
+                  Lo\u1ea1i B\u00e0i Vi\u1ebft
                 </h4>
                 <div className="space-y-2">
                   <span className="inline-block text-[13px] bg-[#B8860B]/20 text-[#8B1A1A] px-3 py-1.5 rounded-full font-medium">
-                    {articleData?.type === "event"
-                      ? "Sự Kiện"
-                      : articleData?.type === "person"
-                        ? "Nhân Vật"
-                        : articleData?.type === "place"
-                          ? "Địa Điểm"
-                          : articleData?.type === "culture"
-                            ? "Văn Hóa"
-                            : "Video"}
+                    {articleData?.display.type_label}
                   </span>
                 </div>
               </div>
 
-              {/* Share Section */}
               <div className="p-6 bg-[#F9F5EF] border border-[#E8D9B0] rounded-sm">
                 <h4 className="text-[11px] font-bold text-[#1c1c1c] uppercase tracking-widest mb-4">
-                  Chia Sẻ
+                  Chia S\u1ebb
                 </h4>
                 <div className="flex gap-2">
                   <button className="p-3 bg-white border border-[#E8D9B0] rounded-full hover:bg-[#F5C842]/10 transition-colors">
