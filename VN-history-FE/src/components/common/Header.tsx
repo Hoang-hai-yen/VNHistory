@@ -14,10 +14,10 @@ import { Link, useLocation } from "react-router";
 
 const navLinks = [
   { path: "/", label: "Trang Chủ", icon: Star },
-  { path: "/trieu-dai", label: "Triều Đại", icon: History },
+  { path: "/kham-pha", label: "Khám phá", icon: History },
   { path: "/nhan-vat", label: "Nhân Vật", icon: Users },
   { path: "/dong-thoi-gian", label: "Dòng Thời Gian", icon: Calendar },
-  { path: "/dia-ly", label: "Địa Lý & Di Tích", icon: MapPin },
+  { path: "/van-hoa", label: "Văn hóa", icon: MapPin },
   { path: "/video", label: "Video", icon: Play },
 ];
 

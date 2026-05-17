@@ -12,12 +12,13 @@ export interface ApiConfig {
   headers?: Record<string, string>;
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
 export class HttpClient {
   private instance: AxiosInstance;
 
   constructor() {
     this.instance = axios.create({
-      baseURL: "http://localhost:3000/api",
+      baseURL: API_URL,
       timeout: 10000,
       headers: {
         "Content-Type": "application/json",
@@ -43,33 +44,7 @@ export class HttpClient {
       <T>(response: AxiosResponse<T>) => response,
       // Error response
       (error: AxiosError) => {
-        const status = error.response?.status;
-
-        switch (status) {
-          case 400:
-            console.error("Bad Request");
-            break;
-
-          case 401:
-            console.error("Unauthorized");
-            // logout / redirect login here
-            break;
-
-          case 403:
-            console.error("Forbidden");
-            break;
-
-          case 404:
-            console.error("Not Found");
-            break;
-
-          case 500:
-            console.error("Server Error");
-            break;
-
-          default:
-            console.error(error.message || "Unknown Error");
-        }
+        
 
         return Promise.reject(error);
       },

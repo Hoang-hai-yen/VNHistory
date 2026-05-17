@@ -1,14 +1,14 @@
-import type { Video } from "../../types/video.type";
+import type { VideoArticle } from "../../types";
 import PageSectionHeader from "../common/PageSectionHeader";
 import VideoCard from "../Video/VideoCard";
 
-export default function VideoSection({ VIDEOS }: { VIDEOS: Video[] }) {
+export default function VideoSection({ VIDEOS }: { VIDEOS: VideoArticle[] }) {
   return (
     <section className="bg-[#1A1208] py-10">
       <div className="max-w-7xl mx-auto px-4">
         <PageSectionHeader
-          subtitle="Lịch Sử Qua Màn Ảnh"
-          title="Video Tư Liệu Lịch Sử"
+          subtitle="Lịch sử qua màn ảnh"
+          title="Video Tư liệu lịch sử"
           moreLink="/video"
           dark={true}
         />

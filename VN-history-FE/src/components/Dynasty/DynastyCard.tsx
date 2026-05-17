@@ -8,36 +8,37 @@ export default function DynastyCard({
   dyn: Dynasty;
   forHome?: boolean;
 }) {
-  // Use year_display as the main period text, fall back to year_start-year_end
   const period = dyn.year_display || `${dyn.year_start} - ${dyn.year_end}`;
+  const link = `/dong-thoi-gian?dynasty=${dyn.slug}`;
 
   if (forHome) {
     return (
-      <Link to={`/bai-viet/${dyn.slug}`} className="cursor-pointer group block">
-        <div className="overflow-hidden bg-[#1A1208] relative mb-3 aspect-[16/10]">
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#1A1208] via-[#2D1F0A] to-[#1A1208]">
-            <span className="text-3xl opacity-40 group-hover:scale-110 transition-transform duration-500">
-              {"⚔"}
-            </span>
-            <span className="text-[9px] tracking-[2px] text-[#C8941A]/50 uppercase font-medium">
-              {period}
-            </span>
+      <Link to={link} className="group block">
+        <div className="overflow-hidden rounded-sm border border-[#e0dbd0] bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#B8860B] hover:shadow-lg">
+          <div className="relative aspect-[16/10] overflow-hidden bg-[#1A1208]">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1A1208] via-[#2D1F0A] to-[#1A1208]" />
+            <div className="absolute inset-0 flex flex-col items-start justify-end p-5">
+              <div className="mb-2 text-[10px] uppercase tracking-[0.25em] text-[#D4A017]">
+                Triều đại
+              </div>
+              <h3 className="font-['Playfair_Display',serif] text-2xl font-bold text-white">
+                {dyn.name}
+              </h3>
+              <div className="mt-2 text-[12px] font-medium text-white/70">
+                {period}
+              </div>
+            </div>
           </div>
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-[#8B1A1A]/0 group-hover:bg-[#8B1A1A]/10 transition-colors duration-300" />
+
+          <div className="p-5">
+            <p className="line-clamp-3 min-h-[60px] text-[13px] leading-relaxed text-[#6b6b6b]">
+              {dyn.description || "Khám phá các sự kiện trọng yếu trong giai đoạn này trên dòng thời gian lịch sử."}
+            </p>
+            <div className="mt-4 text-[11px] font-bold uppercase tracking-wider text-[#8B1A1A]">
+              Xem trên dòng thời gian →
+            </div>
+          </div>
         </div>
-
-        <div className="text-[9px] font-bold tracking-[2.5px] uppercase text-[#8B1A1A] mb-1.5">
-          {dyn.name}
-        </div>
-
-        <h3 className="font-['Playfair_Display',serif] font-bold text-[#1c1c1c] leading-snug group-hover:text-[#8B1A1A] transition-colors mb-2 text-base">
-          {dyn.slug}
-        </h3>
-
-        <p className="font-['Source_Serif_4',serif] text-[13px] text-[#6b6b6b] leading-relaxed font-light line-clamp-2">
-          {/* description is currently null in type; placeholder until API provides it */}
-        </p>
       </Link>
     );
   }
@@ -45,27 +46,28 @@ export default function DynastyCard({
   return (
     <Link
       key={dyn.id}
-      to={`/bai-viet/${dyn.slug}`}
-      className="grid grid-cols-1 md:grid-cols-[180px_1fr] border-b border-[#e0dbd0] group block"
+      to={link}
+      className="grid grid-cols-1 overflow-hidden rounded-sm border border-[#e0dbd0] bg-white transition-all duration-300 hover:border-[#B8860B] hover:shadow-lg md:grid-cols-[220px_1fr]"
     >
-      <div className="bg-[#1A1208] p-6 flex flex-col justify-center cursor-pointer group-hover:bg-[#8B1A1A] transition-colors duration-300">
-        <h3 className="font-['Playfair_Display',serif] text-xl font-bold text-[#D4A017] mb-1 group-hover:text-white transition-colors duration-300">
+      <div className="flex flex-col justify-center bg-[#1A1208] px-6 py-7">
+        <div className="text-[10px] uppercase tracking-[0.24em] text-[#D4A017]">
+          Triều đại
+        </div>
+        <h3 className="mt-2 font-['Playfair_Display',serif] text-2xl font-bold text-white">
           {dyn.name}
         </h3>
-        <div className="text-[10px] text-white/40 tracking-[1.5px] uppercase group-hover:text-white/70">
+        <div className="mt-3 text-[12px] font-medium text-white/65">
           {period}
         </div>
       </div>
 
-      <div className="p-6 lg:p-7 cursor-pointer group-hover:bg-[#FAFAF7]">
-        <h4 className="font-['Playfair_Display',serif] text-base font-semibold text-[#1c1c1c] group-hover:text-[#8B1A1A] transition-colors mb-2">
-          {dyn.description}
-        </h4>
-        <p className="font-['Source_Serif_4',serif] text-[13.5px] text-[#6b6b6b] leading-relaxed font-light mb-4">
-          {/* description is currently null in type; placeholder until API provides it */}
+      <div className="p-6 lg:p-7">
+        <p className="font-['Source_Serif_4',serif] text-[14px] leading-relaxed text-[#4f4f4f]">
+          {dyn.description || "Giai đoạn này hiện chưa có mô tả chi tiết, nhưng bạn có thể mở dòng thời gian để xem các mốc lịch sử liên quan."}
         </p>
-
-        {/* videos field is not part of Dynasty type anymore; remove related UI */}
+        <div className="mt-5 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#8B1A1A]">
+          Mở dòng thời gian <span aria-hidden>→</span>
+        </div>
       </div>
     </Link>
   );

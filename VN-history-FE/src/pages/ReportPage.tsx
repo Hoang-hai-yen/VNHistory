@@ -1,366 +1,381 @@
-import React, { useState } from "react";
-import { Link } from "react-router";
+import { useState } from "react";
+import { Link, useLocation, useSearchParams } from "react-router";
 import { FileText, Info, Clock, CheckCircle2 } from "lucide-react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import type { ReportSeverity } from "../types";
+import {
+  useCreateReportMutation,
+  type CreateReportPayload,
+} from "../hooks/api/useReports";
+import { useArticleBySlug } from "../hooks/api/useArticles";
+
+interface ReportPageState {
+  article?: {
+    id?: string;
+    slug?: string;
+    title?: string;
+    typeLabel?: string;
+    categoryLabel?: string | null;
+  };
+}
 
 export default function ReportPage() {
-  const [severity, setSeverity] = useState<"low" | "medium" | "high">("medium");
-  const [charCount, setCharCount] = useState(0);
-  const [description, setDescription] = useState("");
+  const [severity, setSeverity] = useState<ReportSeverity>("medium");
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const routeState = (location.state as ReportPageState | null) ?? null;
 
-  const handleDescriptionChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
-    const val = e.target.value;
-    if (val.length <= 1000) {
-      setDescription(val);
-      setCharCount(val.length);
-    }
+  const articleIdFromQuery = searchParams.get("article_id") ?? "";
+  const articleSlug = searchParams.get("article_slug") ?? "";
+  const mutation = useCreateReportMutation();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CreateReportPayload>();
+
+  const { data: articleData } = useArticleBySlug(articleSlug);
+  const articleContext = routeState?.article ?? {
+    id: articleData?.id,
+    slug: articleData?.slug,
+    title: articleData?.title,
+    typeLabel: articleData?.display.type_label,
+    categoryLabel: articleData?.display.category_label,
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert("Báo cáo của bạn đã được gửi thành công! Admin sẽ xem xét sớm.");
+  const articleId = articleContext.id || articleIdFromQuery;
+  const articleDetailUrl = articleContext.slug
+    ? `/bai-viet/${articleContext.slug}`
+    : undefined;
+  const articleMeta = [articleContext.typeLabel, articleContext.categoryLabel]
+    .filter(Boolean)
+    .join(" · ");
+
+  const onSubmit: SubmitHandler<CreateReportPayload> = (formData) => {
+    mutation.mutate(
+      {
+        ...formData,
+        article_id: articleId,
+        severity,
+      },
+      {
+        onSuccess: () => {
+          alert("Báo cáo của bạn đã được gửi thành công. Cảm ơn sự đóng góp của bạn.");
+          reset();
+          setSeverity("medium");
+        },
+        onError: () => {
+          alert("Đã có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại sau.");
+        },
+      },
+    );
   };
 
   return (
-    <>
-      <div className="max-w-7xl mx-auto px-4 pb-20">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-[11.5px] text-[#6b6b6b] py-4 lg:py-5">
-          <Link to="/" className="hover:text-[#8B1A1A]">
-            Trang Chủ
-          </Link>
-          <span className="opacity-40">›</span>
-          <Link to="/dong-thoi-gian" className="hover:text-[#8B1A1A]">
-            Chiến Thắng Bạch Đằng
-          </Link>
-          <span className="opacity-40">›</span>
-          <span className="text-[#B8860B]">Báo cáo lỗi</span>
-        </div>
+    <div className="max-w-7xl mx-auto px-4 pb-20">
+      <div className="flex items-center gap-1.5 py-4 text-[11.5px] text-[#6b6b6b] lg:py-5">
+        <Link to="/" className="hover:text-[#8B1A1A]">
+          Trang Chủ
+        </Link>
+        <span className="opacity-40">›</span>
+        {articleDetailUrl ? (
+          <>
+            <Link to={articleDetailUrl} className="hover:text-[#8B1A1A]">
+              {articleContext.title || "Bài viết"}
+            </Link>
+            <span className="opacity-40">›</span>
+          </>
+        ) : null}
+        <span className="text-[#B8860B]">Báo cáo lỗi</span>
+      </div>
 
-        {/* Page Header */}
-        <div className="mb-8">
-          <div className="text-[10px] font-bold text-[#B8860B] tracking-[0.12em] uppercase mb-1.5">
-            Góp ý tư liệu
-          </div>
-          <h1 className="font-['Playfair_Display',serif] text-[28px] text-[#1c1c1c] font-bold">
-            Báo Cáo Lỗi Nội Dung
-          </h1>
-          <hr className="mt-3 border-t border-[#e0dbd0]" />
+      <div className="mb-8">
+        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#B8860B]">
+          Góp ý tư liệu
         </div>
+        <h1 className="font-['Playfair_Display',serif] text-[28px] font-bold text-[#1c1c1c]">
+          Báo Cáo Lỗi Nội Dung
+        </h1>
+        <hr className="mt-3 border-t border-[#e0dbd0]" />
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
-          {/* Main Form */}
-          <div className="bg-[#13100a] border border-[#2e2510] rounded-sm p-6 lg:p-8 text-[#e8d9b0]">
-            <form onSubmit={handleSubmit}>
-              {/* Reference Box */}
-              <div className="mb-6">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  Bài viết được báo cáo
-                </label>
-                <div className="bg-[#0f0c04] border border-[#2e2510] rounded-sm p-3.5 flex items-center gap-3.5">
-                  <div className="w-9 h-9 bg-[#1e1a0a] border border-[#3a2e10] rounded-sm flex items-center justify-center shrink-0">
-                    <FileText size={16} className="text-[#8a7a4a]" />
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_320px]">
+        <div className="rounded-sm border border-[#2e2510] p-6 text-[#e8d9b0] lg:p-8">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="mb-6">
+              <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-[#8a7a4a]">
+                Bài viết được báo cáo
+              </label>
+              <div className="flex items-center gap-3.5 rounded-sm border border-[#2e2510] bg-[#0f0c04] p-3.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-[#3a2e10] bg-[#1e1a0a]">
+                  <FileText size={16} className="text-[#8a7a4a]" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-0.5 text-[9px] uppercase tracking-widest text-[#c5a028]">
+                    {articleMeta || "Bài viết lịch sử"}
                   </div>
-                  <div className="flex-1 min-width-0">
-                    <div className="text-[9px] text-[#c5a028] tracking-widest uppercase mb-0.5">
-                      Sự kiện · Kháng chiến
-                    </div>
-                    <div className="font-['Playfair_Display',serif] text-[14px] text-[#e8d9b0] font-medium leading-tight">
-                      Chiến Thắng Bạch Đằng (938)
-                    </div>
-                    <div className="text-[10px] text-[#5a4e28] font-['DM_Sans']">
-                      lsvn.vn/su-kien/bach-dang-938
-                    </div>
+                  <div className="font-['Playfair_Display',serif] text-[14px] font-medium leading-tight text-[#e8d9b0]">
+                    {articleContext.title || "Không xác định bài viết"}
                   </div>
-                  <button
-                    type="button"
-                    className="text-[10px] text-[#8a7a4a] underline underline-offset-2 hover:text-[#e8d9b0] transition-colors"
+                  <div className="font-['DM_Sans'] text-[10px] text-[#5a4e28]">
+                    {articleDetailUrl ? `lsvn.vn${articleDetailUrl}` : "Không có URL bài viết"}
+                  </div>
+                </div>
+                {articleDetailUrl ? (
+                  <Link
+                    to={articleDetailUrl}
+                    className="text-[10px] underline underline-offset-2 transition-colors hover:text-[#e8d9b0]"
                   >
-                    Đổi bài
-                  </button>
-                </div>
-                <p className="text-[10px] text-[#5a4e28] mt-2">
-                  Trang bạn đang xem khi nhấn "Báo cáo lỗi"
+                    Xem bài
+                  </Link>
+                ) : null}
+              </div>
+              {!articleId && (
+                <p className="mt-2 text-[10px] text-[#c5302a]">
+                  Không xác định được bài viết cần báo cáo. Hãy mở form này từ trang chi tiết bài viết.
                 </p>
-              </div>
+              )}
+            </div>
 
-              {/* URL */}
-              <div className="mb-6">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  URL trang
-                </label>
-                <div className="bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 px-3.5 flex items-center gap-2 text-[11px]">
-                  <span className="text-[#5a4e28]">lsvn.vn</span>
-                  <span className="text-[#2e2510]">/</span>
-                  <span className="text-[#8a9ab0]">su-kien/bach-dang-938</span>
-                </div>
-              </div>
+            <div className="mb-6">
+              <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-[#8a7a4a]">
+                Loại lỗi <span className="text-[#8b1a1a]">*</span>
+              </label>
+              <select
+                {...register("error_type", {
+                  required: "Vui lòng chọn loại lỗi.",
+                })}
+                aria-invalid={!!errors.error_type}
+                className="w-full cursor-pointer appearance-none rounded-sm border border-[#2e2510] bg-[#0f0c04] p-2.5 text-[12.5px] text-[#e8d9b0] outline-none transition-colors focus:border-[#c5a028]"
+              >
+                <option value="">— Chọn loại lỗi —</option>
+                <option>Thông tin sai / không chính xác</option>
+                <option>Ngày tháng sai</option>
+                <option>Tên nhân vật / địa danh sai</option>
+                <option>Thiếu thông tin quan trọng</option>
+                <option>Hình ảnh không phù hợp</option>
+                <option>Lỗi chính tả / ngữ pháp</option>
+                <option>Nguồn tham khảo không hợp lệ</option>
+                <option>Khác</option>
+              </select>
+              {errors.error_type?.message && (
+                <p className="mt-1.5 text-[10px] text-[#c5302a]">
+                  {errors.error_type.message}
+                </p>
+              )}
+            </div>
 
-              {/* Error Type */}
-              <div className="mb-6">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  Loại lỗi <span className="text-[#8b1a1a]">*</span>
-                </label>
-                <select className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 text-[#e8d9b0] text-[12.5px] outline-none focus:border-[#c5a028] transition-colors appearance-none cursor-pointer">
-                  <option value="">— Chọn loại lỗi —</option>
-                  <option>Thông tin sai / không chính xác</option>
-                  <option>Ngày tháng sai</option>
-                  <option>Tên nhân vật / địa danh sai</option>
-                  <option>Thiếu thông tin quan trọng</option>
-                  <option>Hình ảnh không phù hợp</option>
-                  <option>Lỗi chính tả / ngữ pháp</option>
-                  <option>Nguồn tham khảo không hợp lệ</option>
-                  <option>Khác</option>
-                </select>
-              </div>
-
-              {/* Severity */}
-              <div className="mb-6">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  Mức độ nghiêm trọng
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    {
-                      id: "low",
-                      label: "Nhỏ",
-                      color: "#639922",
-                      activeBg: "#131d0a",
-                      activeBorder: "#3b6d11",
-                    },
-                    {
-                      id: "medium",
-                      label: "Trung bình",
-                      color: "#BA7517",
-                      activeBg: "#1a1208",
-                      activeBorder: "#854f0b",
-                    },
-                    {
-                      id: "high",
-                      label: "Nghiêm trọng",
-                      color: "#c5302a",
-                      activeBg: "#160808",
-                      activeBorder: "#7a1010",
-                    },
-                  ].map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      onClick={() => setSeverity(opt.id as any)}
-                      className={`flex flex-col items-center p-2.5 border rounded-sm transition-all ${
-                        severity === opt.id
-                          ? `border-[${opt.activeBorder}] bg-[${opt.activeBg}]`
-                          : "border-[#2e2510] bg-[#0f0c04] opacity-60 hover:opacity-100"
-                      }`}
+            <div className="mb-6">
+              <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-[#8a7a4a]">
+                Mức độ nghiêm trọng
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  {
+                    id: "low",
+                    label: "Nhỏ",
+                    color: "#639922",
+                    activeBg: "#131d0a",
+                    activeBorder: "#3b6d11",
+                  },
+                  {
+                    id: "medium",
+                    label: "Trung bình",
+                    color: "#BA7517",
+                    activeBg: "#1a1208",
+                    activeBorder: "#854f0b",
+                  },
+                  {
+                    id: "high",
+                    label: "Nghiêm trọng",
+                    color: "#c5302a",
+                    activeBg: "#160808",
+                    activeBorder: "#7a1010",
+                  },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setSeverity(opt.id as ReportSeverity)}
+                    className="flex flex-col items-center rounded-sm border p-2.5 transition-all"
+                    style={{
+                      borderColor:
+                        severity === opt.id ? opt.activeBorder : "#2e2510",
+                      backgroundColor:
+                        severity === opt.id ? opt.activeBg : "#0f0c04",
+                      opacity: severity === opt.id ? 1 : 0.7,
+                    }}
+                  >
+                    <div
+                      className="mb-1.5 h-2 w-2 rounded-full"
                       style={{
-                        borderColor:
-                          severity === opt.id ? opt.activeBorder : "#2e2510",
                         backgroundColor:
-                          severity === opt.id ? opt.activeBg : "#0f0c04",
+                          severity === opt.id ? opt.color : "#3a3018",
+                      }}
+                    />
+                    <span
+                      className="text-[10px] tracking-wide"
+                      style={{
+                        color: severity === opt.id ? opt.color : "#8a7a4a",
                       }}
                     >
-                      <div
-                        className="w-2 h-2 rounded-full mb-1.5"
-                        style={{
-                          backgroundColor:
-                            severity === opt.id ? opt.color : "#3a3018",
-                        }}
-                      />
-                      <span
-                        className={`text-[10px] tracking-wide ${severity === opt.id ? "" : "text-[#8a7a4a]"}`}
-                        style={{
-                          color: severity === opt.id ? opt.color : "#8a7a4a",
-                        }}
-                      >
-                        {opt.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-                <p className="text-[10px] text-[#5a4e28] mt-2">
-                  Trung bình: ảnh hưởng đến hiểu đúng sự kiện. Nghiêm trọng: sai
-                  lệch lịch sử lớn.
-                </p>
-              </div>
-
-              {/* Error Content */}
-              <div className="mb-6">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  Nội dung bị lỗi <span className="text-[#8b1a1a]">*</span>
-                </label>
-                <textarea
-                  className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-3 text-[#e8d9b0] text-[13px] font-['Source_Serif_4'] leading-relaxed outline-none focus:border-[#c5a028] min-h-[80px]"
-                  placeholder="Trích dẫn đoạn văn bản hoặc mô tả vị trí nội dung bị sai trong bài..."
-                  required
-                ></textarea>
-              </div>
-
-              {/* Detailed Description */}
-              <div className="mb-6">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  Mô tả chi tiết lỗi <span className="text-[#8b1a1a]">*</span>
-                </label>
-                <textarea
-                  className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-3 text-[#e8d9b0] text-[13px] font-['Source_Serif_4'] leading-relaxed outline-none focus:border-[#c5a028] min-h-[120px]"
-                  placeholder="Giải thích tại sao bạn cho rằng thông tin này sai, và nếu có thể, cung cấp thông tin chính xác hơn cùng nguồn tham khảo..."
-                  value={description}
-                  onChange={handleDescriptionChange}
-                  required
-                ></textarea>
-                <div
-                  className={`text-[10px] text-right mt-1 ${charCount > 900 ? "text-[#8b1a1a]" : "text-[#4a3e20]"}`}
-                >
-                  {charCount} / 1000 ký tự
-                </div>
-              </div>
-
-              {/* Sources */}
-              <div className="mb-6">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  Nguồn tham khảo đề xuất
-                </label>
-                <input
-                  type="text"
-                  className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 px-3.5 text-[#e8d9b0] text-[12px] outline-none focus:border-[#c5a028]"
-                  placeholder="Tên sách, tác giả, link tài liệu... (không bắt buộc)"
-                />
-                <p className="text-[10px] text-[#5a4e28] mt-1.5">
-                  Ví dụ: Đại Việt Sử Ký Toàn Thư, quyển 5, trang 84
-                </p>
-              </div>
-
-              {/* Contact */}
-              <div className="mb-8">
-                <label className="block text-[11px] font-bold text-[#8a7a4a] tracking-wider uppercase mb-2">
-                  Thông tin liên hệ
-                </label>
-                <input
-                  type="email"
-                  className="w-full bg-[#0f0c04] border border-[#2e2510] rounded-sm p-2.5 px-3.5 text-[#e8d9b0] text-[12px] outline-none focus:border-[#c5a028]"
-                  placeholder="Email của bạn (không bắt buộc — để admin phản hồi)"
-                />
-              </div>
-
-              {/* Consents */}
-              <div className="space-y-3 mb-10">
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <div className="w-3.5 h-3.5 border border-[#c5a028] bg-[#1e1a0a] rounded-sm flex-shrink-0 mt-0.5 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-[#c5a028] rounded-full" />
-                  </div>
-                  <span className="text-[11px] text-[#6a5a30] group-hover:text-[#8a7a4a] leading-tight">
-                    Tôi xác nhận thông tin báo cáo này là trung thực và có cơ sở
-                    lịch sử.
-                  </span>
-                </label>
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <div className="w-3.5 h-3.5 border border-[#3a2e10] bg-[#0f0c04] rounded-sm flex-shrink-0 mt-0.5" />
-                  <span className="text-[11px] text-[#6a5a30] group-hover:text-[#8a7a4a] leading-tight">
-                    Tôi đồng ý được liên hệ qua email nếu admin cần xác minh
-                    thêm.
-                  </span>
-                </label>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-3 mt-8 pt-6 border-t border-[#2e2510]">
-                <button
-                  type="submit"
-                  className="bg-[#8b1a1a] text-[#f5e0b0] px-7 py-3 text-[12px] font-bold tracking-wider uppercase rounded-sm hover:bg-[#a01c1c] transition-colors"
-                >
-                  Gửi Báo Cáo
-                </button>
-                <Link
-                  to="/"
-                  className="border border-[#2e2510] text-[#6a5a30] px-6 py-3 text-[12px] tracking-wider uppercase rounded-sm hover:border-[#c5a028] hover:text-[#c5a028] transition-all"
-                >
-                  Huỷ
-                </Link>
-              </div>
-            </form>
-          </div>
-
-          {/* Sidebar */}
-          <div className="flex flex-col gap-5">
-            {/* Guide Card */}
-            <div className="bg-[#13100a] border border-[#2e2510] rounded-sm p-5">
-              <div className="flex items-center gap-2 text-[10px] font-bold text-[#c5a028] tracking-widest uppercase mb-4">
-                <Info size={14} className="text-[#c5a028]" /> Hướng dẫn báo cáo
-              </div>
-              <div className="space-y-4">
-                {[
-                  "Chọn đúng loại lỗi để admin xử lý nhanh hơn.",
-                  "Trích dẫn chính xác đoạn văn bản bị sai nếu có thể.",
-                  "Cung cấp nguồn tài liệu để admin kiểm chứng — giúp xử lý nhanh hơn nhiều.",
-                  "Báo cáo sẽ được xem xét trong vòng 3–5 ngày làm việc.",
-                ].map((text, i) => (
-                  <div
-                    key={i}
-                    className="flex gap-2.5 py-1.5 border-b border-[#1e1a0a] last:border-none last:pb-0"
-                  >
-                    <span className="text-[10px] text-[#c5a028] shrink-0">
-                      {i + 1}.
+                      {opt.label}
                     </span>
-                    <p className="text-[11.5px] text-[#8a7a4a] leading-relaxed">
-                      {text}
-                    </p>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
 
-            {/* History Card */}
-            <div className="bg-[#13100a] border border-[#2e2510] rounded-sm p-5">
-              <div className="flex items-center gap-2 text-[10px] font-bold text-[#c5a028] tracking-widest uppercase mb-4">
-                <Clock size={14} className="text-[#c5a028]" /> Báo cáo của bạn
-              </div>
-              <div className="space-y-4">
-                <div className="pb-3.5 border-b border-[#1e1a0a]">
-                  <div className="inline-flex items-center gap-1.5 bg-[#0a1306] border border-[#3b6d11] text-[#639922] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5">
-                    <CheckCircle2 size={10} /> Đã xử lý
-                  </div>
-                  <div className="font-['Playfair_Display',serif] text-[12px] text-[#b0a070] font-medium leading-tight">
-                    Ngày mất của Trần Hưng Đạo sai
-                  </div>
-                  <div className="text-[10px] text-[#4a3e20] mt-1.5 font-['DM_Sans']">
-                    Gửi 12/03/2026 · Ngô Quyền – Nhà Ngô
-                  </div>
-                </div>
-                <div className="pb-1.5 border-b border-[#1e1a0a] last:border-none">
-                  <div className="inline-flex items-center gap-1.5 bg-[#1a1208] border border-[#854f0b] text-[#BA7517] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5">
-                    <Clock size={10} /> Đang xem xét
-                  </div>
-                  <div className="font-['Playfair_Display',serif] text-[12px] text-[#b0a070] font-medium leading-tight">
-                    Thiếu thông tin về Hội Nghị Diên Hồng
-                  </div>
-                  <div className="text-[10px] text-[#4a3e20] mt-1.5 font-['DM_Sans']">
-                    Gửi 20/03/2026 · Nhà Trần
-                  </div>
-                </div>
-              </div>
-              <button className="mt-3 text-[10px] text-[#5a4e28] underline underline-offset-2 hover:text-[#c5a028] transition-colors">
-                Xem tất cả báo cáo →
-              </button>
+            <div className="mb-6">
+              <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-[#8a7a4a]">
+                Nội dung bị lỗi <span className="text-[#8b1a1a]">*</span>
+              </label>
+              <textarea
+                className="min-h-[100px] w-full rounded-sm border border-[#2e2510] bg-[#0f0c04] p-3 text-[13px] leading-relaxed text-[#e8d9b0] outline-none focus:border-[#c5a028]"
+                placeholder="Mô tả đoạn nội dung bị sai hoặc trích dẫn phần cần kiểm tra..."
+                aria-invalid={!!errors.description}
+                {...register("description", {
+                  required: "Vui lòng nhập nội dung bị lỗi.",
+                  maxLength: {
+                    value: 1000,
+                    message: "Nội dung tối đa 1000 ký tự.",
+                  },
+                  validate: (value) =>
+                    (value?.trim().length ?? 0) > 0 ||
+                    "Nội dung không được để trống.",
+                })}
+              />
+              {errors.description?.message && (
+                <p className="mt-1.5 text-[10px] text-[#c5302a]">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
 
-            {/* Note Card */}
-            <div className="bg-[#110c04] border border-[#3a2208] rounded-sm p-5">
-              <div className="text-[10px] font-bold text-[#c5a028] tracking-widest uppercase mb-2.5">
-                Lưu ý
+            <div className="mb-6">
+              <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-[#8a7a4a]">
+                Nguồn tham khảo đề xuất
+              </label>
+              <input
+                type="text"
+                {...register("suggested_source", {
+                  maxLength: {
+                    value: 255,
+                    message: "Nguồn tham khảo tối đa 255 ký tự.",
+                  },
+                })}
+                aria-invalid={!!errors.suggested_source}
+                className="w-full rounded-sm border border-[#2e2510] bg-[#0f0c04] p-2.5 px-3.5 text-[12px] text-[#e8d9b0] outline-none focus:border-[#c5a028]"
+                placeholder="Tên sách, tác giả, link tài liệu..."
+              />
+              {errors.suggested_source?.message && (
+                <p className="mt-1.5 text-[10px] text-[#c5302a]">
+                  {errors.suggested_source.message}
+                </p>
+              )}
+            </div>
+
+            <div className="mb-8">
+              <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-[#8a7a4a]">
+                Thông tin liên hệ
+              </label>
+              <input
+                type="email"
+                {...register("reporter_email", {
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Email không đúng định dạng.",
+                  },
+                })}
+                aria-invalid={!!errors.reporter_email}
+                className="w-full rounded-sm border border-[#2e2510] bg-[#0f0c04] p-2.5 px-3.5 text-[12px] text-[#e8d9b0] outline-none focus:border-[#c5a028]"
+                placeholder="Email của bạn để admin phản hồi nếu cần"
+              />
+              {errors.reporter_email?.message && (
+                <p className="mt-1.5 text-[10px] text-[#c5302a]">
+                  {errors.reporter_email.message}
+                </p>
+              )}
+            </div>
+
+            {Object.keys(errors).length > 0 && (
+              <div className="mb-6 text-[10px] text-[#c5302a]">
+                Vui lòng kiểm tra các trường bị lỗi ở bên trên.
               </div>
-              <p className="text-[11.5px] text-[#6a5a30] leading-relaxed">
-                Hệ thống không hỗ trợ thêm nội dung mới qua form này. Nếu bạn
-                muốn đóng góp tư liệu, vui lòng dùng chức năng{" "}
-                <span className="text-[#c5a028] cursor-pointer hover:underline underline-offset-2">
-                  Góp Ý Tư Liệu
-                </span>
-                .
-              </p>
+            )}
+
+            <div className="mt-8 flex gap-3 border-t border-[#2e2510] pt-6">
+              <button
+                type="submit"
+                disabled={!articleId || mutation.isPending}
+                className="rounded-sm bg-[#8b1a1a] px-7 py-3 text-[12px] font-bold uppercase tracking-wider text-[#f5e0b0] transition-colors hover:bg-[#a01c1c] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {mutation.isPending ? "Đang gửi..." : "Gửi Báo Cáo"}
+              </button>
+              <button
+                type="reset"
+                onClick={() => reset()}
+                className="rounded-sm border border-[#2e2510] px-6 py-3 text-[12px] uppercase tracking-wider text-[#6a5a30] transition-all hover:border-[#c5a028] hover:text-[#c5a028]"
+              >
+                Huỷ
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div className="flex flex-col gap-5">
+          <div className="rounded-sm border border-[#2e2510] bg-[#13100a] p-5">
+            <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#c5a028]">
+              <Info size={14} className="text-[#c5a028]" /> Hướng dẫn báo cáo
+            </div>
+            <div className="space-y-4">
+              {[
+                "Chọn đúng loại lỗi để admin xử lý nhanh hơn.",
+                "Nêu rõ phần nội dung nào sai và vì sao sai.",
+                "Đính kèm nguồn tham khảo nếu bạn có tài liệu kiểm chứng.",
+                "Báo cáo thường được xem xét trong vòng 3–5 ngày làm việc.",
+              ].map((text, index) => (
+                <div
+                  key={text}
+                  className="flex gap-2.5 border-b border-[#1e1a0a] py-1.5 last:border-none last:pb-0"
+                >
+                  <span className="shrink-0 text-[10px] text-[#c5a028]">
+                    {index + 1}.
+                  </span>
+                  <p className="text-[11.5px] leading-relaxed text-[#8a7a4a]">
+                    {text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-sm border border-[#2e2510] bg-[#13100a] p-5">
+            <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#c5a028]">
+              <Clock size={14} className="text-[#c5a028]" /> Trạng thái xử lý mẫu
+            </div>
+            <div className="space-y-4">
+              <div className="border-b border-[#1e1a0a] pb-3.5">
+                <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full border border-[#3b6d11] bg-[#0a1306] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#639922]">
+                  <CheckCircle2 size={10} /> Đã xử lý
+                </div>
+                <div className="font-['Playfair_Display',serif] text-[12px] font-medium leading-tight text-[#b0a070]">
+                  Báo cáo được xác minh và cập nhật vào bài viết
+                </div>
+              </div>
+              <div className="pb-1.5">
+                <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full border border-[#854f0b] bg-[#1a1208] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#BA7517]">
+                  <Clock size={10} /> Đang xem xét
+                </div>
+                <div className="font-['Playfair_Display',serif] text-[12px] font-medium leading-tight text-[#b0a070]">
+                  Admin đang đối chiếu báo cáo với nguồn tư liệu
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

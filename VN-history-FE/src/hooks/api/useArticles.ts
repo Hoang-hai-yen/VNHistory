@@ -1,71 +1,88 @@
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "../../lib/http";
-import type { Article } from "../../types/article.type";
+import type {
+  ApiListResponse,
+  ApiResponse,
+  ArticleDetailOfType,
+  ArticleSummaryOfType,
+  ArticleType,
+} from "../../types";
+import {
+  normalizeArticleDetail,
+  normalizeArticleListResponse,
+} from "../../utils/article.utils";
 
 async function fetchArticleBySlug(slug: string) {
-  const res = await httpClient.get<Article>(`/articles/${slug}`);
-  return res.data;
+  const res = await httpClient.get<ApiResponse<ArticleDetailOfType>>(
+    `/articles/${slug}`,
+  );
+
+  return normalizeArticleDetail(res.data.data);
 }
 
-export function useArticleBySlug(slug: string | undefined) {
+export function useArticleBySlug(slug: string) {
   return useQuery({
     queryKey: ["article", slug],
     queryFn: () => {
       if (!slug) throw new Error("slug is required");
+
       return fetchArticleBySlug(slug);
     },
     enabled: !!slug,
   });
 }
 
-// List articles
-export type ArticleTypeFilter = Article["type"];
+export type ArticleTypeFilter = ArticleType;
 
-export interface UseArticlesParams {
-  type?: ArticleTypeFilter;
+export interface UseArticlesParams<T extends ArticleType = ArticleType> {
+  type?: T;
   dynasty_id?: string;
   category_id?: string;
   is_featured?: boolean;
   year_from?: number;
   year_to?: number;
   q?: string;
-  page?: number; // default 1 on API
-  limit?: number; // default 20 on API
+  page?: number;
+  limit?: number;
 }
 
-interface ArticlesResponse {
-  data: Article[];
-  total: number;
-}
+async function fetchArticles<T extends ArticleType = ArticleType>(
+  params: UseArticlesParams<T> = {},
+) {
+  const entries = Object.entries(params).flatMap(([key, value]) => {
+    if (value === undefined || value === null) return [];
+    if (typeof value === "string" && value.trim() === "") return [];
+    return [[key, String(value)]];
+  });
 
-async function fetchArticles(params: UseArticlesParams = {}) {
-  const searchParams = new URLSearchParams();
-
-  if (params.type) searchParams.set("type", params.type);
-  if (params.dynasty_id) searchParams.set("dynasty_id", params.dynasty_id);
-  if (params.category_id) searchParams.set("category_id", params.category_id);
-  if (typeof params.is_featured === "boolean")
-    searchParams.set("is_featured", String(params.is_featured));
-  if (typeof params.year_from === "number")
-    searchParams.set("year_from", String(params.year_from));
-  if (typeof params.year_to === "number")
-    searchParams.set("year_to", String(params.year_to));
-  if (params.q) searchParams.set("q", params.q);
-  if (typeof params.page === "number")
-    searchParams.set("page", String(params.page));
-  if (typeof params.limit === "number")
-    searchParams.set("limit", String(params.limit));
-
+  const searchParams = new URLSearchParams(entries);
   const query = searchParams.toString();
-  const res = await httpClient.get<ArticlesResponse>(
+
+  const res = await httpClient.get<ApiListResponse<ArticleSummaryOfType<T>>>(
     `/articles${query ? `?${query}` : ""}`,
   );
-  return res.data;
+
+  return normalizeArticleListResponse(res.data);
 }
 
-export function useArticles(params: UseArticlesParams = {}) {
+export function useArticles<T extends ArticleType = ArticleType>(
+  params: UseArticlesParams<T> = {},
+) {
+  const queryKey = [
+    "articles",
+    params.type ?? "",
+    params.dynasty_id ?? "",
+    params.category_id ?? "",
+    params.is_featured ?? null,
+    params.year_from ?? null,
+    params.year_to ?? null,
+    params.q ?? "",
+    params.page ?? null,
+    params.limit ?? null,
+  ] as const;
+
   return useQuery({
-    queryKey: ["articles", params],
+    queryKey,
     queryFn: () => fetchArticles(params),
   });
 }

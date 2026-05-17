@@ -1,7 +1,7 @@
 import { BookOpen } from "lucide-react";
-import type { Article } from "../../types/article.type";
+import type { ArticleDetail } from "../../types";
 
-export default function QuickFactsCard({ article }: { article: Article }) {
+export default function QuickFactsCard({ article }: { article: ArticleDetail }) {
   return (
     <div className="bg-[#13100a] text-[#e8d9b0] rounded-sm p-6 border border-[#2e2510]">
       <h4 className="text-[10px] font-bold text-[#C5A028] tracking-[0.2em] uppercase mb-6 flex items-center gap-2">
@@ -27,7 +27,7 @@ export default function QuickFactsCard({ article }: { article: Article }) {
             Giai đoạn
           </div>
           <div className="text-[14px] font-serif">
-            {article.dynasty_id || "Đang cập nhật"}
+            {article.dynasty_name || "Đang cập nhật"}
           </div>
         </div>
         <div>
@@ -35,7 +35,7 @@ export default function QuickFactsCard({ article }: { article: Article }) {
             Danh mục
           </div>
           <div className="inline-block bg-[#8B1A1A] text-[#f5e0b0] text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider">
-            {article.type}
+            {article.category_name || "Đang cập nhật"}
           </div>
         </div>
       </div>

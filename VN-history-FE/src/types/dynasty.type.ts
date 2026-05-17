@@ -5,7 +5,6 @@ export interface Dynasty {
   year_start: number;
   year_end: number;
   year_display: string;
-  description: null;
+  description: string;
   sort_order: number;
-  created_at: string;
 }

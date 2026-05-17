@@ -1,35 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "../../lib/http";
+import type { ApiListResponse, ArticleType, Category } from "../../types";
 
-export type CategoryArticleType =
-  | "event"
-  | "person"
-  | "place"
-  | "video"
-  | "culture";
-
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  article_type: CategoryArticleType;
-  sort_order: number;
-}
-
-interface CategoriesResponse {
-  data: Category[];
-  total: number;
-}
-
-async function fetchCategories(type?: CategoryArticleType) {
+async function fetchCategories(type?: ArticleType) {
   const params = type ? `?type=${type}` : "";
-  const res = await httpClient.get<CategoriesResponse>(`/categories${params}`);
+  const res = await httpClient.get<ApiListResponse<Category>>(
+    `/categories${params}`,
+  );
   return res.data;
 }
 
-export function useCategories(type?: CategoryArticleType) {
+export function useCategories(type?: ArticleType) {
   return useQuery({
-    queryKey: ["categories", type ?? "all"],
+    queryKey: [`categories-${type ?? "all"}`],
     queryFn: () => fetchCategories(type),
   });
 }
