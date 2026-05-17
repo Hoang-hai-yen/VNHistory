@@ -1,3 +1,4 @@
+import videoPlaceholder from "../../assets/Image/BG.png";
 import type { VideoArticle } from "../../types";
 
 export default function VideoCard({
@@ -7,10 +8,16 @@ export default function VideoCard({
   video: VideoArticle;
   dark?: boolean;
 }) {
+  const imageSrc = video.cover_image_url || videoPlaceholder;
+
   return (
     <div className="group cursor-pointer">
       <div className="relative overflow-hidden aspect-video bg-[#1A1208] mb-3">
-        <img src={video.cover_image_url} alt={video.slug} />
+        <img
+          src={imageSrc}
+          alt={video.title}
+          className="h-full w-full object-cover"
+        />
 
         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors flex items-center justify-center">
           <div className="w-13 h-13 bg-white/15 border-2 border-white/60 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:bg-[#8B1A1A] group-hover:border-[#8B1A1A] group-hover:scale-110 transition-all">

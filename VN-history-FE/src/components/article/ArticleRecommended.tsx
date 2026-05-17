@@ -14,7 +14,7 @@ export default function ArticleRecommended({
   return (
     <div>
       <h4 className="text-[13px] font-bold text-[#1c1c1c] uppercase tracking-widest mb-6 border-b border-[#E8D9B0] pb-2">
-        B\u00e0i vi\u1ebft g\u1ee3i \u00fd
+        Bài viết liên quan
       </h4>
       <div className="space-y-6">
         {articleRelated.slice(0, 3).map((ev) => (

@@ -28,20 +28,14 @@ export default function ArticleDetailPage() {
     refetch,
   } = useArticleBySlug(slug || "");
 
-  const prevArticle = articleData?.related?.find(
-    (r) => r.relation_type === "previous",
-  );
-  const nextArticle = articleData?.related?.find(
-    (r) => r.relation_type === "next",
-  );
 
   return (
     <QueryStateWrapper
       isLoading={isLoading}
       error={error}
       data={articleData}
-      emptyMessage="B\u00e0i vi\u1ebft kh\u00f4ng t\u1ed3n t\u1ea1i"
-      loadingMessage="\u0110ang t\u1ea3i b\u00e0i vi\u1ebft..."
+      emptyMessage="Bài viết không tồn tại"
+      loadingMessage="Đang tải bài viết ..."
       onRetry={refetch}
     >
       <div className="bg-[#FDFBF7] min-h-screen text-[#2c2c2c] selection:bg-[#F5C842] selection:text-[#1c1c1c]">
@@ -50,11 +44,11 @@ export default function ArticleDetailPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-12 lg:py-20">
           <div className="flex items-center gap-1.5 text-[11.5px] text-[#6b6b6b] mb-8 lg:mb-12">
             <Link to="/" className="hover:text-[#8B1A1A]">
-              Trang Ch\u1ee7
+              Trang chủ
             </Link>
             <span className="opacity-40">{"\u203a"}</span>
             <Link to="/bai-viet" className="hover:text-[#8B1A1A]">
-              B\u00e0i Vi\u1ebft
+              Bài viết
             </Link>
             <span className="opacity-40">{"\u203a"}</span>
             {articleData?.display.category_label && (
@@ -73,7 +67,7 @@ export default function ArticleDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-12 pb-12 border-b border-[#E8D9B0]">
             <div className="flex flex-col">
               <span className="text-[10px] text-[#B8860B] font-bold uppercase tracking-widest mb-2">
-                Ng\u00e0y \u0110\u0103ng
+                Ngày phát hành
               </span>
               <div className="flex items-center gap-2 text-[#1c1c1c]">
                 <Calendar size={16} className="text-[#8B1A1A]" />
@@ -86,7 +80,7 @@ export default function ArticleDetailPage() {
             {articleData?.display.period_label && (
               <div className="flex flex-col">
                 <span className="text-[10px] text-[#B8860B] font-bold uppercase tracking-widest mb-2">
-                  Th\u1eddi K\u1ef3
+                  Thời gian
                 </span>
                 <div className="flex items-center gap-2 text-[#1c1c1c]">
                   <Calendar size={16} className="text-[#8B1A1A]" />
@@ -100,7 +94,7 @@ export default function ArticleDetailPage() {
             {articleData?.display.dynasty_label && (
               <div className="flex flex-col">
                 <span className="text-[10px] text-[#B8860B] font-bold uppercase tracking-widest mb-2">
-                  Tri\u1ec1u \u0110\u1ea1i
+                  Triều đại
                 </span>
                 <div className="flex items-center gap-2 text-[#1c1c1c]">
                   <Book size={16} className="text-[#8B1A1A]" />
@@ -114,7 +108,7 @@ export default function ArticleDetailPage() {
             {articleData?.display.category_label && (
               <div className="flex flex-col">
                 <span className="text-[10px] text-[#B8860B] font-bold uppercase tracking-widest mb-2">
-                  Chuy\u00ean M\u1ee5c
+                  Chuyên mục
                 </span>
                 <div className="flex items-center gap-2 text-[#1c1c1c]">
                   <AlertTriangle size={16} className="text-[#8B1A1A]" />
@@ -135,10 +129,10 @@ export default function ArticleDetailPage() {
               <div className="flex items-center justify-between border-y border-[#E8D9B0] py-4 mb-12 sticky top-4 z-10 bg-[#FDFBF7]/90 backdrop-blur-sm">
                 <div className="flex items-center gap-4">
                   <button className="flex items-center gap-2 text-[12px] font-bold text-[#1c1c1c] uppercase tracking-wider hover:text-[#8B1A1A] transition-colors">
-                    <Heart size={16} /> L\u01b0u b\u00e0i vi\u1ebft
+                    <Heart size={16} /> Lưu bài viết
                   </button>
                   <button className="flex items-center gap-2 text-[12px] font-bold text-[#1c1c1c] uppercase tracking-wider hover:text-[#8B1A1A] transition-colors">
-                    <Share2 size={16} /> Chia s\u1ebb
+                    <Share2 size={16} /> Chia sẻ
                   </button>
                 </div>
                 <div className="flex items-center gap-3">
@@ -151,11 +145,13 @@ export default function ArticleDetailPage() {
                 </div>
               </div>
 
+              <div className="text-2xl font-semibold">{articleData?.title}</div>
+
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
                   h2: ({ children }) => (
-                    <h2 className="text-2xl font-['Playfair_Display',serif] font-bold text-[#1c1c1c] mt-12 mb-6">
+                    <h2 className="border-l-4 border-primary pl-4 text-h2 font-['Playfair_Display',serif] font-bold text-[#1c1c1c] mt-6 mb-3">
                       {children}
                     </h2>
                   ),
@@ -172,7 +168,7 @@ export default function ArticleDetailPage() {
               {articleData?.places && articleData.places.length > 0 && (
                 <div className="mt-16 pt-12 border-t border-[#E8D9B0]">
                   <h3 className="text-xl font-['Playfair_Display',serif] font-bold text-[#1c1c1c] mb-6">
-                    \u0110\u1ecba \u0110i\u1ec3m Li\u00ean Quan
+                    Bài viết liên quan
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {articleData.places.map((place) => (
@@ -206,7 +202,7 @@ export default function ArticleDetailPage() {
                             rel="noopener noreferrer"
                             className="text-[11px] text-[#8B1A1A] font-medium hover:underline"
                           >
-                            Xem tr\u00ean b\u1ea3n \u0111\u1ed3 {"\u2192"}
+                            Xem thêm {"\u2192"}
                           </a>
                         )}
                       </div>
@@ -218,7 +214,7 @@ export default function ArticleDetailPage() {
               {articleData?.sources && articleData.sources.length > 0 && (
                 <div className="mt-16 pt-12 border-t border-[#E8D9B0]">
                   <h3 className="text-xl font-['Playfair_Display',serif] font-bold text-[#1c1c1c] mb-6">
-                    T\u00e0i Li\u1ec7u Tham Kh\u1ea3o
+                    Tư liệu tham khảo
                   </h3>
                   <div className="space-y-4">
                     {articleData.sources.map((source) => (
@@ -262,7 +258,7 @@ export default function ArticleDetailPage() {
                                 rel="noopener noreferrer"
                                 className="text-[11px] text-[#8B1A1A] font-medium hover:underline mt-2 inline-block"
                               >
-                                Xem ngu\u1ed3n {"\u2192"}
+                                Xem ngay {"\u2192"}
                               </a>
                             )}
                           </div>
@@ -280,10 +276,10 @@ export default function ArticleDetailPage() {
                   </div>
                   <div>
                     <div className="text-[12px] text-[#6b6b6b]">
-                      Bi\u00ean t\u1eadp b\u1edfi
+                      Biên tập bởi
                     </div>
                     <div className="text-[14px] font-bold text-[#1c1c1c]">
-                      Ban bi\u00ean t\u1eadp L\u1ecbch S\u1eed Vi\u1ec7t Nam
+                      Ban biên tập lịch sử Việt Nam
                     </div>
                   </div>
                 </div>
@@ -301,56 +297,8 @@ export default function ArticleDetailPage() {
                   }}
                   className="flex items-center gap-2 text-[#8B1A1A] hover:bg-[#8B1A1A]/5 px-4 py-2 rounded-sm border border-dashed border-[#8B1A1A] text-[13px] font-bold transition-all"
                 >
-                  <AlertTriangle size={16} /> B\u00e1o c\u00e1o l\u1ed7i n\u1ed9i dung
+                  <AlertTriangle size={16} /> Báo cáo lỗi hoặc góp ý
                 </Link>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
-                {prevArticle ? (
-                  <Link
-                    to={`/bai-viet/${prevArticle.slug}`}
-                    className="p-6 border border-[#E8D9B0] rounded-sm hover:border-[#8B1A1A] transition-all text-left group"
-                  >
-                    <div className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mb-1">
-                      {"\u2190"} B\u00e0i tr\u01b0\u1edbc \u0111\u00f3
-                    </div>
-                    <div className="text-lg font-['Playfair_Display',serif] group-hover:text-[#8B1A1A]">
-                      {prevArticle.title}
-                    </div>
-                  </Link>
-                ) : (
-                  <div className="p-6 border border-[#E8D9B0]/30 rounded-sm bg-[#F9F5EF]/50 opacity-50">
-                    <div className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mb-1">
-                      {"\u2190"} B\u00e0i tr\u01b0\u1edbc \u0111\u00f3
-                    </div>
-                    <div className="text-lg font-['Playfair_Display',serif] text-[#6b6b6b]">
-                      Kh\u00f4ng c\u00f3 b\u00e0i vi\u1ebft tr\u01b0\u1edbc
-                    </div>
-                  </div>
-                )}
-
-                {nextArticle ? (
-                  <Link
-                    to={`/bai-viet/${nextArticle.slug}`}
-                    className="p-6 border border-[#E8D9B0] rounded-sm hover:border-[#8B1A1A] transition-all text-right group"
-                  >
-                    <div className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mb-1">
-                      Ti\u1ebfp theo {"\u2192"}
-                    </div>
-                    <div className="text-lg font-['Playfair_Display',serif] group-hover:text-[#8B1A1A]">
-                      {nextArticle.title}
-                    </div>
-                  </Link>
-                ) : (
-                  <div className="p-6 border border-[#E8D9B0]/30 rounded-sm bg-[#F9F5EF]/50 opacity-50">
-                    <div className="text-[10px] text-[#6b6b6b] uppercase tracking-widest mb-1">
-                      Ti\u1ebfp theo {"\u2192"}
-                    </div>
-                    <div className="text-lg font-['Playfair_Display',serif] text-[#6b6b6b]">
-                      Kh\u00f4ng c\u00f3 b\u00e0i vi\u1ebft ti\u1ebfp theo
-                    </div>
-                  </div>
-                )}
               </div>
             </motion.article>
 
@@ -361,7 +309,7 @@ export default function ArticleDetailPage() {
               {articleData?.display.category_label && (
                 <div className="p-6 bg-[#F9F5EF] border border-[#E8D9B0] rounded-sm">
                   <h4 className="text-[11px] font-bold text-[#1c1c1c] uppercase tracking-widest mb-4">
-                    Chuy\u00ean M\u1ee5c
+                    Chuyên mục
                   </h4>
                   <div className="space-y-2">
                     <span className="inline-block text-[13px] bg-[#8B1A1A] text-white px-3 py-1.5 rounded-full font-medium hover:bg-[#B8860B] transition-colors">
@@ -373,7 +321,7 @@ export default function ArticleDetailPage() {
 
               <div className="p-6 bg-[#F9F5EF] border border-[#E8D9B0] rounded-sm">
                 <h4 className="text-[11px] font-bold text-[#1c1c1c] uppercase tracking-widest mb-4">
-                  Lo\u1ea1i B\u00e0i Vi\u1ebft
+                  Loại bài viết
                 </h4>
                 <div className="space-y-2">
                   <span className="inline-block text-[13px] bg-[#B8860B]/20 text-[#8B1A1A] px-3 py-1.5 rounded-full font-medium">
@@ -384,7 +332,7 @@ export default function ArticleDetailPage() {
 
               <div className="p-6 bg-[#F9F5EF] border border-[#E8D9B0] rounded-sm">
                 <h4 className="text-[11px] font-bold text-[#1c1c1c] uppercase tracking-widest mb-4">
-                  Chia S\u1ebb
+                  Chia sẻ
                 </h4>
                 <div className="flex gap-2">
                   <button className="p-3 bg-white border border-[#E8D9B0] rounded-full hover:bg-[#F5C842]/10 transition-colors">

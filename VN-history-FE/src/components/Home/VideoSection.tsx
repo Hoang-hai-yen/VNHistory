@@ -7,8 +7,8 @@ export default function VideoSection({ VIDEOS }: { VIDEOS: VideoArticle[] }) {
     <section className="bg-[#1A1208] py-10">
       <div className="max-w-7xl mx-auto px-4">
         <PageSectionHeader
-          subtitle="L\u1ecbch S\u1eed Qua M\u00e0n \u1ea2nh"
-          title="Video T\u01b0 Li\u1ec7u L\u1ecbch S\u1eed"
+          subtitle="Lịch sử qua màn ảnh"
+          title="Video Tư liệu lịch sử"
           moreLink="/video"
           dark={true}
         />

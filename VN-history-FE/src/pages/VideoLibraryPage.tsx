@@ -30,7 +30,7 @@ export default function VideoLibraryPage() {
   const total = data?.total ?? 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 pb-20">
+    <div className="max-w-7xl mx-auto px-4 space-y-4">
       <div className="flex items-center gap-1.5 py-4 text-[11.5px] text-[#6b6b6b] lg:py-5">
         <Link to="/" className="hover:text-[#8B1A1A]">
           Trang Chủ
@@ -42,9 +42,6 @@ export default function VideoLibraryPage() {
       <PageSectionHeader subtitle="Màn Ảnh" title="Video Tư Liệu Lịch Sử" />
 
       <ArchiveFilterPanel
-        title="Kho video lịch sử"
-        description="Xem các video tư liệu theo chuyên mục và triều đại để theo dõi mạch nội dung nhất quán với phần bài viết."
-        total={total}
         categoryOptions={categoriesData?.data || []}
         dynastyOptions={dynastiesData?.data || []}
         categoryId={categoryId}

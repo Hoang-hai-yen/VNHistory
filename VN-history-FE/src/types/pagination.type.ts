@@ -26,7 +26,7 @@ export interface PaginationMeta {
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_LIMIT = 10;
-export const LIMIT_OPTIONS = [10, 20, 50, 100];
+export const LIMIT_OPTIONS = [5, 10, 20, 50];
 
 export const PAGINATION_DEFAULTS = {
   page: DEFAULT_PAGE,

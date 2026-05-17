@@ -42,9 +42,6 @@ export default function GeographyPage() {
       <PageSectionHeader subtitle="Khám Phá" title="Văn hóa Việt" />
 
       <ArchiveFilterPanel
-        title="Không gian văn hóa"
-        description="Tập hợp các bài viết về văn hóa, di sản và không gian lịch sử. Bạn có thể khoanh vùng theo chuyên mục và triều đại."
-        total={total}
         categoryOptions={categoriesData?.data || []}
         dynastyOptions={dynastiesData?.data || []}
         categoryId={categoryId}

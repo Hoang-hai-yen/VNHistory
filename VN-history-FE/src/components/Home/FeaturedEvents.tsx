@@ -19,7 +19,7 @@ export default function FeaturedEvents({
       />
 
       {events.length > 0 ? (
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[5fr_3fr] gap-5 mb-10">
           <ArticleCard lg item={events[0]} />
 
           <div className="flex flex-col">

@@ -1,4 +1,5 @@
 import { Calendar, Clock, MapPin, User } from "lucide-react";
+import articlePlaceholder from "../../assets/Image/BG.png";
 import type { NormalizedArticleDetail } from "../../types";
 
 export default function ArticleHeaderWithImage({
@@ -10,7 +11,7 @@ export default function ArticleHeaderWithImage({
     article.cover_image_url ||
     article.media.find((media) => media.is_cover === 1)?.url ||
     article.media[0]?.url ||
-    "https://via.placeholder.com/800x400?text=No+Image";
+    articlePlaceholder;
 
   return (
     <div className="relative h-[400px] w-full overflow-hidden bg-[#1c1c1c]">
@@ -33,12 +34,15 @@ export default function ArticleHeaderWithImage({
         <div className="flex flex-wrap items-center gap-6 mt-8 text-[12px] text-[#6b6b6b] font-medium border-t border-[#E8D9B0] pt-6">
           <div className="flex items-center gap-2">
             <Calendar size={14} className="text-[#8B1A1A]" />
-            <span>{article.display.period_label || "Kh\u00f4ng r\u00f5 th\u1eddi gian"}</span>
+            <span>
+              {article.display.period_label ||
+                "Kh\u00f4ng r\u00f5 th\u1eddi gian"}
+            </span>
           </div>
           {article.display.dynasty_label && (
             <div className="flex items-center gap-2">
               <Clock size={14} className="text-[#8B1A1A]" />
-              <span>Th\u1eddi k\u1ef3: {article.display.dynasty_label}</span>
+              <span>Thời gian: {article.display.dynasty_label}</span>
             </div>
           )}
           {article.display.location_label && (

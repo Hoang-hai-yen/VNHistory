@@ -29,7 +29,7 @@ function App() {
 
       <Route path="/" element={<MainLayout />}>
         <Route path="" element={<HomePage />} />
-        <Route path="trieu-dai" element={<DynastiesPage />} />
+        <Route path="kham-pha" element={<DynastiesPage />} />
         <Route path="nhan-vat" element={<FiguresPage />} />
         <Route path="dong-thoi-gian" element={<TimelinePage />} />
         <Route path="van-hoa" element={<GeographyPage />} />

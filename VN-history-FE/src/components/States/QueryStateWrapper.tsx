@@ -60,33 +60,32 @@ export default function QueryStateWrapper({
   // Success state - render children with pagination
   return (
     <>
-      {/* Size Selector */}
-      {pagination?.onLimitChange && (
-        <div className="mb-6">
-          <PaginationSizeSelector
-            value={pagination.limit}
-            onChange={pagination.onLimitChange}
-            disabled={isLoading}
-          />
-        </div>
-      )}
-
-      {/* Content */}
       {children}
 
-      {/* Pagination Controls */}
-      {pagination && pagination.totalPages > 1 && (
-        <PaginationControls
-          page={pagination.page}
-          totalPages={pagination.totalPages}
-          hasNextPage={pagination.page < pagination.totalPages}
-          hasPreviousPage={pagination.page > 1}
-          isLoading={isLoading}
-          onNextPage={pagination.onNextPage}
-          onPrevPage={pagination.onPrevPage}
-          onGoToPage={pagination.onGoToPage}
-        />
-      )}
+      <div className="flex flex-row gap-2 items-end justify-end">
+        {pagination?.onLimitChange && (
+          <div className="my-6">
+            <PaginationSizeSelector
+              value={pagination.limit}
+              onChange={pagination.onLimitChange}
+              disabled={isLoading}
+            />
+          </div>
+        )}
+
+        {pagination && pagination.totalPages > 1 && (
+          <PaginationControls
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            hasNextPage={pagination.page < pagination.totalPages}
+            hasPreviousPage={pagination.page > 1}
+            isLoading={isLoading}
+            onNextPage={pagination.onNextPage}
+            onPrevPage={pagination.onPrevPage}
+            onGoToPage={pagination.onGoToPage}
+          />
+        )}
+      </div>
     </>
   );
 }

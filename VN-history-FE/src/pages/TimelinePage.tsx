@@ -2,7 +2,7 @@ import { Link, useSearchParams } from "react-router";
 import PageSectionHeader from "../components/common/PageSectionHeader";
 import { useTimeline } from "../hooks/api/useTimeline";
 import QueryStateWrapper from "../components/States/QueryStateWrapper";
-import { motion, useScroll, useSpring } from "motion/react";
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
@@ -23,16 +23,7 @@ export default function TimelinePage() {
   const [activeDynasty, setActiveDynasty] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
 
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
 
   const timelineData = data?.data || [];
 
@@ -75,10 +66,7 @@ export default function TimelinePage() {
         loadingMessage="Đang tải dòng thời gian..."
         onRetry={refetch}
       >
-        <motion.div
-          className="fixed top-14 left-0 right-0 z-50 h-1 origin-left bg-[#B8860B]"
-          style={{ scaleX }}
-        />
+
 
         <div
           className="min-h-screen bg-[#F4F1EA] font-['Source_Serif_4',serif]"

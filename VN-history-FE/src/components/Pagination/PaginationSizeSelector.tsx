@@ -20,7 +20,7 @@ export default function PaginationSizeSelector({
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value, 10))}
         disabled={disabled}
-        className="px-3 py-1.5 text-xs border border-[#e0dbd0] rounded-md bg-white hover:border-[#8B1A1A] focus:border-[#8B1A1A] focus:ring-1 focus:ring-[#8B1A1A]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="px-3 py-1.5 text-xs border border-[#e0dbd0] rounded-md bg-none text-foreground hover:border-[#8B1A1A] focus:border-[#8B1A1A] focus:ring-1 focus:ring-[#8B1A1A]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         {LIMIT_OPTIONS.map((option) => (
           <option key={option} value={option}>

@@ -10,8 +10,8 @@ export default function HeroFigures({
   return (
     <div>
       <PageSectionHeader
-        subtitle="Nh\u00e2n V\u1eadt"
-        title="Anh H\u00f9ng D\u00e2n T\u1ed9c"
+        subtitle="Nhân vật"
+        title="Anh Hùng Dân Tộc"
         moreLink="/nhan-vat"
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">

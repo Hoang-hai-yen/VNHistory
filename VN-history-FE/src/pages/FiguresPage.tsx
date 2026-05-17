@@ -30,7 +30,7 @@ export default function FiguresPage() {
   const total = data?.total ?? 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 pb-20">
+    <div className="max-w-7xl mx-auto px-4 space-y-4">
       <div className="flex items-center gap-1.5 py-4 text-[11.5px] text-[#6b6b6b] lg:py-5">
         <Link to="/" className="hover:text-[#8B1A1A]">
           Trang Chủ
@@ -42,9 +42,6 @@ export default function FiguresPage() {
       <PageSectionHeader subtitle="Tiểu Sử" title="Nhân vật lịch sử" />
 
       <ArchiveFilterPanel
-        title="Kho nhân vật lịch sử"
-        description="Lọc theo chuyên mục và triều đại để xem đúng tập nhân vật mà bạn đang nghiên cứu."
-        total={total}
         categoryOptions={categoriesData?.data || []}
         dynastyOptions={dynastiesData?.data || []}
         categoryId={categoryId}
