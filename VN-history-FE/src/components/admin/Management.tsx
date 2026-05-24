@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import "../styles/Management.css";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import '../styles/Management.css';
+import {
+  useSearch
+} from '../context/searchContext';
+
+import {
+  highlightText
+} from '../utils/highlightText';
 
 interface AdminUser {
   id: string;
@@ -19,6 +26,9 @@ const Management: React.FC = () => {
     useState(false);
 
   const [creating, setCreating] = useState(false);
+  const {
+  searchText
+} = useSearch();
 
   const [newAdmin, setNewAdmin] = useState({
     full_name: '',
@@ -249,7 +259,14 @@ const Management: React.FC = () => {
                   <div className="user-info">
                     <div className="user-name">{user.name}</div>
 
-                    <div className="user-email">{user.email}</div>
+                    <div className="user-name">
+                      {highlightText(user.name, searchText)}
+                    </div>
+
+                    <div className="user-email">
+                      {highlightText(user.email, searchText)}
+                    </div>
+
                   </div>
                 </td>
 
@@ -260,30 +277,35 @@ const Management: React.FC = () => {
                       user.role === "Super Admin" ? "bg-gold" : "bg-blue"
                     }`}
                   >
-                    {user.role}
+                    {highlightText(user.role, searchText)}
                   </span>
                 </td>
 
                 {/* Posts */}
-                <td className="text-center">{user.postsCount}</td>
+                <td className="text-center">
+                  {highlightText(user.postsCount.toString(), searchText)}
+                </td>
 
                 {/* Reports */}
-                <td className="text-center">{user.reportsHandled}</td>
+                <td className="text-center">
+                  {highlightText(user.reportsHandled.toString(), searchText)}
+                </td>
 
                 {/* Status */}
                 <td>
                   <span
                     className={`status-indicator status-${getStatusKey(user.status)}`}
                   >
-                    ● {user.status}
+                    ● {highlightText(user.status, searchText)}
                   </span>
                 </td>
 
                 {/* Last Login */}
                 <td>
                   {user.lastLogin
-                    ? new Date(user.lastLogin).toLocaleString("vi-VN")
-                    : "Chưa đăng nhập"}
+                    ? highlightText(new Date(user.lastLogin).toLocaleString("vi-VN"), searchText)
+                    : highlightText("Chưa đăng nhập", searchText)}
+
                 </td>
 
                 {/* Actions */}

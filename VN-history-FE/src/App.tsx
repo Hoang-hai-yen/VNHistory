@@ -22,9 +22,13 @@ import VideoLibraryPage from "./pages/VideoLibraryPage";
 import ReportPage from "./pages/ReportPage";
 import PostDetail from "./components/PostDetail";
 import PostEdit from "./components/PostEdit";
+import { SearchProvider } from "./context/searchContext";
+
+
 
 function App() {
   return (
+    <SearchProvider>
     <Routes>
       {/* Login */}
       <Route path="/login" element={<Login />} />
@@ -56,6 +60,7 @@ function App() {
         <Route path="post-edit" element={<PostEdit />} /> {/* 👈 thêm dòng này */}
       </Route>
     </Routes>
+    </SearchProvider>
   );
 }
 

@@ -2,6 +2,15 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/Dashboard.css';
 import { useNavigate } from 'react-router-dom';
+import {
+  useSearch
+} from '../context/searchContext';
+
+import {
+  highlightText
+} from '../utils/highlightText';
+
+
 
 interface ContentItem {
   id: string;
@@ -11,6 +20,7 @@ interface ContentItem {
   assignee: string;
   date: string;
   status: string;
+  rejection_note?: string;
 }
 
 interface Stats {
@@ -30,7 +40,17 @@ const Dashboard: React.FC = () => {
     "Tất cả" | "Sự kiện" | "Nhân vật" | "Di sản" | "Khác"
   >("Tất cả");
 
+  const [showReturnModal, setShowReturnModal] =
+    useState(false);
+
+  const [selectedArticleId, setSelectedArticleId] =
+    useState('');
+
+  const [returnNote, setReturnNote] =
+    useState('');
+
   const navigate = useNavigate();
+  const {searchText} = useSearch();
 
   const [stats, setStats] = useState<Stats>({
     total_published: 0,
@@ -49,67 +69,8 @@ const Dashboard: React.FC = () => {
   const [openReports, setOpenReports] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        const res = await axios.get(
-          "http://localhost:3000/api/admin/dashboard",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        console.log(res.data);
-
-        const dashboardData = res.data.data;
-
-        setStats(dashboardData.stats);
-
-        const formattedArticles = dashboardData.recent_articles.map(
-          (article: any) => ({
-            id: article.id,
-            title: article.title,
-            type:
-              article.type === "event"
-                ? "Sự kiện"
-                : article.type === "person"
-                  ? "Nhân vật"
-                  : article.type === "place"
-                    ? "Di sản"
-                    : "Khác",
-
-            dynasty: article.dynasty_name,
-            assignee: article.created_by_name,
-
-            date: new Date(
-              article.published_at || article.created_at,
-            ).toLocaleDateString("vi-VN"),
-
-            status:
-              article.status === "published"
-                ? "Đã xuất bản"
-                : article.status === "pending"
-                  ? "Chờ duyệt"
-                  : article.status === "draft"
-                    ? "Bản nháp"
-                    : "Từ chối",
-          }),
-        );
-
-        setContentData(formattedArticles);
-
-        setRecentLogs(dashboardData.recent_logs || []);
-        setOpenReports(dashboardData.open_reports || []);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchDashboard();
-  }, []);
+  fetchDashboardData();
+}, []);
 
   const filteredData =
     activeTab === "Tất cả"
@@ -182,6 +143,177 @@ const Dashboard: React.FC = () => {
         console.log(error);
       }
     };
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const res = await axios.get(
+          'http://localhost:3000/api/admin/dashboard',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const dashboardData = res.data.data;
+
+        setStats(dashboardData.stats);
+
+        const formattedArticles =
+          dashboardData.recent_articles.map(
+            (article: any) => ({
+              id: article.id,
+              title: article.title,
+              type:
+                article.type === 'event'
+                  ? 'Sự kiện'
+                  : article.type === 'person'
+                  ? 'Nhân vật'
+                  : article.type === 'place'
+                  ? 'Di sản'
+                  : 'Khác',
+
+              dynasty: article.dynasty_name,
+              assignee: article.created_by_name,
+
+              date: new Date(
+                article.published_at ||
+                article.created_at
+              ).toLocaleDateString('vi-VN'),
+
+              status:
+                article.status === 'published'
+                  ? 'Đã xuất bản'
+                  : article.status === 'pending'
+                  ? 'Chờ duyệt'
+                  : article.status === 'draft'
+                  ? 'Bản nháp'
+                  : 'Từ chối',
+
+              rejection_note:
+                article.rejection_note || '',
+            })
+          );
+
+        setContentData(formattedArticles);
+
+        setRecentLogs(
+          dashboardData.recent_logs || []
+        );
+
+        setOpenReports(
+          dashboardData.open_reports || []
+        );
+
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const handlePublish = async (
+      id: string
+    ) => {
+      try {
+        const token =
+          localStorage.getItem('token');
+
+        await axios.patch(
+          `http://localhost:3000/api/admin/articles/${id}/publish`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        alert(
+          'Xuất bản bài viết thành công!'
+        );
+
+        fetchDashboardData();
+
+      } catch (error) {
+        console.log(error);
+        alert(
+          'Xuất bản thất bại!'
+        );
+      }
+    };
+
+    const handleReject = async (
+      id: string
+    ) => {
+      try {
+        const token =
+          localStorage.getItem('token');
+
+        await axios.patch(
+          `http://localhost:3000/api/admin/articles/${id}/reject`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        alert(
+          'Đã từ chối bài viết!'
+        );
+
+        fetchDashboardData();
+
+      } catch (error) {
+        console.log(error);
+        alert(
+          'Từ chối thất bại!'
+        );
+      }
+    };
+    
+    const handleOpenReturnModal = (
+      id: string
+    ) => {
+      setSelectedArticleId(id);
+      setReturnNote('');
+      setShowReturnModal(true);
+    };
+
+    const handleReturn = async () => {
+      try {
+        const token =
+          localStorage.getItem('token');
+
+        await axios.patch(
+          `http://localhost:3000/api/admin/articles/${selectedArticleId}/return`,
+          {
+            return_note: returnNote,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        alert(
+          'Đã trả bài về cho admin'
+        );
+
+        setShowReturnModal(false);
+
+        fetchDashboardData();
+
+      } catch (error) {
+        console.log(error);
+
+        alert(
+          'Trả bài thất bại'
+        );
+      }
+    };
 
   const renderActions = (item: ContentItem) => {
 
@@ -189,13 +321,42 @@ const Dashboard: React.FC = () => {
       if (item.status === 'Chờ duyệt') {
         return (
           <div className="action-buttons">
-            <button className="btn btn-approve">
+
+            <button
+              className="btn btn-view"
+              onClick={() =>
+                handleViewPost(item.id)
+              }
+            >
+              Xem
+            </button>
+
+            <button
+              className="btn btn-approve"
+              onClick={() =>
+                handlePublish(item.id)
+              }
+            >
               Duyệt & Xuất bản
             </button>
 
-            <button className="btn btn-reject">
+            <button
+              className="btn btn-reject"
+              onClick={() =>
+                handleReject(item.id)
+              }
+            >
               Từ chối
             </button>
+            <button
+              className="btn btn-return"
+              onClick={() =>
+                handleOpenReturnModal(item.id)
+              }
+            >
+              Trả về
+            </button>
+
           </div>
         );
       }
@@ -211,7 +372,12 @@ const Dashboard: React.FC = () => {
             >
               Xem
             </button>
-
+            <button
+              className="btn btn-edit-pub"
+              onClick={() => handleEditPost(item.id)}
+            >
+              Chỉnh sửa
+            </button>
           </div>
         );
       }
@@ -237,15 +403,21 @@ const Dashboard: React.FC = () => {
         return (
           <div className="action-buttons">
 
-            <button className="btn btn-reason">
+            {/* <button className="btn btn-reason">
               Lý do
-            </button>
+            </button> */}
 
-            <button
+            {/* <button
               className="btn btn-edit-pub"
               onClick={() => handleEditPost(item.id)}
             >
               Chỉnh sửa
+            </button> */}
+            <button
+              className="btn btn-view"
+              onClick={() => handleViewPost(item.id)}
+            >
+              Xem
             </button>
 
           </div>
@@ -350,6 +522,7 @@ const Dashboard: React.FC = () => {
                 <th>NGÀY</th>
                 <th>TRẠNG THÁI</th>
                 <th>HÀNH ĐỘNG</th>
+                <th>GHI CHÚ</th>
               </tr>
             </thead>
 
@@ -357,20 +530,30 @@ const Dashboard: React.FC = () => {
               {filteredData.map((item) => (
                 <tr key={item.id}>
                   <td className="title-cell">
-                    <p className="main-title">{item.title}</p>
+                    <p className="main-title">
+                      {
+                        highlightText(
+                          item.title,
+                          searchText
+                        )
+                      }
+                    </p>
                   </td>
 
                   <td>{renderTypeTag(item.type)}</td>
 
-                  <td>{item.dynasty}</td>
+                  <td>{highlightText(item.dynasty, searchText)}</td>
 
-                  <td>{item.assignee}</td>
+                  <td>{highlightText(item.assignee, searchText)}</td>
 
-                  <td>{item.date}</td>
+                  <td>{highlightText(item.date, searchText)}</td>
 
                   <td>{renderStatusTag(item.status)}</td>
 
                   <td>{renderActions(item)}</td>
+                  <td className="note-cell">
+                    {highlightText(item.rejection_note || '', searchText)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -455,6 +638,56 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {
+          showReturnModal && (
+          <div className="modal-overlay">
+
+            <div className="return-modal">
+
+              <h3>
+                Trả bài về cho Admin
+              </h3>
+
+              <textarea
+                value={returnNote}
+                onChange={(e) =>
+                  setReturnNote(
+                    e.target.value
+                  )
+                }
+                placeholder="Nhập ghi chú..."
+                rows={5}
+              />
+
+              <div className="modal-actions">
+
+                <button
+                  className="btn-cancel"
+                  onClick={() =>
+                    setShowReturnModal(
+                      false
+                    )
+                  }
+                >
+                  Hủy
+                </button>
+
+                <button
+                  className="btn-confirm-return"
+                  onClick={
+                    handleReturn
+                  }
+                >
+                  Xác nhận trả về
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+          )}
     </div>
   );
 };

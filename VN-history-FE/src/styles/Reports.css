@@ -349,3 +349,19 @@ textarea:focus {
 .btn-success:hover { background: #3d7214; }
 .btn-danger:hover { background: #a02621; }
 .btn-gold:hover { background: #BA7517; }
+
+.btn-warning {
+  background-color: white;
+  border: 1px solid #E67E22;
+  color: #E67E22;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all .2s ease;
+}
+
+.btn-warning:hover {
+  background-color: #E67E22;
+  color: white;
+}

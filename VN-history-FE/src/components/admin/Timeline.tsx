@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Timeline.css';
+import { useSearch } from '../context/searchContext';
+import { highlightText } from '../utils/highlightText';
 
 interface Dynasty {
   id: string;
@@ -28,6 +30,7 @@ const Timeline: React.FC = () => {
     useState<TimelineEvent[]>([]);
 
   const navigate = useNavigate();
+  const { searchText } = useSearch();
 
   // =========================
   // FETCH DANH SÁCH TRIỀU ĐẠI
@@ -268,11 +271,11 @@ const Timeline: React.FC = () => {
             >
 
               <div className="dynasty-name">
-                {d.name}
+                {highlightText(d.name, searchText)}
               </div>
 
               <div className="dynasty-period">
-                {d.year_display}
+                {highlightText(d.year_display, searchText)}
               </div>
 
             </div>
@@ -286,11 +289,11 @@ const Timeline: React.FC = () => {
 
           <h3 className="content-heading">
 
-            {activeDynasty?.name.toUpperCase()}
+            {highlightText(activeDynasty?.name?.toUpperCase(), searchText)}
 
             {' - '}
 
-            {activeDynasty?.event_count || 0}
+            {highlightText(activeDynasty?.event_count?.toString() || '0', searchText)}
 
             {' SỰ KIỆN'}
 
@@ -318,17 +321,17 @@ const Timeline: React.FC = () => {
                 <tr key={event.id}>
 
                   <td className="year-cell">
-                    {event.year}
+                    {highlightText(event.year, searchText)}
                   </td>
 
                   <td className="name-cell">
-                    {event.name}
+                    {highlightText(event.name, searchText)}
                   </td>
 
                   <td>
 
                     <span className="category-tag">
-                      {event.category}
+                      {highlightText(event.category, searchText)}
                     </span>
 
                   </td>
@@ -340,7 +343,7 @@ const Timeline: React.FC = () => {
                         .toLowerCase()
                         .replace(' ', '-')}`}
                     >
-                      {event.status}
+                      {highlightText(event.status, searchText)}
                     </span>
 
                   </td>

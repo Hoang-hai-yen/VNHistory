@@ -86,11 +86,8 @@ const PostEdit: React.FC = () => {
   };
 
   const handleSaveDraft = async () => {
-
     try {
-
-      const token =
-        localStorage.getItem('token');
+      const token = localStorage.getItem('token');
 
       await axios.put(
         `http://localhost:3000/api/admin/articles/${article.id}`,
@@ -102,40 +99,55 @@ const PostEdit: React.FC = () => {
         }
       );
 
-      alert('Đã lưu bản nháp');
+      alert(
+        article?.status === 'published'
+          ? 'Đã lưu chỉnh sửa'
+          : 'Đã lưu bản nháp'
+      );
 
-      navigate('/posts');
+      navigate(-1);
 
     } catch (error) {
       console.log(error);
+      alert('Lưu thất bại');
     }
   };
 
   const handleSubmitReview = async () => {
+  try {
+    const token = localStorage.getItem('token');
 
-    try {
+    // Bước 1: Lưu bài viết trước
+    await axios.put(
+      `http://localhost:3000/api/admin/articles/${article.id}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      const token =
-        localStorage.getItem('token');
+    // Bước 2: Gửi duyệt
+    await axios.patch(
+      `http://localhost:3000/api/admin/articles/${article.id}/submit`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      await axios.patch(
-        `http://localhost:3000/api/admin/articles/${article.id}/submit`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    alert('Đã lưu và gửi duyệt thành công');
 
-      alert('Đã gửi duyệt');
+    navigate(-1);
 
-      navigate('/posts');
-
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  } catch (error) {
+    console.log(error);
+    alert('Gửi duyệt thất bại');
+  }
+};
 
   return (
     <div className="create-post-container">
@@ -296,26 +308,34 @@ const PostEdit: React.FC = () => {
               }}
             >
 
-              <button
-                className="btn-save-draft"
-                onClick={handleSaveDraft}
-              >
-                LƯU BẢN NHÁP
-              </button>
+              {article?.status === 'published' ? (
 
-              <button
-                className="btn-publish-now"
-                onClick={handleSubmitReview}
-              >
-                GỬI DUYỆT
-              </button>
+                <button
+                  className="btn-publish-now"
+                  onClick={handleSaveDraft}
+                >
+                  LƯU CHỈNH SỬA
+                </button>
 
-              {/* <button
-                className="btn-action"
-                onClick={() => navigate(-1)}
-              >
-                HỦY
-              </button> */}
+              ) : (
+
+                <>
+                  <button
+                    className="btn-save-draft"
+                    onClick={handleSaveDraft}
+                  >
+                    LƯU BẢN NHÁP
+                  </button>
+
+                  <button
+                    className="btn-publish-now"
+                    onClick={handleSubmitReview}
+                  >
+                    GỬI DUYỆT
+                  </button>
+                </>
+
+              )}
 
             </div>
 

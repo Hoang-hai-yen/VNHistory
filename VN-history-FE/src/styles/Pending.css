@@ -38,7 +38,7 @@
 
 /* Table Styling */
 .pending-table-container {
-  border: 1px solid #2E2510; /* Màu nâu đậm viền ngoài */
+  border: 1px solid #2E2510;
   background: white;
   border-radius: 4px;
   overflow: hidden;
@@ -59,15 +59,27 @@
   text-transform: uppercase;
 }
 
+/* Đặt border ở TR thay vì TD */
+.pending-table tbody tr {
+  border-bottom: 1px solid #EEE;
+}
+
+.pending-table tbody tr:last-child {
+  border-bottom: none;
+}
+
 .pending-table td {
   padding: 15px 12px;
-  border-bottom: 1px solid #EEE;
   font-size: 14px;
   color: #333;
   vertical-align: middle;
 }
 
 /* Title Cell */
+.title-cell {
+  min-width: 320px;
+}
+
 .title-cell .main-title {
   font-weight: 500;
   color: #2E2510;
@@ -76,18 +88,22 @@
 
 .title-cell .sub-info {
   font-size: 12px;
-  color: #BA7517; /* Màu cam nâu cho thông tin phụ */
-}
+  color: #BA7517;
 
-.status-text {
-  color: #767676;
-  font-style: italic;
+  line-height: 18px;
+  min-height: 18px;
 }
 
 /* Action Buttons */
-.action-cell {
-  display: flex;
-  gap: 8px;
+.action-cell{
+  vertical-align: middle;
+}
+
+.action-group{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
 }
 
 .btn-publish-final {

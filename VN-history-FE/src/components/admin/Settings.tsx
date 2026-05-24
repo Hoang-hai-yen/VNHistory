@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/Settings.css';
+import { useSearch } from '../context/searchContext';
+import { highlightText } from '../utils/highlightText';
 
 const Settings: React.FC = () => {
 
@@ -13,6 +15,7 @@ const Settings: React.FC = () => {
 
   const [allowCommentsDesc, setAllowCommentsDesc] = useState("");
   const [notifyOnReportDesc, setNotifyOnReportDesc] = useState("");
+  const { searchText } = useSearch();
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -201,7 +204,7 @@ const Settings: React.FC = () => {
             </label>
 
             <span className="switch-label">
-              {allowCommentsDesc}
+              {highlightText(allowCommentsDesc, searchText)}
             </span>
 
           </div>
@@ -224,7 +227,7 @@ const Settings: React.FC = () => {
             </label>
 
             <span className="switch-label">
-              {notifyOnReportDesc}
+              {highlightText(notifyOnReportDesc, searchText)}
             </span>
 
           </div>

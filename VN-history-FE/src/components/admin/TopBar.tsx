@@ -1,9 +1,11 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import "../../styles/TopBar.css";
+import "../styles/TopBar.css";
+import { useSearch } from "../context/searchContext";
 
 const TopBar: React.FC = () => {
   const location = useLocation();
+  const { searchText, setSearchText } = useSearch();
 
   // Hàm chuyển đổi path thành Title
   const getTitle = (path: string) => {
@@ -41,17 +43,18 @@ const TopBar: React.FC = () => {
 
       <div className="topbar-right">
         <div className="search-box">
-          {/* <span className="search-icon">🔍</span> */}
-          <input type="text" placeholder="Tìm kiếm..." />
+          <input
+            type="text"
+            placeholder="Tìm kiếm..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
         </div>
 
         <button className="btn-outline">+ BÀI VIẾT MỚI</button>
-        <button className="btn-primary">XUẤT BẢN NGAY</button>
-
-        <div className="notification-icon">
-          🔔
-          {/* <span className="dot"></span> */}
-        </div>
+        {/* <button className="btn-primary">XUẤT BẢN NGAY</button> */}
+        {/* <span className="dot"></span> */}
+        {/* </div> */}
       </div>
     </header>
   );

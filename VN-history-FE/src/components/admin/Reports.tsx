@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/Reports.css';
+import {
+  useNavigate
+} from 'react-router-dom';
+import {
+  useSearch
+} from '../context/searchContext';
+import {
+  highlightText
+} from '../utils/highlightText';
 
 interface ReportItem {
   id: string;
@@ -28,11 +37,47 @@ const Reports: React.FC = () => {
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [selectedReport, setSelectedReport] =
     useState<ReportItem | null>(null);
+  const [adminNote, setAdminNote] =
+    useState<string>('');
 
-  const [activeTab, setActiveTab] =
-    useState<'new' | 'resolved'>('new');
+    const [activeTab, setActiveTab] =
+        useState<
+          'new' |
+          'reviewing' |
+          'resolved' |
+          'flagged'
+        >('new');
 
   const [admins, setAdmins] = useState<any[]>([]);
+  const navigate = useNavigate();
+  const { searchText } = useSearch();
+
+  const handleOpenPostEdit = async () => {
+    if (!selectedReport) return;
+
+    try {
+      const token = localStorage.getItem('token');
+
+      const res = await axios.get(
+        `http://localhost:3000/api/admin/articles/${selectedReport.article_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      navigate('/post-edit', {
+        state: {
+          article: res.data.data,
+        },
+      });
+
+    } catch (error) {
+      console.log(error);
+      alert('Không thể mở bài viết');
+    }
+  };
   const [selectedAdmin, setSelectedAdmin] =
     useState<string>('');
 
@@ -77,12 +122,23 @@ const Reports: React.FC = () => {
 
   }, []);
 
-  const filteredReports = reports.filter(
-    (report) =>
-      activeTab === 'new'
-        ? report.status === 'new'
-        : report.status === 'resolved'
-  );
+    const filteredReports = reports.filter(
+      (report) => {
+
+        if (activeTab === 'new') {
+          return report.status === 'new';
+        }
+        if (activeTab === 'reviewing') {
+          return report.status === 'reviewing';
+        }
+        if (activeTab === 'flagged') {
+          return report.status === 'flagged';
+        }
+        if (activeTab === 'resolved') {
+          return report.status === 'resolved' || report.status === 'rejected';}
+        // return report.status === 'resolved';
+      }
+    );
 
   useEffect(() => {
 
@@ -116,21 +172,30 @@ const Reports: React.FC = () => {
     }
   };
 
-  const getStatusText = (
-    status: string
-  ) => {
+    const getStatusText = (
+      status: string
+    ) => {
 
-    switch (status) {
-      case 'new':
-        return 'Mới';
+      switch (status) {
 
-      case 'resolved':
-        return 'Đã xử lý';
+        case 'new':
+          return 'Mới';
 
-      default:
-        return status;
-    }
-  };
+        case 'reviewing':
+          return 'Đang xử lý';
+
+        case 'resolved':
+          return 'Đã xử lý';
+
+        case 'flagged':
+          return 'Đã gắn cờ';
+        case 'rejected':
+          return 'Đã từ chối';
+
+        default:
+          return status;
+      }
+    };
 
   // const getCategoryText = (
   //   type?: string
@@ -151,9 +216,12 @@ const Reports: React.FC = () => {
   //   }
   // };
 
-  const unresolvedCount = reports.filter(
-    (r) => r.status === 'new'
-  ).length;
+    const unresolvedCount = reports.filter(
+      (r) =>
+        r.status === 'new' ||
+        r.status === 'reviewing' ||
+        r.status === 'flagged'
+    ).length;
 
   useEffect(() => {
 
@@ -193,6 +261,19 @@ const Reports: React.FC = () => {
     fetchAdmins();
 
   }, []);
+
+      useEffect(() => {
+
+      if (
+        selectedReport?.assigned_to &&
+        admins.length > 0
+      ) {
+        setSelectedAdmin(
+          selectedReport.assigned_to
+        );
+      }
+
+    }, [selectedReport, admins]);
 
   const handleAssignReport = async () => {
 
@@ -240,6 +321,236 @@ const Reports: React.FC = () => {
     }
   };
 
+    useEffect(() => {
+      if (selectedReport) {
+        setAdminNote(
+          selectedReport.admin_note || ''
+        );
+      }
+    }, [selectedReport]);
+
+  const handleFlagReport = async () => {
+
+    if (!selectedReport) return;
+
+    try {
+
+      const token =
+        localStorage.getItem('token');
+
+      const isFlagged =
+        selectedReport.admin_note;
+
+      // Gắn cờ
+      if (!isFlagged) {
+
+        await axios.patch(
+          `http://localhost:3000/api/admin/reports/${selectedReport.id}/flag`,
+          {
+            admin_note: adminNote,
+          },
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
+
+        alert("Đã gắn cờ");
+        navigate('/reports');
+
+        setReports(prev =>
+          prev.map(report =>
+            report.id === selectedReport.id
+              ? {
+                  ...report,
+                  admin_note: adminNote,
+                }
+              : report
+          )
+        );
+
+        setSelectedReport(prev =>
+          prev
+            ? {
+                ...prev,
+                admin_note: adminNote,
+              }
+            : null
+        );
+
+      }
+
+      // Gỡ cờ
+      else {
+
+        await axios.patch(
+          `http://localhost:3000/api/admin/reports/${selectedReport.id}/flag`,
+          {
+            admin_note: null,
+          },
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
+
+        alert("Đã gỡ cờ");
+
+        setReports(prev =>
+          prev.map(report =>
+            report.id === selectedReport.id
+              ? {
+                  ...report,
+                  admin_note: null,
+                }
+              : report
+          )
+        );
+
+        setSelectedReport(prev =>
+          prev
+            ? {
+                ...prev,
+                admin_note: null,
+              }
+            : null
+        );
+
+        setAdminNote('');
+
+      }
+
+    } catch(error) {
+
+      console.log(error);
+      alert('Thao tác thất bại');
+
+    }
+
+  };
+
+    const handleResolveReport = async () => {
+
+    if (!selectedReport) return;
+
+    try {
+
+      const token =
+        localStorage.getItem('token');
+
+      await axios.patch(
+        `http://localhost:3000/api/admin/reports/${selectedReport.id}/resolve`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert('Đã xử lý báo cáo');
+
+      // cập nhật local state
+      setReports(prev =>
+        prev.map(report =>
+          report.id === selectedReport.id
+            ? {
+                ...report,
+                status: 'resolved',
+                resolved_at:
+                  new Date().toISOString(),
+              }
+            : report
+        )
+      );
+
+      // chuyển sang report tiếp theo nếu có
+      const remainingReports =
+        reports.filter(
+          report =>
+            report.id !== selectedReport.id &&
+            report.status !== 'resolved'
+        );
+
+      setSelectedReport(
+        remainingReports.length > 0
+          ? remainingReports[0]
+          : null
+      );
+
+    } catch (error) {
+
+      console.log(error);
+      alert(
+        'Xử lý báo cáo thất bại'
+      );
+
+    }
+
+  };
+
+  const handleRejectReport = async () => {
+
+    if (!selectedReport) return;
+
+    try {
+
+      const token =
+        localStorage.getItem('token');
+
+      await axios.patch(
+        `http://localhost:3000/api/admin/reports/${selectedReport.id}/reject`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert('Đã từ chối báo cáo');
+
+      // cập nhật local state
+      setReports(prev =>
+        prev.map(report =>
+          report.id === selectedReport.id
+            ? {
+                ...report,
+                status: 'rejected',
+              }
+            : report
+        )
+      );
+
+      // chọn report tiếp theo
+      const remainingReports =
+        reports.filter(
+          report =>
+            report.id !== selectedReport.id &&
+            report.status !== 'rejected'
+        );
+
+      setSelectedReport(
+        remainingReports.length > 0
+          ? remainingReports[0]
+          : null
+      );
+
+    } catch (error) {
+
+      console.log(error);
+      alert(
+        'Từ chối báo cáo thất bại'
+      );
+
+    }
+
+  };
+
   return (
     <div className="reports-page">
 
@@ -271,6 +582,32 @@ const Reports: React.FC = () => {
             }
           >
             MỚI
+          </button>
+
+          <button
+            className={`tab ${
+              activeTab === 'reviewing'
+                ? 'active'
+                : ''
+            }`}
+            onClick={() =>
+              setActiveTab('reviewing')
+            }
+          >
+            ĐANG XỬ LÝ
+          </button>
+          
+          <button
+            className={`tab ${
+              activeTab === 'flagged'
+                ? 'active'
+                : ''
+            }`}
+            onClick={() =>
+              setActiveTab('flagged')
+            }
+          >
+            ĐÃ GẮN CỜ
           </button>
 
           <button
@@ -313,11 +650,13 @@ const Reports: React.FC = () => {
               <div className="item-content">
 
                 <div className="item-title">
-                  {report.error_type}
+                  {highlightText(report.error_type, searchText)}
                 </div>
 
                 <div className="item-meta">
-                  {report.article_title}
+
+                  {highlightText(report.article_title, searchText)}
+
                 </div>
 
                 <div className="item-footer">
@@ -325,8 +664,9 @@ const Reports: React.FC = () => {
                   <div className="status-pills">
 
                     <span className="pill-serious">
-                      {getSeverityText(
-                        report.severity
+                      {highlightText(
+                        getSeverityText(report.severity),
+                        searchText
                       )}
                     </span>
 
@@ -334,9 +674,12 @@ const Reports: React.FC = () => {
 
                   <span className="item-time">
 
-                    {new Date(
-                      report.created_at
-                    ).toLocaleString('vi-VN')}
+                    {highlightText(
+                      new Date(
+                        report.created_at
+                      ).toLocaleString('vi-VN'),
+                      searchText
+                    )}
 
                   </span>
 
@@ -367,21 +710,44 @@ const Reports: React.FC = () => {
 
               </h2>
 
-              <div className="header-actions">
+              {selectedReport?.status !== 'resolved' &&
+                selectedReport?.status !== 'rejected' && (
 
-                <button className="btn-danger">
-                  Từ chối
-                </button>
+                <div className="header-actions">
 
-                <button className="btn-info">
-                  Mở bài để sửa
-                </button>
+                  <button
+                    className="btn-danger"
+                    onClick={handleRejectReport}
+                  >
+                    Từ chối
+                  </button>
 
-                <button className="btn-success">
-                  Xử lý xong
-                </button>
+                  {selectedReport?.status !== 'flagged' && (
+                    <button
+                      className="btn-warning"
+                      onClick={handleFlagReport}
+                    >
+                      GẮN CỜ
+                    </button>
+                  )}
 
-              </div>
+                  <button
+                    className="btn-info"
+                    onClick={handleOpenPostEdit}
+                  >
+                    Mở bài để sửa
+                  </button>
+
+                  <button
+                    className="btn-success"
+                    onClick={handleResolveReport}
+                  >
+                    Xử lý xong
+                  </button>
+
+                </div>
+
+                )}
 
             </div>
 
@@ -393,8 +759,11 @@ const Reports: React.FC = () => {
 
                 <span className="tag-new">
 
-                  {getStatusText(
-                    selectedReport.status
+                  {highlightText(
+                    getStatusText(
+                      selectedReport.status
+                    ),
+                    searchText
                   )}
 
                 </span>
@@ -407,8 +776,11 @@ const Reports: React.FC = () => {
 
                 <span className="tag-urgent">
 
-                  {getSeverityText(
-                    selectedReport.severity
+                  {highlightText(
+                    getSeverityText(
+                      selectedReport.severity
+                    ),
+                    searchText
                   )}
 
                 </span>
@@ -420,7 +792,7 @@ const Reports: React.FC = () => {
                 <label>LOẠI LỖI</label>
 
                 <span>
-                  {selectedReport.error_type}
+                  {highlightText(selectedReport.error_type, searchText)}
                 </span>
 
               </div>
@@ -431,9 +803,12 @@ const Reports: React.FC = () => {
 
                 <span>
 
-                  {new Date(
-                    selectedReport.created_at
-                  ).toLocaleString('vi-VN')}
+                  {highlightText(
+                    new Date(
+                      selectedReport.created_at
+                    ).toLocaleString('vi-VN'),
+                    searchText
+                  )}
 
                 </span>
 
@@ -458,13 +833,13 @@ const Reports: React.FC = () => {
                 </span> */}
 
                 <h4>
-                  {selectedReport.article_title}
+                  {highlightText(selectedReport.article_title, searchText)}
                 </h4>
 
                 <span className="link-text">
 
                   lsvn.vn/
-                  {selectedReport.article_slug}
+                  {highlightText(selectedReport.article_slug, searchText)}
 
                 </span>
 
@@ -484,7 +859,7 @@ const Reports: React.FC = () => {
               <blockquote className="error-quote">
 
                 "
-                {selectedReport.quoted_text}
+                {highlightText(selectedReport.quoted_text, searchText)}
                 "
 
               </blockquote>
@@ -501,7 +876,7 @@ const Reports: React.FC = () => {
 
               <p className="user-comment">
 
-                {selectedReport.description}
+                {highlightText(selectedReport.description, searchText)}
 
               </p>
 
@@ -518,7 +893,7 @@ const Reports: React.FC = () => {
 
               <div className="source-box">
 
-                {selectedReport.suggested_source}
+                {highlightText(selectedReport.suggested_source, searchText)}
 
               </div>
 
@@ -531,7 +906,7 @@ const Reports: React.FC = () => {
                 <label>NGƯỜI GỬI</label>
 
                 <span>
-                  {selectedReport.reporter_email}
+                  {highlightText(selectedReport.reporter_email, searchText)}
                 </span>
 
               </div>
@@ -548,16 +923,23 @@ const Reports: React.FC = () => {
               </label>
 
               <textarea
-                defaultValue={
-                  selectedReport.admin_note || ''
+                value={adminNote}
+                onChange={(e) =>
+                  setAdminNote(
+                    e.target.value
+                  )
                 }
-                placeholder="Thêm ghi chú..."
-              ></textarea>
+                placeholder={
+                  selectedReport.admin_note ||
+                  'Thêm ghi chú...'
+                }
+              />
 
             </section>
 
             <div className="detail-footer">
-
+            {selectedReport?.status !== 'resolved' &&
+                selectedReport?.status !== 'rejected' && (
             <div className="assign-action">
 
               <span>Chuyển cho:</span>
@@ -571,7 +953,15 @@ const Reports: React.FC = () => {
               >
 
                 <option value="">
-                  — Chọn moderator —
+                  {selectedReport?.assigned_to
+                    ? `Đã giao: ${
+                        admins.find(
+                          (a) =>
+                            a.id ===
+                            selectedReport.assigned_to
+                        )?.full_name || 'Không rõ'
+                      }`
+                    : '— Chọn moderator —'}
                 </option>
 
                 {admins.map((admin) => (
@@ -594,7 +984,7 @@ const Reports: React.FC = () => {
                 Chuyển
               </button>
 
-            </div>
+            </div> )}
 
           </div>
 
