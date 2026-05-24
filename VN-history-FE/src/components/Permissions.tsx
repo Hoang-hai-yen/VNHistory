@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/Permissions.css';
+import { useSearch } from '../context/searchContext';
+import { highlightText } from '../utils/highlightText';
 
 interface PermissionItem {
   key: string;
@@ -20,6 +22,7 @@ const Permissions: React.FC = () => {
 
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [currentRole, setCurrentRole] = useState("");
+  const { searchText } = useSearch();
 
   useEffect(() => {
 
@@ -271,7 +274,7 @@ const Permissions: React.FC = () => {
                   />
 
                   <span className="permission-label">
-                    {permission.label}
+                    {highlightText(permission.label, searchText)}
                   </span>
 
                 </label>

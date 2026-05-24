@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/History.css';
+import {
+  useSearch
+} from '../context/searchContext';
+
+import {
+  highlightText
+} from '../utils/highlightText';
 
 interface HistoryLog {
   id: number;
@@ -16,6 +23,9 @@ interface HistoryLog {
 const History: React.FC = () => {
 
   const [historyData, setHistoryData] = useState<HistoryLog[]>([]);
+  const {
+    searchText
+  } = useSearch();
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -73,26 +83,26 @@ const History: React.FC = () => {
             {historyData.map((log) => (
               <tr key={log.id}>
                 <td className="time-cell">
-                  {new Date(log.created_at).toLocaleString("vi-VN")}
+                  {highlightText(new Date(log.created_at).toLocaleString("vi-VN"), searchText)}
                 </td>
 
                 <td className="admin-cell">
                   <div className="admin-avatar"></div>
-                  <span>{log.admin_name}</span>
+                  <span>{highlightText(log.admin_name, searchText)}</span>
                 </td>
 
                 <td>
                   <span className="action-status">
-                    {log.action}
+                    {highlightText(log.action, searchText)}
                   </span>
                 </td>
 
                 <td className="target-cell">
-                  {log.target_title}
+                  {highlightText(log.target_title, searchText)}
                 </td>
 
                 <td className="details-cell">
-                  {log.detail}
+                  {highlightText(log.detail, searchText)}
                 </td>
               </tr>
             ))}

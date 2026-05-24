@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Posts.css';
+import { useSearch } from '../context/searchContext';
+import { highlightText } from '../utils/highlightText';
 
 
 type PublishTab =
   | 'Tất cả'
   | 'Đã xuất bản'
   | 'Chờ duyệt'
-  | 'Bản nháp';
+  | 'Bản nháp'
+  | 'Từ chối';
 
 interface ContentItem {
   id: string;
@@ -19,20 +22,34 @@ interface ContentItem {
   assignee: string;
   date: string;
   status: string;
+  rejection_note?: string;
 }
 
 const Posts: React.FC = () => {
   const [activeTab, setActiveTab] =
     useState<PublishTab>('Tất cả');
   const navigate = useNavigate();
+  const { searchText } = useSearch();
 
   const [contentData, setContentData] = useState<
     ContentItem[]
   >([]);
 
+  const [showReturnModal, setShowReturnModal] =
+    useState(false);
+
+  const [selectedArticleId, setSelectedArticleId] =
+    useState('');
+
+  const [returnNote, setReturnNote] =
+    useState('');
+
   const fetchArticles = async (
-    status?: 'published' | 'pending' | 'draft'
-  ) => {
+    status?: 'published'
+    | 'pending'
+    | 'draft'
+    | 'rejected'
+    ) => {
     try {
       const token = localStorage.getItem('token');
 
@@ -82,6 +99,9 @@ const Posts: React.FC = () => {
               : article.status === 'draft'
               ? 'Bản nháp'
               : 'Từ chối',
+
+          rejection_note:
+                article.rejection_note || '',
         })
       );
 
@@ -106,6 +126,10 @@ const Posts: React.FC = () => {
 
     if (activeTab === 'Bản nháp') {
       fetchArticles('draft');
+    }
+
+    if (activeTab === 'Từ chối') {
+      fetchArticles('rejected' as any);
     }
   }, [activeTab]);
 
@@ -199,6 +223,112 @@ const Posts: React.FC = () => {
       }
     };
 
+    const handlePublish = async (
+  id:string
+) => {
+  try {
+
+    const token =
+      localStorage.getItem('token');
+
+    await axios.patch(
+      `http://localhost:3000/api/admin/articles/${id}/publish`,
+      {},
+      {
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      }
+    );
+
+    alert(
+      'Xuất bản thành công'
+    );
+
+    fetchArticles();
+
+  } catch(error){
+    console.log(error);
+  }
+};
+
+
+    const handleReject = async (
+      id:string
+    ) => {
+      try {
+
+        const token =
+          localStorage.getItem('token');
+
+        await axios.patch(
+          `http://localhost:3000/api/admin/articles/${id}/reject`,
+          {},
+          {
+            headers:{
+              Authorization:`Bearer ${token}`
+            }
+          }
+        );
+
+        alert(
+          'Đã từ chối'
+        );
+
+        fetchArticles();
+
+      } catch(error){
+        console.log(error);
+      }
+    };
+
+
+    const handleOpenReturnModal = (
+    id:string
+    )=>{
+      setSelectedArticleId(id);
+      setReturnNote('');
+      setShowReturnModal(true);
+    };
+
+
+    const handleReturn = async () => {
+
+    try{
+
+      const token =
+      localStorage.getItem('token');
+
+      await axios.patch(
+        `http://localhost:3000/api/admin/articles/${selectedArticleId}/return`,
+        {
+          return_note:
+          returnNote
+        },
+        {
+          headers:{
+            Authorization:`Bearer ${token}`
+          }
+        }
+      );
+
+      alert(
+        'Đã trả bài'
+      );
+
+      setShowReturnModal(false);
+
+      fetchArticles();
+
+    }
+    catch(error){
+
+      console.log(error);
+
+    }
+
+    };
+
     const renderActions = (item: ContentItem) => {
 
       // Published -> Xem
@@ -212,19 +342,6 @@ const Posts: React.FC = () => {
             >
               Xem
             </button>
-
-          </div>
-        );
-      }
-
-      // Draft + Rejected -> Chỉnh sửa
-      if (
-        item.status === 'Bản nháp' ||
-        item.status === 'Từ chối'
-      ) {
-        return (
-          <div className="action-group">
-
             <button
               className="btn-action btn-blue-text"
               onClick={() => handleEditPost(item.id)}
@@ -236,20 +353,81 @@ const Posts: React.FC = () => {
         );
       }
 
+      // Draft + Rejected -> Chỉnh sửa
+      if (
+        item.status === 'Bản nháp') {
+        return (
+          <div className="action-group">
+            <button
+              className="btn-action btn-blue-text"
+              onClick={() => handleEditPost(item.id)}
+            >
+              Chỉnh sửa
+            </button>
+
+          </div>
+        );
+      }
+
+      //Rejected -> Xem
+      if (item.status === 'Từ chối') {
+        return (
+          <div className="action-group">
+            <button
+              className="btn-action btn-gray-text"
+              onClick={() => handleViewPost(item.id)}
+            >
+              Xem
+            </button>
+
+          </div>
+        );
+      }
+
       // Pending
       return (
         <div className="action-group">
 
-          <button className="btn-action btn-green-text">
-            Duyệt & Xuất bản
-          </button>
+        <button
+        className="btn-action btn-gray-text"
+        onClick={() =>
+        handleViewPost(item.id)
+        }
+        >
+        Xem
+        </button>
 
-          <button className="btn-action btn-red-text">
-            Từ chối
-          </button>
+        <button
+        className="btn-action btn-green-text"
+        onClick={() =>
+        handlePublish(item.id)
+        }
+        >
+        Duyệt & xuất bản
+        </button>
+
+        <button
+        className="btn-action btn-red-text"
+        onClick={() =>
+        handleReject(item.id)
+        }
+        >
+        Từ chối
+        </button>
+
+        <button
+        className="btn-action btn-return"
+        onClick={() =>
+        handleOpenReturnModal(
+        item.id
+        )
+        }
+        >
+        Trả về
+        </button>
 
         </div>
-      );
+        );
     };
 
     
@@ -314,6 +492,20 @@ const Posts: React.FC = () => {
             Bản nháp
           </button>
 
+          <button
+            className={`tab-link ${
+            activeTab==='Từ chối'
+            ?'active':''
+            }`}
+            onClick={() =>
+            setActiveTab(
+            'Từ chối'
+            )
+            }
+            >
+            Từ chối
+            </button>
+
         </div>
 
         <button
@@ -339,6 +531,7 @@ const Posts: React.FC = () => {
               <th>NGÀY</th>
               <th>TRẠNG THÁI</th>
               <th>HÀNH ĐỘNG</th>
+              <th>GHI CHÚ</th>
             </tr>
           </thead>
 
@@ -349,7 +542,7 @@ const Posts: React.FC = () => {
 
                 <td className="title-column">
                   <div className="title-main">
-                    {item.title}
+                    {highlightText(item.title, searchText)}
                   </div>
 
                   {/* {item.subtitle && (
@@ -363,11 +556,11 @@ const Posts: React.FC = () => {
                   {renderTypeTag(item.type)}
                 </td>
 
-                <td>{item.dynasty}</td>
+                <td>{highlightText(item.dynasty, searchText)}</td>
 
-                <td>{item.assignee}</td>
+                <td>{highlightText(item.assignee, searchText)}</td>
 
-                <td>{item.date}</td>
+                <td>{highlightText(item.date, searchText)}</td>
 
                 <td>
                   {renderStatusTag(item.status)}
@@ -377,6 +570,10 @@ const Posts: React.FC = () => {
                   {renderActions(item)}
                 </td>
 
+                <td className="note-cell">
+                    {highlightText(item.rejection_note || '', searchText)}
+                  </td>
+
               </tr>
             ))}
 
@@ -385,6 +582,61 @@ const Posts: React.FC = () => {
         </table>
 
       </section>
+
+      {
+        showReturnModal && (
+
+        <div className="modal-overlay">
+
+        <div className="return-modal">
+
+        <h3 style={{color:'#333', marginBottom:'15px'}}>
+        Trả bài về cho Admin
+        </h3>
+
+        <textarea
+        rows={5}
+        value={returnNote}
+        onChange={(e)=>
+        setReturnNote(
+        e.target.value
+        )
+        }
+        placeholder="Nhập ghi chú..."
+        />
+
+        <div
+        className="modal-actions"
+        >
+
+        <button
+        className="btn-cancel"
+        onClick={() =>
+        setShowReturnModal(
+        false
+        )
+        }
+        >
+        Huỷ
+        </button>
+
+        <button
+        className="btn-confirm-return"
+        onClick={
+        handleReturn
+        }
+        >
+        Xác nhận trả về
+        </button>
+
+        </div>
+
+        </div>
+
+        </div>
+
+        )
+        }
     </div>
   );
 };

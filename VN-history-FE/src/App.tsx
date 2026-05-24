@@ -13,10 +13,14 @@ import Settings from "./components/Settings"; // 👈 thêm dòng này
 import Reports from "./components/Reports"; // 👈 thêm dòng nà  y
 import PostDetail from "./components/PostDetail"; // 👈 thêm dòng này
 import PostEdit from "./components/PostEdit"; // 👈 thêm dòng này
+import {
+  SearchProvider
+} from './context/searchContext';
 
 
 function App() {
   return (
+    <SearchProvider>
     <Routes>
       {/* Login */}
       <Route path="/" element={<Login />} />
@@ -37,6 +41,7 @@ function App() {
         <Route path="post-edit" element={<PostEdit />} /> {/* 👈 thêm dòng này */}
       </Route>
     </Routes>
+    </SearchProvider>
   );
 }
 

@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/Management.css';
+import {
+  useSearch
+} from '../context/searchContext';
+
+import {
+  highlightText
+} from '../utils/highlightText';
 
 interface AdminUser {
   id: string;
@@ -20,6 +27,9 @@ const Management: React.FC = () => {
     useState(false);
 
   const [creating, setCreating] = useState(false);
+  const {
+  searchText
+} = useSearch();
 
   const [newAdmin, setNewAdmin] = useState({
     full_name: '',
@@ -270,11 +280,11 @@ const Management: React.FC = () => {
                   <div className="user-info">
 
                     <div className="user-name">
-                      {user.name}
+                      {highlightText(user.name, searchText)}
                     </div>
 
                     <div className="user-email">
-                      {user.email}
+                      {highlightText(user.email, searchText)}
                     </div>
 
                   </div>
@@ -291,19 +301,19 @@ const Management: React.FC = () => {
                         : 'bg-blue'
                     }`}
                   >
-                    {user.role}
+                    {highlightText(user.role, searchText)}
                   </span>
 
                 </td>
 
                 {/* Posts */}
                 <td className="text-center">
-                  {user.postsCount}
+                  {highlightText(user.postsCount.toString(), searchText)}
                 </td>
 
                 {/* Reports */}
                 <td className="text-center">
-                  {user.reportsHandled}
+                  {highlightText(user.reportsHandled.toString(), searchText)}
                 </td>
 
                 {/* Status */}
@@ -312,7 +322,7 @@ const Management: React.FC = () => {
                   <span
                     className={`status-indicator status-${getStatusKey(user.status)}`}
                   >
-                    ● {user.status}
+                    ● {highlightText(user.status, searchText)}
                   </span>
 
                 </td>
@@ -321,9 +331,8 @@ const Management: React.FC = () => {
                 <td>
 
                   {user.lastLogin
-                    ? new Date(user.lastLogin)
-                        .toLocaleString("vi-VN")
-                    : "Chưa đăng nhập"}
+                    ? highlightText(new Date(user.lastLogin).toLocaleString("vi-VN"), searchText)
+                    : highlightText("Chưa đăng nhập", searchText)}
 
                 </td>
 
