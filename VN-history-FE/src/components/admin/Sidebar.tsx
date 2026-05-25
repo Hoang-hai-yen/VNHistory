@@ -1,13 +1,72 @@
-import React from "react";
-import "../../styles/Sidebar.css";
+import React, { useEffect, useState } from 'react';
+import '../../styles/Sidebar.css';
 import { NavLink, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState({
+    name: "",
+    role: "",
+    rawRole: "",
+  });
 
-  const handleLogout = () => {
-    // Thêm logic xóa token/session ở đây nếu cần
-    navigate("/login");
+  console.log("USER STATE:", user);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await axios.get(
+          "http://localhost:3000/api/auth/me",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("ME API RESPONSE:");
+        console.log(res.data);
+
+        setUser({
+          name: res.data.data.full_name,
+          rawRole: res.data.data.role,
+          role: res.data.data.role.replace("_", " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
+        });
+        console.log("SETTING USER");
+
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  console.log("USER STATE:", user);
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.post(
+        "http://localhost:3000/api/auth/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      localStorage.removeItem("token");
+
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Helper function để quản lý class active một cách sạch sẽ
@@ -25,9 +84,7 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      <div className="status-badge" style={{ marginLeft: 20 }}>
-        ● Super Admin
-      </div>
+      <div className="status-badge" style={{marginLeft: 20}}>● {user.role}</div>
 
       {/* Menu Content */}
       <nav className="menu-section" style={{ background: "#FAFAF7" }}>
@@ -61,19 +118,27 @@ const Sidebar: React.FC = () => {
           {/* <span className="badge" style={{ color: '#4da6ff' }}>5</span> */}
         </NavLink>
 
-        <div className="menu-group-label">HỆ THỐNG</div>
-        <NavLink to="/admin/management" className={navLinkClass}>
-          Quản lý Admin
-        </NavLink>
-        <NavLink to="/admin/permissions" className={navLinkClass}>
-          Phân quyền
-        </NavLink>
-        <NavLink to="/admin/history" className={navLinkClass}>
-          Nhật ký
-        </NavLink>
-        <NavLink to="/admin/settings" className={navLinkClass}>
-          Cài đặt
-        </NavLink>
+        {user.rawRole === "super_admin" && (
+          <>
+            <div className="menu-group-label">HỆ THỐNG</div>
+
+            <NavLink to="/management" className={navLinkClass}>
+              Quản lý Admin
+            </NavLink>
+
+            <NavLink to="/permissions" className={navLinkClass}>
+              Phân quyền
+            </NavLink>
+
+            <NavLink to="/history" className={navLinkClass}>
+              Nhật ký
+            </NavLink>
+
+            <NavLink to="/settings" className={navLinkClass}>
+              Cài đặt
+            </NavLink>
+          </>
+        )}
       </nav>
 
       {/* Footer */}
@@ -81,10 +146,8 @@ const Sidebar: React.FC = () => {
         <div className="user-profile">
           <div className="avatar-circle">NM</div>
           <div>
-            <div style={{ fontSize: "14px", fontWeight: "bold" }}>
-              Nguyễn Minh
-            </div>
-            <div style={{ fontSize: "11px", color: "#666" }}>Super Admin</div>
+            <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{user.name}</div>
+            <div style={{ fontSize: '11px', color: '#666' }}>{user.role}</div>
           </div>
         </div>
         <button className="logout-btn" onClick={handleLogout}>

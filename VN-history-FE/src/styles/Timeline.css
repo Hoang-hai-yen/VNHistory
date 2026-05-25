@@ -154,3 +154,13 @@
   border-color: #4A8A18;
   color: #4A8A18;
 }
+
+.btn-view {
+  background: #fff;
+  border: 1px solid currentColor;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
