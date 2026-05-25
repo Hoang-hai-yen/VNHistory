@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Timeline.css';
-import { useSearch } from '../context/searchContext';
-import { highlightText } from '../utils/highlightText';
+import '../../styles/Timeline.css';
+import { highlightText } from '../../utils/highlightText';
+import { useSearch } from '../../context/SearchContext';
+
 
 interface Dynasty {
   id: string;
@@ -289,7 +290,7 @@ const Timeline: React.FC = () => {
 
           <h3 className="content-heading">
 
-            {highlightText(activeDynasty?.name?.toUpperCase(), searchText)}
+            {highlightText(activeDynasty?.name?.toUpperCase() || "", searchText)}
 
             {' - '}
 

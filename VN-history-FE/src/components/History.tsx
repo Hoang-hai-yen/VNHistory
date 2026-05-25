@@ -3,7 +3,7 @@ import axios from 'axios';
 import '../styles/History.css';
 import {
   useSearch
-} from '../context/searchContext';
+} from '../context/SearchContext';
 
 import {
   highlightText

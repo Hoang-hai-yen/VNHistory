@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Posts.css';
-import { useSearch } from '../context/searchContext';
+import { useSearch } from '../context/SearchContext';
 import { highlightText } from '../utils/highlightText';
 
 

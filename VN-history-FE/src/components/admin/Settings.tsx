@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/Settings.css';
-import { useSearch } from '../context/searchContext';
-import { highlightText } from '../utils/highlightText';
+import '../../styles/Settings.css';
+import { useSearch } from '../../context/SearchContext';
+import { highlightText } from '../../utils/highlightText';
 
 const Settings: React.FC = () => {
 

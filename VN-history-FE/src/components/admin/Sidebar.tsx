@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../styles/Sidebar.css';
+import '../../styles/Sidebar.css';
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/Reports.css';
+import '../../styles/Reports.css';
 import {
   useNavigate
 } from 'react-router-dom';
 import {
   useSearch
-} from '../context/searchContext';
+} from '../../context/SearchContext';
 import {
   highlightText
-} from '../utils/highlightText';
+} from '../../utils/highlightText';
 
 interface ReportItem {
   id: string;

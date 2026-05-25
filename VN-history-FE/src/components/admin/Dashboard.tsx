@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/Dashboard.css';
+import '../../styles/Dashboard.css';
 import { useNavigate } from 'react-router-dom';
-import {
-  useSearch
-} from '../context/searchContext';
-
-import {
-  highlightText
-} from '../utils/highlightText';
-
-
+import { useSearch } from '../../context/SearchContext';
+import { highlightText } from '../../utils/highlightText';
 
 interface ContentItem {
   id: string;

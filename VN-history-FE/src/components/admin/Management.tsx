@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/Management.css';
+import '../../styles/Management.css';
 import {
   useSearch
-} from '../context/searchContext';
+} from '../../context/SearchContext';
 
 import {
   highlightText
-} from '../utils/highlightText';
+} from '../../utils/highlightText';
 
 interface AdminUser {
   id: string;

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/Pending.css';
+import '../../styles/Pending.css';
 import { useNavigate } from 'react-router-dom';
 import {
   useSearch
-} from '../context/searchContext';
+} from '../../context/SearchContext';
 import {
   highlightText
-} from '../utils/highlightText';
+} from '../../utils/highlightText';
 
 interface PendingItem {
   id: string;

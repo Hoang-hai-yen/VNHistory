@@ -22,7 +22,7 @@ import VideoLibraryPage from "./pages/VideoLibraryPage";
 import ReportPage from "./pages/ReportPage";
 import PostDetail from "./components/PostDetail";
 import PostEdit from "./components/PostEdit";
-import { SearchProvider } from "./context/searchContext";
+import { SearchProvider } from "./context/SearchContext";
 
 
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import "../styles/TopBar.css";
-import { useSearch } from "../context/searchContext";
+import "../../styles/TopBar.css";
+import { useSearch } from "../../context/SearchContext";
 
 const TopBar: React.FC = () => {
   const location = useLocation();
