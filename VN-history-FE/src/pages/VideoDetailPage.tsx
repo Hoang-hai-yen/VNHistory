@@ -7,7 +7,6 @@ import {
   Printer,
   Heart,
   MapPin,
-  Calendar,
   Book,
   User,
   Play,
