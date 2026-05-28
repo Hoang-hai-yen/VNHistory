@@ -31,7 +31,7 @@ export class HttpClient {
   private setupInterceptors(): void {
     this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("token");
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -45,7 +45,6 @@ export class HttpClient {
       // Error response
       (error: AxiosError) => {
         
-
         return Promise.reject(error);
       },
     );
@@ -65,6 +64,10 @@ export class HttpClient {
 
   public delete<T>(url: string) {
     return this.instance.delete<T>(url);
+  }
+
+  public patch<T>(url: string, data?: unknown) {
+    return this.instance.patch<T>(url, data);
   }
 }
 

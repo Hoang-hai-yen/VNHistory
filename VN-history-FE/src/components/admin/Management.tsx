@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useMemo } from 'react';
 import '../../styles/Management.css';
+import { useSearch } from '../../context/SearchContext';
+import { highlightText } from '../../utils/highlightText';
 import {
-  useSearch
-} from '../../context/SearchContext';
-
-import {
-  highlightText
-} from '../../utils/highlightText';
+  useAdminAdminsQuery,
+  useCreateAdminMutation,
+  useUpdateAdminMutation,
+  useDeleteAdminMutation
+} from '../../hooks/api/useAdminAdmins';
 
 interface AdminUser {
   id: string;
@@ -21,14 +21,31 @@ interface AdminUser {
 }
 
 const Management: React.FC = () => {
-  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const { data: adminsRaw = [] } = useAdminAdminsQuery();
+  const createAdminMutation = useCreateAdminMutation();
+  const updateAdminMutation = useUpdateAdminMutation();
+  const deleteAdminMutation = useDeleteAdminMutation();
+
+  const adminUsers = useMemo(() => {
+    return adminsRaw.map((admin: any) => ({
+      id: admin.id,
+      name: admin.full_name,
+      email: admin.email,
+      role: admin.role === "super_admin" ? "Super Admin" : "Admin",
+      postsCount: admin.article_count,
+      reportsHandled: admin.resolved_report_count,
+      status: admin.is_active === 1 ? "Đang hoạt động" : "Không hoạt động",
+      lastLogin: admin.last_login_at,
+    }));
+  }, [adminsRaw]);
+
   const [showCreateModal, setShowCreateModal] =
     useState(false);
 
   const [creating, setCreating] = useState(false);
   const {
-  searchText
-} = useSearch();
+    searchText
+  } = useSearch();
 
   const [newAdmin, setNewAdmin] = useState({
     full_name: '',
@@ -38,7 +55,7 @@ const Management: React.FC = () => {
   });
 
   const [isEditModalOpen, setIsEditModalOpen] =
-  useState(false);
+    useState(false);
 
   const [selectedAdmin, setSelectedAdmin] =
     useState<AdminUser | null>(null);
@@ -50,60 +67,11 @@ const Management: React.FC = () => {
     role: 'admin',
   });
 
-  useEffect(() => {
-    const fetchAdmins = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        const res = await axios.get("http://localhost:3000/api/admin/admins", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        console.log("ADMINS RESPONSE:");
-        console.log(res.data);
-
-        const formattedData = res.data.data.map((admin: any) => ({
-          id: admin.id,
-          name: admin.full_name,
-          email: admin.email,
-
-          role: admin.role === "super_admin" ? "Super Admin" : "Admin",
-
-          postsCount: admin.article_count,
-
-          reportsHandled: admin.resolved_report_count,
-
-          status: admin.is_active === 1 ? "Đang hoạt động" : "Không hoạt động",
-
-          lastLogin: admin.last_login_at,
-        }));
-
-        setAdminUsers(formattedData);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchAdmins();
-  }, []);
-
   const handleCreateAdmin = async () => {
     try {
       setCreating(true);
 
-      const token = localStorage.getItem('token');
-
-      await axios.post(
-        'http://localhost:3000/api/admin/admins',
-        newAdmin,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await createAdminMutation.mutateAsync(newAdmin);
 
       alert('Tạo admin thành công');
 
@@ -115,9 +83,6 @@ const Management: React.FC = () => {
         password: '',
         role: 'admin',
       });
-
-      // reload list
-      window.location.reload();
 
     } catch (error) {
       console.log(error);
@@ -144,29 +109,21 @@ const Management: React.FC = () => {
   };
 
   const handleUpdateAdmin = async () => {
+    if (!selectedAdmin) return;
     try {
-      const token = localStorage.getItem('token');
-
-      await axios.put(
-        `http://localhost:3000/api/admin/admins/${selectedAdmin?.id}`,
-        {
+      await updateAdminMutation.mutateAsync({
+        id: selectedAdmin.id,
+        payload: {
           full_name: editForm.full_name,
           old_password: editForm.old_password,
           new_password: editForm.new_password,
           role: editForm.role,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         }
-      );
+      });
 
       alert('Cập nhật admin thành công');
 
       setIsEditModalOpen(false);
-
-      window.location.reload();
 
     } catch (error: any) {
       console.log(error);
@@ -179,33 +136,19 @@ const Management: React.FC = () => {
   };
 
   const handleDeleteAdmin = async () => {
+    if (!selectedAdmin) return;
     const confirmDelete = window.confirm(
-      `Xóa tài khoản ${selectedAdmin?.name}?`
+      `Xóa tài khoản ${selectedAdmin.name}?`
     );
 
     if (!confirmDelete) return;
 
     try {
-      const token = localStorage.getItem('token');
-
-      await axios.delete(
-        `http://localhost:3000/api/admin/admins/${selectedAdmin?.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await deleteAdminMutation.mutateAsync(selectedAdmin.id);
 
       alert('Xóa admin thành công');
 
       setIsEditModalOpen(false);
-
-      setAdminUsers((prev) =>
-        prev.filter(
-          (item) => item.id !== selectedAdmin?.id
-        )
-      );
 
     } catch (error: any) {
       console.log(error);

@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useMemo } from 'react';
 import '../../styles/Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import { useSearch } from '../../context/SearchContext';
 import { highlightText } from '../../utils/highlightText';
+import { httpClient } from '../../lib/http';
+import { useAdminDashboardQuery } from '../../hooks/api/useAdminDashboard';
+import {
+  usePublishArticleMutation,
+  useRejectArticleMutation,
+  useReturnArticleMutation
+} from '../../hooks/api/useAdminArticles';
 
 interface ContentItem {
   id: string;
@@ -16,17 +22,7 @@ interface ContentItem {
   rejection_note?: string;
 }
 
-interface Stats {
-  total_published: number;
-  total_pending: number;
-  total_draft: number;
-  total_rejected: number;
-  reports_new: number;
-  reports_reviewing: number;
-  published_today: number;
-  active_admins: number;
-  total_dynasties: number;
-}
+
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
@@ -45,7 +41,12 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const {searchText} = useSearch();
 
-  const [stats, setStats] = useState<Stats>({
+  const { data: dashboardData } = useAdminDashboardQuery();
+  const publishMutation = usePublishArticleMutation();
+  const rejectMutation = useRejectArticleMutation();
+  const returnMutation = useReturnArticleMutation();
+
+  const stats = dashboardData?.stats || {
     total_published: 0,
     total_pending: 0,
     total_draft: 0,
@@ -55,15 +56,45 @@ const Dashboard: React.FC = () => {
     published_today: 0,
     active_admins: 0,
     total_dynasties: 0,
-  });
+  };
 
-  const [contentData, setContentData] = useState<ContentItem[]>([]);
-  const [recentLogs, setRecentLogs] = useState<any[]>([]);
-  const [openReports, setOpenReports] = useState<any[]>([]);
+  const contentData = useMemo(() => {
+    if (!dashboardData?.recent_articles) return [];
+    return dashboardData.recent_articles.map((article: any) => ({
+      id: article.id,
+      title: article.title,
+      type:
+        article.type === 'event'
+          ? 'Sự kiện'
+          : article.type === 'person'
+          ? 'Nhân vật'
+          : article.type === 'place'
+          ? 'Di sản'
+          : 'Khác',
 
-  useEffect(() => {
-  fetchDashboardData();
-}, []);
+      dynasty: article.dynasty_name,
+      assignee: article.created_by_name,
+
+      date: new Date(
+        article.published_at || article.created_at
+      ).toLocaleDateString('vi-VN'),
+
+      status:
+        article.status === 'published'
+          ? 'Đã xuất bản'
+          : article.status === 'pending'
+          ? 'Chờ duyệt'
+          : article.status === 'draft'
+          ? 'Bản nháp'
+          : 'Từ chối',
+
+      rejection_note:
+        article.rejection_note || '',
+    }));
+  }, [dashboardData]);
+
+  const recentLogs = dashboardData?.recent_logs || [];
+  const openReports = dashboardData?.open_reports || [];
 
   const filteredData =
     activeTab === "Tất cả"
@@ -91,222 +122,71 @@ const Dashboard: React.FC = () => {
     return <span className={className}>{status}</span>;
   };
 
-    const handleViewPost = async (id: string) => {
-      try {
-        const token = localStorage.getItem('token');
+  const handleViewPost = async (id: string) => {
+    try {
+      const res = await httpClient.get<any>(`/admin/articles/${id}`);
+      navigate('/post-detail', {
+        state: {
+          article: res.data.data,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-        const res = await axios.get(
-          `http://localhost:3000/api/admin/articles/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+  const handleEditPost = async (id: string) => {
+    try {
+      const res = await httpClient.get<any>(`/admin/articles/${id}`);
+      navigate('/post-edit', {
+        state: {
+          article: res.data.data,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-        navigate('/post-detail', {
-          state: {
-            article: res.data.data,
-          },
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  const handlePublish = async (id: string) => {
+    try {
+      await publishMutation.mutateAsync(id);
+      alert('Xuất bản bài viết thành công!');
+    } catch (error) {
+      console.log(error);
+      alert('Xuất bản thất bại!');
+    }
+  };
 
-    const handleEditPost = async (id: string) => {
-      try {
-        const token = localStorage.getItem('token');
+  const handleReject = async (id: string) => {
+    try {
+      await rejectMutation.mutateAsync(id);
+      alert('Đã từ chối bài viết!');
+    } catch (error) {
+      console.log(error);
+      alert('Từ chối thất bại!');
+    }
+  };
+  
+  const handleOpenReturnModal = (id: string) => {
+    setSelectedArticleId(id);
+    setReturnNote('');
+    setShowReturnModal(true);
+  };
 
-        const res = await axios.get(
-          `http://localhost:3000/api/admin/articles/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        navigate('/post-edit', {
-          state: {
-            article: res.data.data,
-          },
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const fetchDashboardData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-
-        const res = await axios.get(
-          'http://localhost:3000/api/admin/dashboard',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const dashboardData = res.data.data;
-
-        setStats(dashboardData.stats);
-
-        const formattedArticles =
-          dashboardData.recent_articles.map(
-            (article: any) => ({
-              id: article.id,
-              title: article.title,
-              type:
-                article.type === 'event'
-                  ? 'Sự kiện'
-                  : article.type === 'person'
-                  ? 'Nhân vật'
-                  : article.type === 'place'
-                  ? 'Di sản'
-                  : 'Khác',
-
-              dynasty: article.dynasty_name,
-              assignee: article.created_by_name,
-
-              date: new Date(
-                article.published_at ||
-                article.created_at
-              ).toLocaleDateString('vi-VN'),
-
-              status:
-                article.status === 'published'
-                  ? 'Đã xuất bản'
-                  : article.status === 'pending'
-                  ? 'Chờ duyệt'
-                  : article.status === 'draft'
-                  ? 'Bản nháp'
-                  : 'Từ chối',
-
-              rejection_note:
-                article.rejection_note || '',
-            })
-          );
-
-        setContentData(formattedArticles);
-
-        setRecentLogs(
-          dashboardData.recent_logs || []
-        );
-
-        setOpenReports(
-          dashboardData.open_reports || []
-        );
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const handlePublish = async (
-      id: string
-    ) => {
-      try {
-        const token =
-          localStorage.getItem('token');
-
-        await axios.patch(
-          `http://localhost:3000/api/admin/articles/${id}/publish`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        alert(
-          'Xuất bản bài viết thành công!'
-        );
-
-        fetchDashboardData();
-
-      } catch (error) {
-        console.log(error);
-        alert(
-          'Xuất bản thất bại!'
-        );
-      }
-    };
-
-    const handleReject = async (
-      id: string
-    ) => {
-      try {
-        const token =
-          localStorage.getItem('token');
-
-        await axios.patch(
-          `http://localhost:3000/api/admin/articles/${id}/reject`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        alert(
-          'Đã từ chối bài viết!'
-        );
-
-        fetchDashboardData();
-
-      } catch (error) {
-        console.log(error);
-        alert(
-          'Từ chối thất bại!'
-        );
-      }
-    };
-    
-    const handleOpenReturnModal = (
-      id: string
-    ) => {
-      setSelectedArticleId(id);
-      setReturnNote('');
-      setShowReturnModal(true);
-    };
-
-    const handleReturn = async () => {
-      try {
-        const token =
-          localStorage.getItem('token');
-
-        await axios.patch(
-          `http://localhost:3000/api/admin/articles/${selectedArticleId}/return`,
-          {
-            return_note: returnNote,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        alert(
-          'Đã trả bài về cho admin'
-        );
-
-        setShowReturnModal(false);
-
-        fetchDashboardData();
-
-      } catch (error) {
-        console.log(error);
-
-        alert(
-          'Trả bài thất bại'
-        );
-      }
-    };
+  const handleReturn = async () => {
+    try {
+      await returnMutation.mutateAsync({
+        id: selectedArticleId,
+        return_note: returnNote,
+      });
+      alert('Đã trả bài về cho admin');
+      setShowReturnModal(false);
+    } catch (error) {
+      console.log(error);
+      alert('Trả bài thất bại');
+    }
+  };
 
   const renderActions = (item: ContentItem) => {
 

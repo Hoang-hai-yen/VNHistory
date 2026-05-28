@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
+import { useUpdateArticleMutation, useSubmitReviewArticleMutation } from '../hooks/api/useAdminArticles';
 
 import '../styles/CreatePost.css';
 import '../styles/Posts.css';
@@ -14,6 +14,9 @@ const PostEdit: React.FC = () => {
   const navigate = useNavigate();
 
   const article = location.state?.article;
+
+  const updateArticleMutation = useUpdateArticleMutation();
+  const submitReviewArticleMutation = useSubmitReviewArticleMutation();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -87,17 +90,10 @@ const PostEdit: React.FC = () => {
 
   const handleSaveDraft = async () => {
     try {
-      const token = localStorage.getItem('token');
-
-      await axios.put(
-        `http://localhost:3000/api/admin/articles/${article.id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await updateArticleMutation.mutateAsync({
+        id: article.id,
+        payload: formData,
+      });
 
       alert(
         article?.status === 'published'
@@ -114,40 +110,25 @@ const PostEdit: React.FC = () => {
   };
 
   const handleSubmitReview = async () => {
-  try {
-    const token = localStorage.getItem('token');
+    try {
+      // Bước 1: Lưu bài viết trước
+      await updateArticleMutation.mutateAsync({
+        id: article.id,
+        payload: formData,
+      });
 
-    // Bước 1: Lưu bài viết trước
-    await axios.put(
-      `http://localhost:3000/api/admin/articles/${article.id}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      // Bước 2: Gửi duyệt
+      await submitReviewArticleMutation.mutateAsync(article.id);
 
-    // Bước 2: Gửi duyệt
-    await axios.patch(
-      `http://localhost:3000/api/admin/articles/${article.id}/submit`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      alert('Đã lưu và gửi duyệt thành công');
 
-    alert('Đã lưu và gửi duyệt thành công');
+      navigate(-1);
 
-    navigate(-1);
-
-  } catch (error) {
-    console.log(error);
-    alert('Gửi duyệt thất bại');
-  }
-};
+    } catch (error) {
+      console.log(error);
+      alert('Gửi duyệt thất bại');
+    }
+  };
 
   return (
     <div className="create-post-container">

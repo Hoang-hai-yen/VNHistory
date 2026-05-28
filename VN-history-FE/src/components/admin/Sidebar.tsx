@@ -1,68 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import '../../styles/Sidebar.css';
 import { NavLink, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useMeQuery, useLogoutMutation } from '../../hooks/api/useAuth';
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState({
-    name: "",
-    role: "",
-    rawRole: "",
-  });
+  const { data: meRes } = useMeQuery();
+  const logoutMutation = useLogoutMutation();
 
-  console.log("USER STATE:", user);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        const res = await axios.get(
-          "http://localhost:3000/api/auth/me",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        console.log("ME API RESPONSE:");
-        console.log(res.data);
-
-        setUser({
-          name: res.data.data.full_name,
-          rawRole: res.data.data.role,
-          role: res.data.data.role.replace("_", " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
-        });
-        console.log("SETTING USER");
-
-      } catch (error) {
-        console.log(error);
-      }
+  const user = useMemo(() => {
+    if (!meRes?.data) {
+      return { name: "", role: "", rawRole: "" };
+    }
+    const rawRole = meRes.data.role;
+    const roleFormatted = rawRole.replace("_", " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+    return {
+      name: meRes.data.full_name,
+      rawRole,
+      role: roleFormatted,
     };
-
-    fetchUser();
-  }, []);
-
-  console.log("USER STATE:", user);
+  }, [meRes]);
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      await axios.post(
-        "http://localhost:3000/api/auth/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      localStorage.removeItem("token");
-
+      await logoutMutation.mutateAsync();
       navigate("/");
     } catch (error) {
       console.log(error);
@@ -89,31 +50,31 @@ const Sidebar: React.FC = () => {
       {/* Menu Content */}
       <nav className="menu-section" style={{ background: "#FAFAF7" }}>
         <div className="menu-group-label">TỔNG QUAN</div>
-        <NavLink to="/admin/dashboard" className={navLinkClass}>
+        <NavLink to="/dashboard" className={navLinkClass}>
           Dashboard
         </NavLink>
 
         <div className="menu-group-label">NỘI DUNG</div>
-        <NavLink to="/admin/posts" className={navLinkClass}>
+        <NavLink to="/posts" className={navLinkClass}>
           Bài viết
           {/* <span className="badge" style={{ color: '#d4af37' }}>47</span> */}
         </NavLink>
 
-        <NavLink to="/admin/create-post" className={navLinkClass}>
+        <NavLink to="/create-post" className={navLinkClass}>
           Tạo bài mới
         </NavLink>
 
-        <NavLink to="/admin/timeline" className={navLinkClass}>
+        <NavLink to="/timeline" className={navLinkClass}>
           Timeline
         </NavLink>
 
         <div className="menu-group-label">XÉT DUYỆT</div>
-        <NavLink to="/admin/reports" className={navLinkClass}>
+        <NavLink to="/reports" className={navLinkClass}>
           Báo cáo lỗi
           {/* <span className="badge" style={{ color: '#ff4d4d' }}>8</span> */}
         </NavLink>
 
-        <NavLink to="/admin/pending" className={navLinkClass}>
+        <NavLink to="/pending" className={navLinkClass}>
           Chờ xuất bản{" "}
           {/* <span className="badge" style={{ color: '#4da6ff' }}>5</span> */}
         </NavLink>

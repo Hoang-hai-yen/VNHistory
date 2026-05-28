@@ -1,179 +1,54 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 import '../styles/Permissions.css';
 import { useSearch } from '../context/SearchContext';
 import { highlightText } from '../utils/highlightText';
+import { useAdminPermissionsQuery, useUpdateAdminPermissionsMutation } from '../hooks/api/useAdminPermissions';
 
-interface PermissionItem {
-  key: string;
-  label: string;
-  granted: boolean;
-  configurable: boolean;
-}
 
-interface RoleData {
-  role: string;
-  label: string;
-  description: string;
-  permissions: PermissionItem[];
-}
 
 const Permissions: React.FC = () => {
-
-  const [roles, setRoles] = useState<RoleData[]>([]);
-  const [currentRole, setCurrentRole] = useState("");
+  const { data: permissionsData } = useAdminPermissionsQuery();
+  const updatePermissionsMutation = useUpdateAdminPermissionsMutation();
   const { searchText } = useSearch();
 
-  useEffect(() => {
-
-    const fetchPermissions = async () => {
-      try {
-
-        const token = localStorage.getItem("token");
-
-        const res = await axios.get(
-          "http://localhost:3000/api/admin/permissions",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        console.log("PERMISSIONS RESPONSE:");
-        console.log(res.data);
-
-        setRoles(res.data.data);
-        setCurrentRole(res.data.current_role);
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchPermissions();
-
-  }, []);
+  const roles = permissionsData?.data || [];
+  const currentRole = permissionsData?.current_role || "";
 
   const handleToggle = async (
-  roleIndex: number,
-  permissionKey: string
-) => {
+    roleIndex: number,
+    permissionKey: string
+  ) => {
+    // Chỉ Super Admin mới được chỉnh
+    if (currentRole !== "super_admin") return;
 
-  // Chỉ Super Admin mới được chỉnh
-  if (currentRole !== "super_admin") return;
+    // Tìm role admin
+    const targetRole = roles[roleIndex];
+    if (!targetRole || targetRole.role !== "admin") return;
 
-  // Tìm role admin
-  const targetRole = roles[roleIndex];
-
-  if (targetRole.role !== "admin") return;
-
-  // Tìm permission hiện tại
-  const targetPermission =
-    targetRole.permissions.find(
+    // Tìm permission hiện tại
+    const targetPermission = targetRole.permissions.find(
       (p) => p.key === permissionKey
     );
 
-  if (
-    !targetPermission ||
-    !targetPermission.configurable
-  ) {
-    return;
-  }
+    if (
+      !targetPermission ||
+      !targetPermission.configurable
+    ) {
+      return;
+    }
 
-  // Giá trị mới
-  const newGranted =
-    !targetPermission.granted;
+    // Giá trị mới
+    const newGranted = !targetPermission.granted;
 
-  // Update UI trước
-  setRoles((prev) =>
-    prev.map((role, index) => {
-
-      if (
-        index !== roleIndex ||
-        role.role !== "admin"
-      ) {
-        return role;
-      }
-
-      return {
-        ...role,
-        permissions: role.permissions.map(
-          (permission) => {
-
-            if (
-              permission.key === permissionKey
-            ) {
-              return {
-                ...permission,
-                granted: newGranted,
-              };
-            }
-
-            return permission;
-          }
-        ),
-      };
-    })
-  );
-
-  try {
-
-    const token =
-      localStorage.getItem("token");
-
-    await axios.patch(
-      "http://localhost:3000/api/admin/permissions",
-      {
+    try {
+      await updatePermissionsMutation.mutateAsync({
         [permissionKey]: newGranted,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-  } catch (error) {
-
-    console.log(error);
-
-    // rollback nếu lỗi
-    setRoles((prev) =>
-      prev.map((role, index) => {
-
-        if (
-          index !== roleIndex ||
-          role.role !== "admin"
-        ) {
-          return role;
-        }
-
-        return {
-          ...role,
-          permissions: role.permissions.map(
-            (permission) => {
-
-              if (
-                permission.key === permissionKey
-              ) {
-                return {
-                  ...permission,
-                  granted:
-                    !newGranted,
-                };
-              }
-
-              return permission;
-            }
-          ),
-        };
-      })
-    );
-
-    alert("Cập nhật quyền thất bại");
-  }
-};
+      });
+    } catch (error) {
+      console.log(error);
+      alert("Cập nhật quyền thất bại");
+    }
+  };
 
   return (
     <div className="permission-page">

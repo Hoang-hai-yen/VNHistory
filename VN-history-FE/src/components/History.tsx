@@ -1,57 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 import '../styles/History.css';
-import {
-  useSearch
-} from '../context/SearchContext';
-
-import {
-  highlightText
-} from '../utils/highlightText';
-
-interface HistoryLog {
-  id: number;
-  action: string;
-  target_type: string;
-  target_title: string;
-  detail: string;
-  admin_name: string;
-  admin_role: string;
-  created_at: string;
-}
+import { useSearch } from '../context/SearchContext';
+import { highlightText } from '../utils/highlightText';
+import { useAdminLogsQuery } from '../hooks/api/useAdminLogs';
 
 const History: React.FC = () => {
-
-  const [historyData, setHistoryData] = useState<HistoryLog[]>([]);
-  const {
-    searchText
-  } = useSearch();
-
-  useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        const res = await axios.get(
-          "http://localhost:3000/api/admin/logs",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        console.log(res.data);
-
-        setHistoryData(res.data.data);
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchLogs();
-  }, []);
+  const { data: historyData = [] } = useAdminLogsQuery();
+  const { searchText } = useSearch();
 
   return (
     <div className="history-page">

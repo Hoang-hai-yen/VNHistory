@@ -19,6 +19,7 @@ import FiguresPage from "./pages/FiguresPage";
 import TimelinePage from "./pages/TimelinePage";
 import GeographyPage from "./pages/CulturePage";
 import VideoLibraryPage from "./pages/VideoLibraryPage";
+import VideoDetailPage from "./pages/VideoDetailPage";
 import ReportPage from "./pages/ReportPage";
 import PostDetail from "./components/PostDetail";
 import PostEdit from "./components/PostEdit";
@@ -40,6 +41,7 @@ function App() {
         <Route path="dong-thoi-gian" element={<TimelinePage />} />
         <Route path="van-hoa" element={<GeographyPage />} />
         <Route path="video" element={<VideoLibraryPage />} />
+        <Route path="video/:slug" element={<VideoDetailPage />} />
         <Route path="bao-cao-loi" element={<ReportPage />} />
         <Route path="bai-viet/:slug" element={<ArticleDetailPage />} />
       </Route>

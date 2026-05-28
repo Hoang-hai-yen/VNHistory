@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Timeline.css';
 import { highlightText } from '../../utils/highlightText';
 import { useSearch } from '../../context/SearchContext';
-
+import { httpClient } from '../../lib/http';
+import { useAdminTimelineQuery, useAdminTimelineEventsQuery } from '../../hooks/api/useAdminTimeline';
 
 interface Dynasty {
   id: string;
@@ -22,135 +22,41 @@ interface TimelineEvent {
 }
 
 const Timeline: React.FC = () => {
-
-  const [dynasties, setDynasties] = useState<Dynasty[]>([]);
-  const [activeDynasty, setActiveDynasty] =
-    useState<Dynasty | null>(null);
-
-  const [events, setEvents] =
-    useState<TimelineEvent[]>([]);
-
   const navigate = useNavigate();
   const { searchText } = useSearch();
 
-  // =========================
-  // FETCH DANH SÁCH TRIỀU ĐẠI
-  // =========================
-  useEffect(() => {
+  const { data: dynasties = [] } = useAdminTimelineQuery();
+  const [activeDynastyState, setActiveDynastyState] = useState<Dynasty | null>(null);
 
-    const fetchDynasties = async () => {
+  const activeDynasty = activeDynastyState || dynasties[0] || null;
 
-      try {
+  const { data: rawEvents = [] } = useAdminTimelineEventsQuery(activeDynasty?.id || "");
 
-        const token = localStorage.getItem('token');
+  const events = useMemo(() => {
+    return rawEvents.map((article: any) => ({
+      id: article.article_id || article.id,
+      year: article.year_display || '',
+      name: article.title || '',
+      category: article.category_name || '',
+      status:
+        article.status === 'published'
+          ? 'Đã xuất bản'
+          : article.status === 'pending'
+          ? 'Chờ duyệt'
+          : article.status === 'draft'
+          ? 'Bản nháp'
+          : 'Từ chối',
+    }));
+  }, [rawEvents]);
 
-        const res = await axios.get(
-          'http://localhost:3000/api/admin/timeline',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setDynasties(res.data.data);
-
-        if (res.data.data.length > 0) {
-          setActiveDynasty(res.data.data[0]);
-        }
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchDynasties();
-
-  }, []);
-
-  // =========================
-  // FETCH EVENTS
-  // =========================
-  useEffect(() => {
-
-    if (!activeDynasty) return;
-
-    const fetchEvents = async () => {
-
-      try {
-
-        const token = localStorage.getItem('token');
-
-        const res = await axios.get(
-          `http://localhost:3000/api/admin/timeline/${activeDynasty.id}/events`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const formattedEvents = res.data.data.map(
-          (article: any) => ({
-
-            id: article.article_id || article.id,
-
-            year:
-              article.year_display || '',
-
-            name:
-              article.title || '',
-
-            category:
-              article.category_name || '',
-
-            status:
-              article.status === 'published'
-                ? 'Đã xuất bản'
-                : article.status === 'pending'
-                ? 'Chờ duyệt'
-                : article.status === 'draft'
-                ? 'Bản nháp'
-                : 'Từ chối',
-
-          })
-        );
-
-        setEvents(formattedEvents);
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchEvents();
-
-  }, [activeDynasty]);
-
-  // =========================
-  // VIEW POST
-  // =========================
   const handleViewPost = async (id: string) => {
-
     try {
-
-      const token = localStorage.getItem('token');
-
-      const res = await axios.get(
-        `http://localhost:3000/api/admin/articles/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const res = await httpClient.get<any>(`/admin/articles/${id}`);
       navigate('/post-detail', {
         state: {
           article: res.data.data,
         },
       });
-
     } catch (error) {
       console.log(error);
     }
@@ -267,7 +173,7 @@ const Timeline: React.FC = () => {
                   : ''
               }`}
               onClick={() =>
-                setActiveDynasty(d)
+                setActiveDynastyState(d)
               }
             >
 

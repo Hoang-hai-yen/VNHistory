@@ -1,31 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useMemo } from 'react';
 import '../../styles/Pending.css';
 import { useNavigate } from 'react-router-dom';
+import { useSearch } from '../../context/SearchContext';
+import { highlightText } from '../../utils/highlightText';
+import { httpClient } from '../../lib/http';
 import {
-  useSearch
-} from '../../context/SearchContext';
-import {
-  highlightText
-} from '../../utils/highlightText';
+  useAdminArticlesQuery,
+  usePublishArticleMutation,
+  useRejectArticleMutation,
+  useReturnArticleMutation,
+  useBulkPublishArticlesMutation
+} from '../../hooks/api/useAdminArticles';
 
-interface PendingItem {
-  id: string;
-  title: string;
-  dynasty: string;
-  year: string;
-  category: string;
-  editor: string;
-  submitDate: string;
-}
+
 
 const Pending: React.FC = () => {
-
-  const [pendingData, setPendingData] = useState<PendingItem[]>([]);
   const navigate = useNavigate();
-  const {
-    searchText
-  } = useSearch();
+  const { searchText } = useSearch();
+
   const [showReturnModal, setShowReturnModal] =
     useState(false);
 
@@ -35,84 +27,32 @@ const Pending: React.FC = () => {
   const [returnNote, setReturnNote] =
     useState('');
 
-  useEffect(() => {
+  const { data: rawArticles = [] } = useAdminArticlesQuery({ status: 'pending' });
+  const publishMutation = usePublishArticleMutation();
+  const rejectMutation = useRejectArticleMutation();
+  const returnMutation = useReturnArticleMutation();
+  const bulkPublishMutation = useBulkPublishArticlesMutation();
 
-    const fetchPendingArticles = async () => {
-      try {
-
-        const token = localStorage.getItem("token");
-
-        const res = await axios.get(
-          "http://localhost:3000/api/admin/articles?status=pending&page=1&limit=20",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        console.log("PENDING ARTICLES:");
-        console.log(res.data);
-
-        const formattedData = res.data.data.map((article: any) => ({
-
-          id: article.id,
-
-          title: article.title,
-
-          // dynasty.name
-          dynasty:
-            article.dynasty_name || "Không rõ",
-
-          // articles.year_display
-          year:
-            article.year_display || "",
-
-          // category.name
-          category:
-            article.category_name || "Không rõ",
-
-          // created_by
-          editor:
-            article.created_by_name || "Không rõ",
-
-          // created_at
-          submitDate:
-            new Date(article.created_at)
-              .toLocaleDateString("vi-VN"),
-
-        }));
-
-        setPendingData(formattedData);
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchPendingArticles();
-
-  }, []);
+  const pendingData = useMemo(() => {
+    return rawArticles.map((article: any) => ({
+      id: article.id,
+      title: article.title,
+      dynasty: article.dynasty_name || "Không rõ",
+      year: article.year_display || "",
+      category: article.category_name || "Không rõ",
+      editor: article.created_by_name || "Không rõ",
+      submitDate: new Date(article.created_at).toLocaleDateString("vi-VN"),
+    }));
+  }, [rawArticles]);
 
   const handleViewPost = async (id: string) => {
     try {
-      const token = localStorage.getItem('token');
-
-      const res = await axios.get(
-        `http://localhost:3000/api/admin/articles/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const res = await httpClient.get<any>(`/admin/articles/${id}`);
       navigate('/post-detail', {
         state: {
           article: res.data.data,
         },
       });
-
     } catch (error) {
       console.log(error);
     }
@@ -120,135 +60,54 @@ const Pending: React.FC = () => {
 
   const handlePublish = async (id: string) => {
     try {
-      const token = localStorage.getItem('token');
-
-      await axios.patch(
-        `http://localhost:3000/api/admin/articles/${id}/publish`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      await publishMutation.mutateAsync(id);
       alert("Xuất bản thành công");
-
-      window.location.reload();
-
     } catch (error) {
       console.log(error);
     }
   };
 
-    const handleReject = async (
-        id:string
-      ) => {
-        try {
+  const handleReject = async (id: string) => {
+    try {
+      await rejectMutation.mutateAsync(id);
+      alert('Đã từ chối');
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-          const token =
-            localStorage.getItem('token');
+  const handleOpenReturnModal = (id: string) => {
+    setSelectedArticleId(id);
+    setReturnNote('');
+    setShowReturnModal(true);
+  };
 
-          await axios.patch(
-            `http://localhost:3000/api/admin/articles/${id}/reject`,
-            {},
-            {
-              headers:{
-                Authorization:`Bearer ${token}`
-              }
-            }
-          );
+  const handleReturn = async () => {
+    try {
+      await returnMutation.mutateAsync({
+        id: selectedArticleId,
+        return_note: returnNote,
+      });
+      alert("Đã trả bài về");
+      setShowReturnModal(false);
+    } catch (error) {
+      console.log(error);
+      alert("Trả bài thất bại");
+    }
+  };
 
-          alert(
-            'Đã từ chối'
-          );
+  const handleBulkPublish = async () => {
+    const confirmPublish = window.confirm("Xuất bản toàn bộ bài viết đang chờ duyệt?");
+    if (!confirmPublish) return;
 
-          window.location.reload();
-
-        } catch(error){
-          console.log(error);
-        }
-      };
-
-
-    const handleOpenReturnModal = (
-      id: string
-    ) => {
-      setSelectedArticleId(id);
-      setReturnNote('');
-      setShowReturnModal(true);
-    };
-  
-    const handleReturn = async () => {
-      try {
-
-        const token =
-          localStorage.getItem('token');
-
-        await axios.patch(
-          `http://localhost:3000/api/admin/articles/${selectedArticleId}/return`,
-          {
-            return_note: returnNote
-          },
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
-
-        alert("Đã trả bài về");
-
-        setShowReturnModal(false);
-
-        window.location.reload();
-
-      } catch (error) {
-        console.log(error);
-        alert("Trả bài thất bại");
-      }
-    };
-
-    const handleBulkPublish = async () => {
-
-      const confirmPublish =
-        window.confirm(
-          "Xuất bản toàn bộ bài viết đang chờ duyệt?"
-        );
-
-      if (!confirmPublish) return;
-
-      try {
-
-        const token =
-          localStorage.getItem("token");
-
-        await axios.post(
-          "http://localhost:3000/api/admin/articles/bulk-publish",
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        alert(
-          "Đã duyệt tất cả thành công"
-        );
-
-        window.location.reload();
-
-      } catch (error) {
-
-        console.log(error);
-
-        alert(
-          "Duyệt tất cả thất bại"
-        );
-      }
-    };
+    try {
+      await bulkPublishMutation.mutateAsync();
+      alert("Đã duyệt tất cả thành công");
+    } catch (error) {
+      console.log(error);
+      alert("Duyệt tất cả thất bại");
+    }
+  };
 
   return (
     <div className="pending-page">

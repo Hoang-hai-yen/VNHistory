@@ -10,25 +10,25 @@ const TopBar: React.FC = () => {
   // Hàm chuyển đổi path thành Title
   const getTitle = (path: string) => {
     switch (path) {
-      case "/admin/dashboard":
+      case "/dashboard":
         return "Dashboard";
-      case "/admin/posts":
+      case "/posts":
         return "Quản lý bài viết";
-      case "/admin/create-post":
+      case "/create-post":
         return "Tạo/Sửa bài viết";
-      case "/admin/timeline":
+      case "/timeline":
         return "Quản lý Timeline";
-      case "/admin/reports":
+      case "/reports":
         return "Báo cáo lỗi";
-      case "/admin/pending":
+      case "/pending":
         return "Chờ xuất bản";
-      case "/admin/management":
+      case "/management":
         return "Quản lý Admin";
-      case "/admin/permissions":
+      case "/permissions":
         return "Phân quyền";
-      case "/admin/history":
+      case "/history":
         return "Nhật ký";
-      case "/admin/settings":
+      case "/settings":
         return "Cài đặt hệ thống";
       default:
         return "Admin Portal";

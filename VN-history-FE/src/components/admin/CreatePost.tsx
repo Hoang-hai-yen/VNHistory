@@ -1,19 +1,8 @@
-
-
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import '../../styles/CreatePost.css';
-
-interface Dynasty {
-  id: string;
-  name: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  article_type: string;
-}
+import { useAdminTimelineQuery } from '../../hooks/api/useAdminTimeline';
+import { useCategories } from '../../hooks/api/useCategories';
+import { useCreateArticleMutation } from '../../hooks/api/useAdminArticles';
 
 interface FormData {
   title: string;
@@ -33,10 +22,14 @@ interface FormData {
 }
 
 const CreatePost: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  const { data: dynastiesRaw = [] } = useAdminTimelineQuery();
+  const { data: categoriesRaw } = useCategories();
+  const createArticleMutation = useCreateArticleMutation();
 
-  const [dynasties, setDynasties] = useState<Dynasty[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const dynasties = dynastiesRaw.map(d => ({ id: d.id, name: d.name }));
+  const categories = categoriesRaw?.data || [];
+
+  const loading = createArticleMutation.isPending;
 
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -54,46 +47,6 @@ const CreatePost: React.FC = () => {
     category_id: '',
     is_featured: false,
   });
-
-  useEffect(() => {
-    fetchInitData();
-  }, []);
-
-  const fetchInitData = async () => {
-    try {
-      const token = localStorage.getItem('token');
-
-      // gọi song song 2 API
-      const [dynastyRes, categoryRes] = await Promise.all([
-
-        axios.get(
-          'http://localhost:3000/api/admin/timeline',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        ),
-
-        axios.get(
-          'http://localhost:3000/api/categories'
-        )
-      ]);
-
-      // triều đại
-      setDynasties(
-        dynastyRes.data.data || []
-      );
-
-      // danh mục
-      setCategories(
-        categoryRes.data.data || []
-      );
-
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -136,29 +89,15 @@ const CreatePost: React.FC = () => {
 
   const createArticle = async () => {
     try {
-      setLoading(true);
-
-      const token = localStorage.getItem('token');
-
-      await axios.post(
-        'http://localhost:3000/api/admin/articles',
-        {
-          ...formData,
-          status: 'draft',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await createArticleMutation.mutateAsync({
+        ...formData,
+        status: 'draft',
+      });
 
       alert('Tạo bài viết thành công!');
     } catch (error) {
       console.log(error);
       alert('Tạo bài viết thất bại!');
-    } finally {
-      setLoading(false);
     }
   };
 

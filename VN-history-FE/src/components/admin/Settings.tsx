@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import '../../styles/Settings.css';
 import { useSearch } from '../../context/SearchContext';
 import { highlightText } from '../../utils/highlightText';
+import { useAdminSettingsQuery, useUpdateAdminSettingsMutation } from '../../hooks/api/useAdminSettings';
 
 const Settings: React.FC = () => {
+  const { data: settings } = useAdminSettingsQuery();
+  const updateSettingsMutation = useUpdateAdminSettingsMutation();
 
   const [siteName, setSiteName] = useState("");
   const [description, setDescription] = useState("");
@@ -18,71 +20,38 @@ const Settings: React.FC = () => {
   const { searchText } = useSearch();
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const token = localStorage.getItem("token");
+    if (settings) {
+      // Website info
+      setSiteName(settings.site_name?.value || "");
+      setDescription(settings.site_description?.value || "");
+      setSiteEmail(settings.site_email?.value || "");
 
-        const res = await axios.get(
-          "http://localhost:3000/api/admin/settings",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      // Switch values
+      setAllowComments(
+        settings.allow_comments?.value === "true"
+      );
 
-        console.log("SETTINGS RESPONSE:");
-        console.log(res.data);
+      setNotifyOnReport(
+        settings.notify_on_report?.value === "true"
+      );
 
-        const settings = res.data.asObject;
+      // Switch descriptions
+      setAllowCommentsDesc(
+        settings.allow_comments?.description || ""
+      );
 
-        // Website info
-        setSiteName(settings.site_name?.value || "");
-        setDescription(settings.site_description?.value || "");
-        setSiteEmail(settings.site_email?.value || "");
-
-        // Switch values
-        setAllowComments(
-          settings.allow_comments?.value === "true"
-        );
-
-        setNotifyOnReport(
-          settings.notify_on_report?.value === "true"
-        );
-
-        // Switch descriptions
-        setAllowCommentsDesc(
-          settings.allow_comments?.description || ""
-        );
-
-        setNotifyOnReportDesc(
-          settings.notify_on_report?.description || ""
-        );
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchSettings();
-  }, []);
+      setNotifyOnReportDesc(
+        settings.notify_on_report?.description || ""
+      );
+    }
+  }, [settings]);
 
   const handleSaveWebsiteInfo = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      await axios.patch(
-        "http://localhost:3000/api/admin/settings",
-        {
-          site_name: siteName,
-          site_description: description,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await updateSettingsMutation.mutateAsync({
+        site_name: siteName,
+        site_description: description,
+      });
 
       alert("Cập nhật thông tin website thành công");
 
@@ -98,21 +67,11 @@ const Settings: React.FC = () => {
 
   const handleSavePublishSettings = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      await axios.patch(
-        "http://localhost:3000/api/admin/settings",
-        {
-          allow_comments: allowComments,
-          notify_on_report: notifyOnReport,
-          site_email: siteEmail,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await updateSettingsMutation.mutateAsync({
+        allow_comments: allowComments,
+        notify_on_report: notifyOnReport,
+        site_email: siteEmail,
+      });
 
       alert("Cập nhật cài đặt thành công");
 
