@@ -1,554 +1,188 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../../styles/Reports.css';
+import { useNavigate } from 'react-router-dom';
+import { useSearch } from '../../context/SearchContext';
+import { highlightText } from '../../utils/highlightText';
+import { httpClient } from '../../lib/http';
+import { useAdminAdminsQuery } from '../../hooks/api/useAdminAdmins';
 import {
-  useNavigate
-} from 'react-router-dom';
-import {
-  useSearch
-} from '../../context/SearchContext';
-import {
-  highlightText
-} from '../../utils/highlightText';
+  useAdminReportsQuery,
+  useAssignReportMutation,
+  useFlagReportMutation,
+  useResolveReportMutation,
+  useRejectReportMutation
+} from '../../hooks/api/useAdminReports';
 
-interface ReportItem {
-  id: string;
-  report_code: string;
-  article_id: string;
-  error_type: string;
-  severity: string;
-  quoted_text: string;
-  description: string;
-  suggested_source: string;
-  reporter_email: string;
-  status: string;
-  assigned_to: string | null;
-  admin_note: string | null;
-  resolved_at: string | null;
-  resolved_by: string | null;
-  created_at: string;
-  article_title: string;
-  article_slug: string;
-  // article_type?: string;
-}
+
 
 const Reports: React.FC = () => {
+  const { data: reports = [] } = useAdminReportsQuery();
+  const { data: adminsRaw = [] } = useAdminAdminsQuery();
 
-  const [reports, setReports] = useState<ReportItem[]>([]);
-  const [selectedReport, setSelectedReport] =
-    useState<ReportItem | null>(null);
-  const [adminNote, setAdminNote] =
-    useState<string>('');
+  const assignReportMutation = useAssignReportMutation();
+  const flagReportMutation = useFlagReportMutation();
+  const resolveReportMutation = useResolveReportMutation();
+  const rejectReportMutation = useRejectReportMutation();
 
-    const [activeTab, setActiveTab] =
-        useState<
-          'new' |
-          'reviewing' |
-          'resolved' |
-          'flagged'
-        >('new');
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  const [adminNote, setAdminNote] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'new' | 'reviewing' | 'resolved' | 'flagged'>('new');
+  const [selectedAdmin, setSelectedAdmin] = useState<string>('');
 
-  const [admins, setAdmins] = useState<any[]>([]);
   const navigate = useNavigate();
   const { searchText } = useSearch();
 
+  const admins = useMemo(() => {
+    return adminsRaw.filter((admin: any) => admin.is_active === 1);
+  }, [adminsRaw]);
+
+  const filteredReports = useMemo(() => {
+    return reports.filter((report) => {
+      if (activeTab === 'new') return report.status === 'new';
+      if (activeTab === 'reviewing') return report.status === 'reviewing';
+      if (activeTab === 'flagged') return report.status === 'flagged';
+      if (activeTab === 'resolved') return report.status === 'resolved' || report.status === 'rejected';
+      return false;
+    });
+  }, [reports, activeTab]);
+
+  const selectedReport = useMemo(() => {
+    if (!reports.length) return null;
+    if (selectedReportId) {
+      return reports.find((r) => r.id === selectedReportId) || null;
+    }
+    return filteredReports[0] || null;
+  }, [reports, selectedReportId, filteredReports]);
+
+  // Sync selectedAdmin with selectedReport.assigned_to when selectedReport changes
+  useEffect(() => {
+    if (selectedReport?.assigned_to) {
+      setSelectedAdmin(selectedReport.assigned_to);
+    } else {
+      setSelectedAdmin('');
+    }
+    if (selectedReport) {
+      setAdminNote(selectedReport.admin_note || '');
+    } else {
+      setAdminNote('');
+    }
+  }, [selectedReport]);
+
   const handleOpenPostEdit = async () => {
     if (!selectedReport) return;
-
     try {
-      const token = localStorage.getItem('token');
-
-      const res = await axios.get(
-        `http://localhost:3000/api/admin/articles/${selectedReport.article_id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const res = await httpClient.get<any>(`/admin/articles/${selectedReport.article_id}`);
       navigate('/post-edit', {
         state: {
           article: res.data.data,
         },
       });
-
     } catch (error) {
       console.log(error);
       alert('Không thể mở bài viết');
     }
   };
-  const [selectedAdmin, setSelectedAdmin] =
-    useState<string>('');
 
-  useEffect(() => {
-
-    const fetchReports = async () => {
-
-      try {
-
-        const token =
-          localStorage.getItem('token');
-
-        const res = await axios.get(
-          'http://localhost:3000/api/admin/reports',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        console.log(res.data);
-
-        setReports(res.data.data);
-
-        // mặc định chọn report đầu tiên theo tab
-        const defaultReport = res.data.data.find(
-          (r: ReportItem) =>
-            r.status === 'new'
-        );
-
-        if (defaultReport) {
-          setSelectedReport(defaultReport);
-        }
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchReports();
-
-  }, []);
-
-    const filteredReports = reports.filter(
-      (report) => {
-
-        if (activeTab === 'new') {
-          return report.status === 'new';
-        }
-        if (activeTab === 'reviewing') {
-          return report.status === 'reviewing';
-        }
-        if (activeTab === 'flagged') {
-          return report.status === 'flagged';
-        }
-        if (activeTab === 'resolved') {
-          return report.status === 'resolved' || report.status === 'rejected';}
-        // return report.status === 'resolved';
-      }
-    );
-
-  useEffect(() => {
-
-    if (
-      filteredReports.length > 0 &&
-      !filteredReports.find(
-        (r) => r.id === selectedReport?.id
-      )
-    ) {
-      setSelectedReport(filteredReports[0]);
-    }
-
-  }, [activeTab, reports]);
-
-  const getSeverityText = (
-    severity: string
-  ) => {
-
+  const getSeverityText = (severity: string) => {
     switch (severity) {
       case 'high':
         return 'Nghiêm trọng';
-
       case 'medium':
         return 'Trung bình';
-
       case 'low':
         return 'Bình thường';
-
       default:
         return severity;
     }
   };
 
-    const getStatusText = (
-      status: string
-    ) => {
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'new':
+        return 'Mới';
+      case 'reviewing':
+        return 'Đang xử lý';
+      case 'resolved':
+        return 'Đã xử lý';
+      case 'flagged':
+        return 'Đã gắn cờ';
+      case 'rejected':
+        return 'Đã từ chối';
+      default:
+        return status;
+    }
+  };
 
-      switch (status) {
-
-        case 'new':
-          return 'Mới';
-
-        case 'reviewing':
-          return 'Đang xử lý';
-
-        case 'resolved':
-          return 'Đã xử lý';
-
-        case 'flagged':
-          return 'Đã gắn cờ';
-        case 'rejected':
-          return 'Đã từ chối';
-
-        default:
-          return status;
-      }
-    };
-
-  // const getCategoryText = (
-  //   type?: string
-  // ) => {
-
-  //   switch (type) {
-  //     case 'event':
-  //       return 'Sự kiện';
-
-  //     case 'person':
-  //       return 'Nhân vật';
-
-  //     case 'place':
-  //       return 'Di sản';
-
-  //     default:
-  //       return 'Khác';
-  //   }
-  // };
-
-    const unresolvedCount = reports.filter(
+  const unresolvedCount = useMemo(() => {
+    return reports.filter(
       (r) =>
         r.status === 'new' ||
         r.status === 'reviewing' ||
         r.status === 'flagged'
     ).length;
-
-  useEffect(() => {
-
-    const fetchAdmins = async () => {
-
-      try {
-
-        const token =
-          localStorage.getItem('token');
-
-        const res = await axios.get(
-          'http://localhost:3000/api/admin/admins',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        console.log('ADMINS');
-        console.log(res.data);
-
-        // chỉ lấy admin active
-        const activeAdmins =
-          res.data.data.filter(
-            (admin: any) =>
-              admin.is_active === 1
-          );
-
-        setAdmins(activeAdmins);
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchAdmins();
-
-  }, []);
-
-      useEffect(() => {
-
-      if (
-        selectedReport?.assigned_to &&
-        admins.length > 0
-      ) {
-        setSelectedAdmin(
-          selectedReport.assigned_to
-        );
-      }
-
-    }, [selectedReport, admins]);
+  }, [reports]);
 
   const handleAssignReport = async () => {
-
     if (!selectedReport) return;
-
     if (!selectedAdmin) {
       alert('Vui lòng chọn admin');
       return;
     }
-
     try {
-
-      const token =
-        localStorage.getItem('token');
-
-      await axios.patch(
-        `http://localhost:3000/api/admin/reports/${selectedReport.id}/assign`,
-        {
-          admin_id: selectedAdmin,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      await assignReportMutation.mutateAsync({
+        id: selectedReport.id,
+        admin_id: selectedAdmin,
+      });
       alert('Phân công thành công');
-
-      // cập nhật local state
-      setReports((prev) =>
-        prev.map((report) =>
-          report.id === selectedReport.id
-            ? {
-                ...report,
-                assigned_to: selectedAdmin,
-              }
-            : report
-        )
-      );
-
     } catch (error) {
       console.log(error);
       alert('Phân công thất bại');
     }
   };
 
-    useEffect(() => {
-      if (selectedReport) {
-        setAdminNote(
-          selectedReport.admin_note || ''
-        );
-      }
-    }, [selectedReport]);
-
   const handleFlagReport = async () => {
-
     if (!selectedReport) return;
-
     try {
-
-      const token =
-        localStorage.getItem('token');
-
-      const isFlagged =
-        selectedReport.admin_note;
-
-      // Gắn cờ
+      const isFlagged = !!selectedReport.admin_note;
       if (!isFlagged) {
-
-        await axios.patch(
-          `http://localhost:3000/api/admin/reports/${selectedReport.id}/flag`,
-          {
-            admin_note: adminNote,
-          },
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
-
+        await flagReportMutation.mutateAsync({
+          id: selectedReport.id,
+          admin_note: adminNote,
+        });
         alert("Đã gắn cờ");
-        navigate('/reports');
-
-        setReports(prev =>
-          prev.map(report =>
-            report.id === selectedReport.id
-              ? {
-                  ...report,
-                  admin_note: adminNote,
-                }
-              : report
-          )
-        );
-
-        setSelectedReport(prev =>
-          prev
-            ? {
-                ...prev,
-                admin_note: adminNote,
-              }
-            : null
-        );
-
-      }
-
-      // Gỡ cờ
-      else {
-
-        await axios.patch(
-          `http://localhost:3000/api/admin/reports/${selectedReport.id}/flag`,
-          {
-            admin_note: null,
-          },
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
-
+      } else {
+        await flagReportMutation.mutateAsync({
+          id: selectedReport.id,
+          admin_note: null,
+        });
         alert("Đã gỡ cờ");
-
-        setReports(prev =>
-          prev.map(report =>
-            report.id === selectedReport.id
-              ? {
-                  ...report,
-                  admin_note: null,
-                }
-              : report
-          )
-        );
-
-        setSelectedReport(prev =>
-          prev
-            ? {
-                ...prev,
-                admin_note: null,
-              }
-            : null
-        );
-
-        setAdminNote('');
-
       }
-
-    } catch(error) {
-
+    } catch (error) {
       console.log(error);
       alert('Thao tác thất bại');
-
     }
-
   };
 
-    const handleResolveReport = async () => {
-
+  const handleResolveReport = async () => {
     if (!selectedReport) return;
-
     try {
-
-      const token =
-        localStorage.getItem('token');
-
-      await axios.patch(
-        `http://localhost:3000/api/admin/reports/${selectedReport.id}/resolve`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      await resolveReportMutation.mutateAsync(selectedReport.id);
       alert('Đã xử lý báo cáo');
-
-      // cập nhật local state
-      setReports(prev =>
-        prev.map(report =>
-          report.id === selectedReport.id
-            ? {
-                ...report,
-                status: 'resolved',
-                resolved_at:
-                  new Date().toISOString(),
-              }
-            : report
-        )
-      );
-
-      // chuyển sang report tiếp theo nếu có
-      const remainingReports =
-        reports.filter(
-          report =>
-            report.id !== selectedReport.id &&
-            report.status !== 'resolved'
-        );
-
-      setSelectedReport(
-        remainingReports.length > 0
-          ? remainingReports[0]
-          : null
-      );
-
     } catch (error) {
-
       console.log(error);
-      alert(
-        'Xử lý báo cáo thất bại'
-      );
-
+      alert('Xử lý báo cáo thất bại');
     }
-
   };
 
   const handleRejectReport = async () => {
-
     if (!selectedReport) return;
-
     try {
-
-      const token =
-        localStorage.getItem('token');
-
-      await axios.patch(
-        `http://localhost:3000/api/admin/reports/${selectedReport.id}/reject`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      await rejectReportMutation.mutateAsync(selectedReport.id);
       alert('Đã từ chối báo cáo');
-
-      // cập nhật local state
-      setReports(prev =>
-        prev.map(report =>
-          report.id === selectedReport.id
-            ? {
-                ...report,
-                status: 'rejected',
-              }
-            : report
-        )
-      );
-
-      // chọn report tiếp theo
-      const remainingReports =
-        reports.filter(
-          report =>
-            report.id !== selectedReport.id &&
-            report.status !== 'rejected'
-        );
-
-      setSelectedReport(
-        remainingReports.length > 0
-          ? remainingReports[0]
-          : null
-      );
-
     } catch (error) {
-
       console.log(error);
-      alert(
-        'Từ chối báo cáo thất bại'
-      );
-
+      alert('Từ chối báo cáo thất bại');
     }
-
   };
 
   return (
@@ -638,7 +272,7 @@ const Reports: React.FC = () => {
                   : ''
               }`}
               onClick={() =>
-                setSelectedReport(report)
+                setSelectedReportId(report.id)
               }
             >
 

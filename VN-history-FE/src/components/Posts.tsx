@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Posts.css';
 import { useSearch } from '../context/SearchContext';
 import { highlightText } from '../utils/highlightText';
+import { httpClient } from '../lib/http';
+import {
+  useAdminArticlesQuery,
+  usePublishArticleMutation,
+  useRejectArticleMutation,
+  useReturnArticleMutation
+} from '../hooks/api/useAdminArticles';
 
 
 type PublishTab =
@@ -31,10 +37,6 @@ const Posts: React.FC = () => {
   const navigate = useNavigate();
   const { searchText } = useSearch();
 
-  const [contentData, setContentData] = useState<
-    ContentItem[]
-  >([]);
-
   const [showReturnModal, setShowReturnModal] =
     useState(false);
 
@@ -44,94 +46,54 @@ const Posts: React.FC = () => {
   const [returnNote, setReturnNote] =
     useState('');
 
-  const fetchArticles = async (
-    status?: 'published'
-    | 'pending'
-    | 'draft'
-    | 'rejected'
-    ) => {
-    try {
-      const token = localStorage.getItem('token');
+  const publishMutation = usePublishArticleMutation();
+  const rejectMutation = useRejectArticleMutation();
+  const returnMutation = useReturnArticleMutation();
 
-      let url =
-        'http://localhost:3000/api/admin/articles?page=1&limit=20';
+  const statusParam =
+    activeTab === 'Đã xuất bản' ? 'published' :
+    activeTab === 'Chờ duyệt' ? 'pending' :
+    activeTab === 'Bản nháp' ? 'draft' :
+    activeTab === 'Từ chối' ? 'rejected' : undefined;
 
-      if (status) {
-        url = `http://localhost:3000/api/admin/articles?status=${status}&page=1&limit=20`;
-      }
+  const { data: articles = [] } = useAdminArticlesQuery({ status: statusParam });
 
-      const res = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const contentData = useMemo(() => {
+    return articles.map((article: any) => ({
+      id: article.id,
+      title: article.title,
+      subtitle: article.subtitle,
 
-      console.log(res.data);
+      type:
+        article.type === 'event'
+          ? 'Sự kiện'
+          : article.type === 'person'
+          ? 'Nhân vật'
+          : article.type === 'place'
+          ? 'Di sản'
+          : 'Khác',
 
-      const formattedData = res.data.data.map(
-        (article: any) => ({
-          id: article.id,
-          title: article.title,
-          subtitle: article.subtitle,
+      dynasty: article.dynasty_name || '-',
 
-          type:
-            article.type === 'event'
-              ? 'Sự kiện'
-              : article.type === 'person'
-              ? 'Nhân vật'
-              : article.type === 'place'
-              ? 'Di sản'
-              : 'Khác',
+      assignee: article.created_by_name || '-',
 
-          dynasty: article.dynasty_name || '-',
+      date: new Date(
+        article.published_at || article.created_at
+      ).toLocaleDateString('vi-VN'),
 
-          assignee: article.created_by_name || '-' ,
+      status:
+        article.status === 'published'
+          ? 'Đã xuất bản'
+          : article.status === 'pending'
+          ? 'Chờ duyệt'
+          : article.status === 'draft'
+          ? 'Bản nháp'
+          : 'Từ chối',
 
-          date: new Date(
-              article.published_at || article.created_at
-            ).toLocaleDateString('vi-VN'),
-
-          status:
-            article.status === 'published'
-              ? 'Đã xuất bản'
-              : article.status === 'pending'
-              ? 'Chờ duyệt'
-              : article.status === 'draft'
-              ? 'Bản nháp'
-              : 'Từ chối',
-
-          rejection_note:
-                article.rejection_note || '',
-        })
-      );
-
-      setContentData(formattedData);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    if (activeTab === 'Tất cả') {
-      fetchArticles();
-    }
-
-    if (activeTab === 'Đã xuất bản') {
-      fetchArticles('published');
-    }
-
-    if (activeTab === 'Chờ duyệt') {
-      fetchArticles('pending');
-    }
-
-    if (activeTab === 'Bản nháp') {
-      fetchArticles('draft');
-    }
-
-    if (activeTab === 'Từ chối') {
-      fetchArticles('rejected' as any);
-    }
-  }, [activeTab]);
+      rejection_note:
+        article.rejection_note || '',
+    }));
+  }, [articles]);
 
   const renderStatusTag = (status: string) => {
     const statusMap: Record<string, string> = {
@@ -174,160 +136,67 @@ const Posts: React.FC = () => {
   };
 
   const handleViewPost = async (id: string) => {
-      try {
-        const token = localStorage.getItem('token');
-
-        const res = await axios.get(
-          `http://localhost:3000/api/admin/articles/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        navigate('/post-detail', {
-          state: {
-            article: res.data.data,
-          },
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const handleEditPost = async (id: string) => {
-
-      try {
-
-        const token =
-          localStorage.getItem('token');
-
-        const res = await axios.get(
-          `http://localhost:3000/api/admin/articles/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        navigate('/post-edit', {
-          state: {
-            article: res.data.data,
-          },
-        });
-
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const handlePublish = async (
-  id:string
-) => {
-  try {
-
-    const token =
-      localStorage.getItem('token');
-
-    await axios.patch(
-      `http://localhost:3000/api/admin/articles/${id}/publish`,
-      {},
-      {
-        headers:{
-          Authorization:`Bearer ${token}`
-        }
-      }
-    );
-
-    alert(
-      'Xuất bản thành công'
-    );
-
-    fetchArticles();
-
-  } catch(error){
-    console.log(error);
-  }
-};
-
-
-    const handleReject = async (
-      id:string
-    ) => {
-      try {
-
-        const token =
-          localStorage.getItem('token');
-
-        await axios.patch(
-          `http://localhost:3000/api/admin/articles/${id}/reject`,
-          {},
-          {
-            headers:{
-              Authorization:`Bearer ${token}`
-            }
-          }
-        );
-
-        alert(
-          'Đã từ chối'
-        );
-
-        fetchArticles();
-
-      } catch(error){
-        console.log(error);
-      }
-    };
-
-
-    const handleOpenReturnModal = (
-    id:string
-    )=>{
-      setSelectedArticleId(id);
-      setReturnNote('');
-      setShowReturnModal(true);
-    };
-
-
-    const handleReturn = async () => {
-
-    try{
-
-      const token =
-      localStorage.getItem('token');
-
-      await axios.patch(
-        `http://localhost:3000/api/admin/articles/${selectedArticleId}/return`,
-        {
-          return_note:
-          returnNote
+    try {
+      const res = await httpClient.get<any>(`/admin/articles/${id}`);
+      navigate('/post-detail', {
+        state: {
+          article: res.data.data,
         },
-        {
-          headers:{
-            Authorization:`Bearer ${token}`
-          }
-        }
-      );
-
-      alert(
-        'Đã trả bài'
-      );
-
-      setShowReturnModal(false);
-
-      fetchArticles();
-
-    }
-    catch(error){
-
+      });
+    } catch (error) {
       console.log(error);
-
     }
+  };
 
-    };
+  const handleEditPost = async (id: string) => {
+    try {
+      const res = await httpClient.get<any>(`/admin/articles/${id}`);
+      navigate('/post-edit', {
+        state: {
+          article: res.data.data,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlePublish = async (id: string) => {
+    try {
+      await publishMutation.mutateAsync(id);
+      alert('Xuất bản thành công');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    try {
+      await rejectMutation.mutateAsync(id);
+      alert('Đã từ chối');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleOpenReturnModal = (id: string) => {
+    setSelectedArticleId(id);
+    setReturnNote('');
+    setShowReturnModal(true);
+  };
+
+  const handleReturn = async () => {
+    try {
+      await returnMutation.mutateAsync({
+        id: selectedArticleId,
+        return_note: returnNote,
+      });
+      alert('Đã trả bài');
+      setShowReturnModal(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
     const renderActions = (item: ContentItem) => {
 

@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Login.css";
-import axios from "axios";
+import { useLoginMutation } from "../../hooks/api/useAuth";
 
 function Login() {
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,41 +12,25 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
+  const loginMutation = useLoginMutation();
 
   const handleLogin = async (e: React.FormEvent) => {
-
     e.preventDefault();
 
     try {
-
-      const res = await axios.post(
-        "http://localhost:3000/api/auth/login",
-        {
-          email: username,
-          password: password,
-        }
-      );
-
-      console.log(res.data);
-
-      console.log("TOKEN:");
-      console.log(res.data.token);
-
-      localStorage.setItem(
-        "token",
-        res.data.token
-      );
+      await loginMutation.mutateAsync({
+        email: username,
+        password: password,
+      });
 
       navigate("/dashboard");
 
     } catch (error: any) {
-
-      console.error(
-        error.response?.data || error.message
-      );
+      console.error(error);
 
       setError(
         error.response?.data?.message ||
+        error.message ||
         "Sai tài khoản hoặc mật khẩu!"
       );
     }
