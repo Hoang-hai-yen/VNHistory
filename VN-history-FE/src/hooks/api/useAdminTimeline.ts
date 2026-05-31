@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "../../lib/http";
 
 export interface AdminDynastyRaw {
@@ -45,5 +45,33 @@ export function useAdminTimelineEventsQuery(dynastyId: string) {
     },
     enabled: !!dynastyId,
     staleTime: 30 * 1000,
+  });
+}
+
+export function useAddTimelineEventMutation(dynastyId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<any, any, { article_id: string; note?: string; sort_order?: number }>({
+    mutationFn: async (payload) => {
+      const res = await httpClient.post(`/admin/timeline/${dynastyId}/events`, payload);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminTimelineEvents", dynastyId] });
+      queryClient.invalidateQueries({ queryKey: ["adminTimeline"] });
+    },
+  });
+}
+
+export function useRemoveTimelineEventMutation(dynastyId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<any, any, string>({
+    mutationFn: async (eventId) => {
+      const res = await httpClient.delete(`/admin/timeline/events/${eventId}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminTimelineEvents", dynastyId] });
+      queryClient.invalidateQueries({ queryKey: ["adminTimeline"] });
+    },
   });
 }

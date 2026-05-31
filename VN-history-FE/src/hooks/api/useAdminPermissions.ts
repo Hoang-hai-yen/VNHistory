@@ -20,6 +20,19 @@ export interface PermissionsResponse {
   current_role: string;
 }
 
+export function useMyPermissionsQuery() {
+  const token = localStorage.getItem("token");
+  return useQuery<string[]>({
+    queryKey: ["myPermissions", token],
+    queryFn: async () => {
+      const res = await httpClient.get<{ permissions: string[] }>("/admin/permissions/me");
+      return res.data.permissions;
+    },
+    enabled: !!token,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useAdminPermissionsQuery() {
   return useQuery<PermissionsResponse>({
     queryKey: ["adminPermissions"],

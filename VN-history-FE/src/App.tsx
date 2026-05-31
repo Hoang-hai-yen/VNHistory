@@ -24,6 +24,7 @@ import ReportPage from "./pages/ReportPage";
 import PostDetail from "./components/PostDetail";
 import PostEdit from "./components/PostEdit";
 import { SearchProvider } from "./context/SearchContext";
+import PermissionGuard from "./components/admin/PermissionGuard";
 
 
 
@@ -49,17 +50,17 @@ function App() {
       {/* Layout có Sidebar */}
       <Route path="/" element={<AdminLayout />}>
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="posts" element={<Posts />} />
-        <Route path="create-post" element={<CreatePost />} />
-        <Route path="timeline" element={<Timeline />} />
-        <Route path="reports" element={<Reports />} />
-        <Route path="pending" element={<Pending />} />
-        <Route path="management" element={<Management />} />
-        <Route path="permissions" element={<Permissions />} />
-        <Route path="history" element={<History />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="post-detail" element={<PostDetail />} /> {/* 👈 thêm dòng này */}
-        <Route path="post-edit" element={<PostEdit />} /> {/* 👈 thêm dòng này */}
+        <Route path="posts" element={<PermissionGuard permissionKey="article.edit_own"><Posts /></PermissionGuard>} />
+        <Route path="create-post" element={<PermissionGuard permissionKey="article.create"><CreatePost /></PermissionGuard>} />
+        <Route path="timeline" element={<PermissionGuard permissionKey="timeline.manage"><Timeline /></PermissionGuard>} />
+        <Route path="reports" element={<PermissionGuard permissionKey="report.view"><Reports /></PermissionGuard>} />
+        <Route path="pending" element={<PermissionGuard permissionKey="article.publish"><Pending /></PermissionGuard>} />
+        <Route path="management" element={<PermissionGuard permissionKey="admin.manage"><Management /></PermissionGuard>} />
+        <Route path="permissions" element={<PermissionGuard permissionKey="permissions.manage"><Permissions /></PermissionGuard>} />
+        <Route path="history" element={<PermissionGuard permissionKey="logs.view"><History /></PermissionGuard>} />
+        <Route path="settings" element={<PermissionGuard permissionKey="settings.manage"><Settings /></PermissionGuard>} />
+        <Route path="post-detail" element={<PostDetail />} />
+        <Route path="post-edit" element={<PermissionGuard permissionKey="article.edit_own"><PostEdit /></PermissionGuard>} />
       </Route>
     </Routes>
     </SearchProvider>

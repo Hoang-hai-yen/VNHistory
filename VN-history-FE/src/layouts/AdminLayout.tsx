@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/admin/Sidebar";
 import Topbar from "../components/admin/TopBar";
+import { PermissionProvider } from "../context/PermissionContext";
 
 const AdminLayout = () => {
   // Giả sử Sidebar của bạn rộng 260px (dựa trên các thiết kế trước đó)
@@ -8,6 +9,7 @@ const AdminLayout = () => {
   const topbarHeight = "60px";
 
   return (
+    <PermissionProvider>
     <div style={{ display: "flex", minHeight: "100vh", background: "#FAFAF7" }}>
       {/* Sidebar - Cần fixed hoặc có chiều rộng cố định */}
       <div style={{ width: sidebarWidth, flexShrink: 0 }}>
@@ -39,6 +41,7 @@ const AdminLayout = () => {
         </main>
       </div>
     </div>
+    </PermissionProvider>
   );
 };
 
