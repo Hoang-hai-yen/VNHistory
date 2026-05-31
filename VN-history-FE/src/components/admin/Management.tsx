@@ -57,6 +57,9 @@ const Management: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] =
     useState(false);
 
+  const [isViewModalOpen, setIsViewModalOpen] =
+    useState(false);
+
   const [selectedAdmin, setSelectedAdmin] =
     useState<AdminUser | null>(null);
 
@@ -90,6 +93,11 @@ const Management: React.FC = () => {
     } finally {
       setCreating(false);
     }
+  };
+
+  const handleOpenView = (user: AdminUser) => {
+    setSelectedAdmin(user);
+    setIsViewModalOpen(true);
   };
 
   const handleOpenEdit = (user: AdminUser) => {
@@ -253,9 +261,19 @@ const Management: React.FC = () => {
 
                 {/* Actions */}
                 <td className="action-buttons">
-                  <button className="btn-action-outline">Xem</button>
+                  <button
+                    className="btn-action-outline"
+                    onClick={() => handleOpenView(user)}
+                  >
+                    Xem
+                  </button>
 
-                  <button className="btn-action-outline">Sửa quyền</button>
+                  <button
+                    className="btn-action-outline"
+                    onClick={() => handleOpenEdit(user)}
+                  >
+                    Sửa quyền
+                  </button>
                   <button
                     className="btn-action-outline"
                     onClick={() => handleOpenEdit(user)}
@@ -381,6 +399,53 @@ const Management: React.FC = () => {
 
         </div>
       )}
+      {isViewModalOpen && selectedAdmin && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3 className="modal-title" style={{ color: '#C5A028', fontSize: '14px', fontFamily: 'Source Sans Pro' }}>
+              THÔNG TIN ADMIN
+            </h3>
+            <div className="form-group">
+              <label>Họ tên</label>
+              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.name}</p>
+            </div>
+            <div className="form-group">
+              <label>Email</label>
+              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.email}</p>
+            </div>
+            <div className="form-group">
+              <label>Vai trò</label>
+              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.role}</p>
+            </div>
+            <div className="form-group">
+              <label>Bài đã đăng</label>
+              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.postsCount}</p>
+            </div>
+            <div className="form-group">
+              <label>Báo cáo đã xử lý</label>
+              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.reportsHandled}</p>
+            </div>
+            <div className="form-group">
+              <label>Trạng thái</label>
+              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.status}</p>
+            </div>
+            <div className="form-group">
+              <label>Đăng nhập lần cuối</label>
+              <p style={{ color: '#fff', margin: '4px 0 12px' }}>
+                {selectedAdmin.lastLogin
+                  ? new Date(selectedAdmin.lastLogin).toLocaleString('vi-VN')
+                  : 'Chưa đăng nhập'}
+              </p>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-cancel-admin" onClick={() => setIsViewModalOpen(false)}>
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isEditModalOpen && selectedAdmin && (
         <div className="modal-overlay">
 

@@ -2,11 +2,13 @@ import React, { useMemo } from 'react';
 import '../../styles/Sidebar.css';
 import { NavLink, useNavigate } from "react-router-dom";
 import { useMeQuery, useLogoutMutation } from '../../hooks/api/useAuth';
+import { usePermissions } from '../../context/PermissionContext';
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const { data: meRes } = useMeQuery();
   const logoutMutation = useLogoutMutation();
+  const { hasPermission, isSuperAdmin } = usePermissions();
 
   const user = useMemo(() => {
     if (!meRes?.data) {
@@ -54,50 +56,46 @@ const Sidebar: React.FC = () => {
           Dashboard
         </NavLink>
 
-        <div className="menu-group-label">NỘI DUNG</div>
-        <NavLink to="/posts" className={navLinkClass}>
-          Bài viết
-          {/* <span className="badge" style={{ color: '#d4af37' }}>47</span> */}
-        </NavLink>
+        {(hasPermission("article.create") || hasPermission("article.edit_own") || hasPermission("article.edit_any")) && (
+          <>
+            <div className="menu-group-label">NỘI DUNG</div>
+            <NavLink to="/posts" className={navLinkClass}>Bài viết</NavLink>
+            {hasPermission("article.create") && (
+              <NavLink to="/create-post" className={navLinkClass}>Tạo bài mới</NavLink>
+            )}
+            {hasPermission("timeline.manage") && (
+              <NavLink to="/timeline" className={navLinkClass}>Timeline</NavLink>
+            )}
+          </>
+        )}
 
-        <NavLink to="/create-post" className={navLinkClass}>
-          Tạo bài mới
-        </NavLink>
+        {(hasPermission("report.view") || hasPermission("report.handle") || hasPermission("article.publish")) && (
+          <>
+            <div className="menu-group-label">XÉT DUYỆT</div>
+            {(hasPermission("report.view") || hasPermission("report.handle")) && (
+              <NavLink to="/reports" className={navLinkClass}>Báo cáo lỗi</NavLink>
+            )}
+            {hasPermission("article.publish") && (
+              <NavLink to="/pending" className={navLinkClass}>Chờ xuất bản</NavLink>
+            )}
+          </>
+        )}
 
-        <NavLink to="/timeline" className={navLinkClass}>
-          Timeline
-        </NavLink>
-
-        <div className="menu-group-label">XÉT DUYỆT</div>
-        <NavLink to="/reports" className={navLinkClass}>
-          Báo cáo lỗi
-          {/* <span className="badge" style={{ color: '#ff4d4d' }}>8</span> */}
-        </NavLink>
-
-        <NavLink to="/pending" className={navLinkClass}>
-          Chờ xuất bản{" "}
-          {/* <span className="badge" style={{ color: '#4da6ff' }}>5</span> */}
-        </NavLink>
-
-        {user.rawRole === "super_admin" && (
+        {(isSuperAdmin || hasPermission("admin.manage") || hasPermission("permissions.manage") || hasPermission("logs.view") || hasPermission("settings.manage")) && (
           <>
             <div className="menu-group-label">HỆ THỐNG</div>
-
-            <NavLink to="/management" className={navLinkClass}>
-              Quản lý Admin
-            </NavLink>
-
-            <NavLink to="/permissions" className={navLinkClass}>
-              Phân quyền
-            </NavLink>
-
-            <NavLink to="/history" className={navLinkClass}>
-              Nhật ký
-            </NavLink>
-
-            <NavLink to="/settings" className={navLinkClass}>
-              Cài đặt
-            </NavLink>
+            {hasPermission("admin.manage") && (
+              <NavLink to="/management" className={navLinkClass}>Quản lý Admin</NavLink>
+            )}
+            {hasPermission("permissions.manage") && (
+              <NavLink to="/permissions" className={navLinkClass}>Phân quyền</NavLink>
+            )}
+            {hasPermission("logs.view") && (
+              <NavLink to="/history" className={navLinkClass}>Nhật ký</NavLink>
+            )}
+            {hasPermission("settings.manage") && (
+              <NavLink to="/settings" className={navLinkClass}>Cài đặt</NavLink>
+            )}
           </>
         )}
       </nav>
