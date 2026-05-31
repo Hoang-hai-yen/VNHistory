@@ -5,6 +5,7 @@ import { highlightText } from '../../utils/highlightText';
 import { useSearch } from '../../context/SearchContext';
 import { httpClient } from '../../lib/http';
 import { useAdminTimelineQuery, useAdminTimelineEventsQuery } from '../../hooks/api/useAdminTimeline';
+import { usePublishArticleMutation, useRejectArticleMutation } from '../../hooks/api/useAdminArticles';
 
 interface Dynasty {
   id: string;
@@ -31,6 +32,8 @@ const Timeline: React.FC = () => {
   const activeDynasty = activeDynastyState || dynasties[0] || null;
 
   const { data: rawEvents = [] } = useAdminTimelineEventsQuery(activeDynasty?.id || "");
+  const publishMutation = usePublishArticleMutation();
+  const rejectMutation = useRejectArticleMutation();
 
   const events = useMemo(() => {
     return rawEvents.map((article: any) => ({
@@ -62,78 +65,76 @@ const Timeline: React.FC = () => {
     }
   };
 
+  const handlePublish = async (id: string) => {
+    try {
+      await publishMutation.mutateAsync(id);
+      alert("Xuất bản thành công");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Xuất bản thất bại");
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    try {
+      await rejectMutation.mutateAsync(id);
+      alert("Đã từ chối");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Từ chối thất bại");
+    }
+  };
+
+  const handleEditPost = async (id: string) => {
+    try {
+      const res = await httpClient.get<any>(`/admin/articles/${id}`);
+      navigate('/post-edit', { state: { article: res.data.data } });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // =========================
   // ACTIONS
   // =========================
-  const renderActions = (
-    item: TimelineEvent
-  ) => {
-
-    // Pending
+  const renderActions = (item: TimelineEvent) => {
     if (item.status === 'Chờ duyệt') {
-
       return (
         <div className="action-buttons">
-
-          <button className="btn btn-approve">
+          <button className="btn btn-approve" onClick={() => handlePublish(item.id)}>
             Duyệt & Xuất bản
           </button>
-
-          <button className="btn btn-reject">
+          <button className="btn btn-reject" onClick={() => handleReject(item.id)}>
             Từ chối
           </button>
-
         </div>
       );
     }
 
-    // Published
     if (item.status === 'Đã xuất bản') {
-
       return (
         <div className="action-buttons">
-
-          <button
-            className="btn btn-view"
-            onClick={() =>
-              handleViewPost(item.id)
-            }
-          >
+          <button className="btn btn-view" onClick={() => handleViewPost(item.id)}>
             Xem
           </button>
-
         </div>
       );
     }
 
-    // Draft
     if (item.status === 'Bản nháp') {
-
       return (
         <div className="action-buttons">
-
-          <button className="btn btn-edit-pub">
+          <button className="btn btn-edit-pub" onClick={() => handleEditPost(item.id)}>
             Chỉnh sửa
           </button>
-
         </div>
       );
     }
 
-    // Rejected
     if (item.status === 'Từ chối') {
-
       return (
         <div className="action-buttons">
-
-          <button className="btn btn-reason">
-            Lý do
-          </button>
-
-          <button className="btn btn-edit-pub">
+          <button className="btn btn-edit-pub" onClick={() => handleEditPost(item.id)}>
             Chỉnh sửa
           </button>
-
         </div>
       );
     }

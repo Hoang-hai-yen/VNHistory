@@ -1,159 +1,162 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import "../../styles/Posts.css";
+import { useNavigate } from "react-router-dom";
+import { useSearch } from "../../context/SearchContext";
+import { highlightText } from "../../utils/highlightText";
+import { httpClient } from "../../lib/http";
+import {
+  useAdminArticlesQuery,
+  usePublishArticleMutation,
+  useRejectArticleMutation,
+} from "../../hooks/api/useAdminArticles";
 
-// Định nghĩa các loại Tab lọc theo trạng thái xuất bản
 type PublishTab = "TẤT CẢ" | "XUẤT BẢN" | "CHỜ DUYỆT" | "BẢN NHÁP";
 
-interface ContentItem {
-  id: number;
-  title: string;
-  subtitle?: string;
-  type: "SỰ KIỆN" | "NHÂN VẬT";
-  dynasty: string;
-  assignee: string;
-  date: string;
-  status: "Chờ duyệt" | "Đang xem xét" | "Đã xuất bản" | "Bản nháp" | "Từ chối";
-}
+const STATUS_MAP: Record<PublishTab, string | undefined> = {
+  "TẤT CẢ": undefined,
+  "XUẤT BẢN": "published",
+  "CHỜ DUYỆT": "pending",
+  "BẢN NHÁP": "draft",
+};
 
 const Posts: React.FC = () => {
   const [activeTab, setActiveTab] = useState<PublishTab>("TẤT CẢ");
+  const navigate = useNavigate();
+  const { searchText } = useSearch();
 
-  const contentData: ContentItem[] = [
-    {
-      id: 1,
-      title: "Trận Bạch Đằng (938)",
-      type: "SỰ KIỆN",
-      dynasty: "Nhà Ngô",
-      assignee: "Trần Thị B",
-      date: "25/03/2026",
-      status: "Chờ duyệt",
-    },
-    {
-      id: 2,
-      title: "Nguyễn Trãi — Nhà văn hoá lớn",
-      type: "NHÂN VẬT",
-      dynasty: "Lê sơ",
-      assignee: "Lê Văn C",
-      date: "24/03/2026",
-      status: "Đang xem xét",
-    },
-    {
-      id: 3,
-      title: "Khởi nghĩa Lam Sơn (1418–1427)",
-      type: "SỰ KIỆN",
-      dynasty: "Hậu Lê",
-      assignee: "Admin",
-      date: "23/03/2026",
-      status: "Đã xuất bản",
-    },
-    {
-      id: 4,
-      title: "Nhà Trần và kháng chiến Nguyên Mông",
-      subtitle: "Có báo cáo lỗi: Ngày tháng sai",
-      type: "SỰ KIỆN",
-      dynasty: "Trần",
-      assignee: "Lê Văn C",
-      date: "22/03/2026",
-      status: "Chờ duyệt",
-    },
-    {
-      id: 5,
-      title: "Đinh Bộ Lĩnh thống nhất đất nước",
-      type: "NHÂN VẬT",
-      dynasty: "Đinh",
-      assignee: "Nguyễn Thị A",
-      date: "21/03/2026",
-      status: "Bản nháp",
-    },
-    {
-      id: 6,
-      title: "Văn hoá Đông Sơn — nguồn gốc trống đồng",
-      type: "SỰ KIỆN",
-      dynasty: "Hùng Vương",
-      assignee: "Admin",
-      date: "20/03/2026",
-      status: "Từ chối",
-    },
-  ];
+  const { data: allArticles = [] } = useAdminArticlesQuery({ limit: 100 });
+  const publishMutation = usePublishArticleMutation();
+  const rejectMutation = useRejectArticleMutation();
 
-  const renderStatusTag = (status: string) => {
-    const statusMap: Record<string, string> = {
-      "Chờ duyệt": "pending",
-      "Đang xem xét": "reviewing",
-      "Đã xuất bản": "published",
-      "Bản nháp": "draft",
-      "Từ chối": "rejected",
-    };
-    return (
-      <span className={`status-tag status-${statusMap[status]}`}>{status}</span>
-    );
+  const filteredData = useMemo(() => {
+    const statusFilter = STATUS_MAP[activeTab];
+    return statusFilter
+      ? allArticles.filter((a: any) => a.status === statusFilter)
+      : allArticles;
+  }, [allArticles, activeTab]);
+
+  const counts = useMemo(() => ({
+    all: allArticles.length,
+    published: allArticles.filter((a: any) => a.status === "published").length,
+    pending: allArticles.filter((a: any) => a.status === "pending").length,
+    draft: allArticles.filter((a: any) => a.status === "draft").length,
+  }), [allArticles]);
+
+  const handleViewPost = async (id: string) => {
+    try {
+      const res = await httpClient.get<any>(`/admin/articles/${id}`);
+      navigate("/post-detail", { state: { article: res.data.data } });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const renderActions = (item: ContentItem) => {
-    if (item.status === "Đã xuất bản" || item.status === "Bản nháp") {
+  const handleEditPost = async (id: string) => {
+    try {
+      const res = await httpClient.get<any>(`/admin/articles/${id}`);
+      navigate("/post-edit", { state: { article: res.data.data } });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlePublish = async (id: string) => {
+    try {
+      await publishMutation.mutateAsync(id);
+      alert("Xuất bản thành công");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Xuất bản thất bại");
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    try {
+      await rejectMutation.mutateAsync(id);
+      alert("Đã từ chối");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Từ chối thất bại");
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const map: Record<string, string> = {
+      pending: "Chờ duyệt",
+      published: "Đã xuất bản",
+      draft: "Bản nháp",
+      rejected: "Từ chối",
+    };
+    return map[status] || status;
+  };
+
+  const getStatusClass = (status: string) => {
+    const map: Record<string, string> = {
+      pending: "pending",
+      published: "published",
+      draft: "draft",
+      rejected: "rejected",
+    };
+    return map[status] || "draft";
+  };
+
+  const renderActions = (item: any) => {
+    if (item.status === "published") {
       return (
         <div className="action-group">
-          <button className="btn-action btn-blue-text">Chỉnh sửa</button>
-          <button className="btn-action btn-gray-text">Xem</button>
+          <button className="btn-action btn-gray-text" onClick={() => handleViewPost(item.id)}>Xem</button>
+          <button className="btn-action btn-blue-text" onClick={() => handleEditPost(item.id)}>Chỉnh sửa</button>
         </div>
       );
     }
-    if (item.status === "Từ chối") {
+    if (item.status === "draft") {
       return (
         <div className="action-group">
-          <button className="btn-action btn-red-text">Lý do</button>
-          <button className="btn-action btn-blue-text">Chỉnh sửa</button>
+          <button className="btn-action btn-blue-text" onClick={() => handleEditPost(item.id)}>Chỉnh sửa</button>
+        </div>
+      );
+    }
+    if (item.status === "rejected") {
+      return (
+        <div className="action-group">
+          <button className="btn-action btn-blue-text" onClick={() => handleEditPost(item.id)}>Chỉnh sửa</button>
         </div>
       );
     }
     return (
       <div className="action-group">
-        <button className="btn-action btn-green-text">Duyệt</button>
-        <button className="btn-action btn-red-text">Từ chối</button>
-        <button className="btn-action btn-blue-text">Sửa</button>
+        <button className="btn-action btn-gray-text" onClick={() => handleViewPost(item.id)}>Xem</button>
+        <button className="btn-action btn-green-text" onClick={() => handlePublish(item.id)}>Duyệt</button>
+        <button className="btn-action btn-red-text" onClick={() => handleReject(item.id)}>Từ chối</button>
+        <button className="btn-action btn-blue-text" onClick={() => handleEditPost(item.id)}>Sửa</button>
       </div>
     );
   };
 
   return (
     <div className="posts-page">
-      {/* Header điều hướng và nút tạo bài mới */}
       <div className="posts-toolbar">
         <div className="tabs-container">
-          <button
-            className={`tab-link ${activeTab === "TẤT CẢ" ? "active" : ""}`}
-            onClick={() => setActiveTab("TẤT CẢ")}
-          >
-            TẤT CẢ (1,284)
-          </button>
-          <button
-            className={`tab-link ${activeTab === "XUẤT BẢN" ? "active" : ""}`}
-            onClick={() => setActiveTab("XUẤT BẢN")}
-          >
-            XUẤT BẢN (1,102)
-          </button>
-          <button
-            className={`tab-link ${activeTab === "CHỜ DUYỆT" ? "active" : ""}`}
-            onClick={() => setActiveTab("CHỜ DUYỆT")}
-          >
-            CHỜ DUYỆT (47)
-          </button>
-          <button
-            className={`tab-link ${activeTab === "BẢN NHÁP" ? "active" : ""}`}
-            onClick={() => setActiveTab("BẢN NHÁP")}
-          >
-            BẢN NHÁP (135)
-          </button>
+          {(["TẤT CẢ", "XUẤT BẢN", "CHỜ DUYỆT", "BẢN NHÁP"] as PublishTab[]).map((tab) => {
+            const countMap = { "TẤT CẢ": counts.all, "XUẤT BẢN": counts.published, "CHỜ DUYỆT": counts.pending, "BẢN NHÁP": counts.draft };
+            return (
+              <button
+                key={tab}
+                className={`tab-link ${activeTab === tab ? "active" : ""}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab} ({countMap[tab]})
+              </button>
+            );
+          })}
         </div>
-        <button className="btn-create-primary">+ TẠO BÀI MỚI</button>
+        <button className="btn-create-primary" onClick={() => navigate("/create-post")}>
+          + TẠO BÀI MỚI
+        </button>
       </div>
 
-      {/* Bảng dữ liệu */}
       <section className="posts-table-section">
         <table className="posts-main-table">
           <thead>
             <tr>
-              {/* <th style={{ width: '40px' }}><input type="checkbox" /></th> */}
               <th>TIÊU ĐỀ</th>
               <th>LOẠI</th>
               <th>TRIỀU ĐẠI</th>
@@ -164,26 +167,24 @@ const Posts: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {contentData.map((item) => (
+            {filteredData.map((item: any) => (
               <tr key={item.id}>
-                {/* <td><input type="checkbox" /></td> */}
                 <td className="title-column">
-                  <div className="title-main">{item.title}</div>
-                  {item.subtitle && (
-                    <div className="title-sub">⚠ {item.subtitle}</div>
-                  )}
+                  <div className="title-main">{highlightText(item.title, searchText)}</div>
                 </td>
                 <td>
-                  <span
-                    className={`type-badge ${item.type === "SỰ KIỆN" ? "type-event" : "type-person"}`}
-                  >
-                    {item.type}
+                  <span className={`type-badge ${item.type === "event" ? "type-event" : item.type === "person" ? "type-person" : "type-event"}`}>
+                    {item.type === "event" ? "SỰ KIỆN" : item.type === "person" ? "NHÂN VẬT" : item.type === "place" ? "DI SẢN" : "KHÁC"}
                   </span>
                 </td>
-                <td>{item.dynasty}</td>
-                <td>{item.assignee}</td>
-                <td>{item.date}</td>
-                <td>{renderStatusTag(item.status)}</td>
+                <td>{highlightText(item.dynasty_name || "", searchText)}</td>
+                <td>{highlightText(item.created_by_name || "", searchText)}</td>
+                <td>{highlightText(new Date(item.created_at).toLocaleDateString("vi-VN"), searchText)}</td>
+                <td>
+                  <span className={`status-tag status-${getStatusClass(item.status)}`}>
+                    {getStatusLabel(item.status)}
+                  </span>
+                </td>
                 <td>{renderActions(item)}</td>
               </tr>
             ))}
