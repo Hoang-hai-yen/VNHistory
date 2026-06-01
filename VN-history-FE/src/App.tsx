@@ -21,7 +21,6 @@ import GeographyPage from "./pages/CulturePage";
 import VideoLibraryPage from "./pages/VideoLibraryPage";
 import VideoDetailPage from "./pages/VideoDetailPage";
 import ReportPage from "./pages/ReportPage";
-import PostDetail from "./components/PostDetail";
 import PostEdit from "./components/PostEdit";
 import PostPreview from "./components/PostPreview";
 import { SearchProvider } from "./context/SearchContext";
@@ -60,7 +59,6 @@ function App() {
         <Route path="permissions" element={<PermissionGuard permissionKey="permissions.manage"><Permissions /></PermissionGuard>} />
         <Route path="history" element={<PermissionGuard permissionKey="logs.view"><History /></PermissionGuard>} />
         <Route path="settings" element={<PermissionGuard permissionKey="settings.manage"><Settings /></PermissionGuard>} />
-        <Route path="post-detail" element={<PostDetail />} />
         <Route path="post-edit" element={<PermissionGuard permissionKey="article.edit_own"><PostEdit /></PermissionGuard>} />
         <Route path="post-preview" element={<PostPreview />} />
       </Route>

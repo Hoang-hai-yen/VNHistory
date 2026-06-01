@@ -5,6 +5,7 @@ export interface AdminArticleListParams {
   status?: string;
   page?: number;
   limit?: number;
+  created_by?: string;
 }
 
 export interface AdminArticleResponse {
@@ -17,12 +18,13 @@ export interface AdminArticleDetailResponse {
 
 export function useAdminArticlesQuery(params: AdminArticleListParams = {}) {
   return useQuery<any[]>({
-    queryKey: ["adminArticles", params.status ?? "all", params.page ?? 1, params.limit ?? 20],
+    queryKey: ["adminArticles", params.status ?? "all", params.page ?? 1, params.limit ?? 20, params.created_by ?? ""],
     queryFn: async () => {
       const searchParams = new URLSearchParams();
       if (params.status) searchParams.append("status", params.status);
       if (params.page) searchParams.append("page", String(params.page));
       if (params.limit) searchParams.append("limit", String(params.limit));
+      if (params.created_by) searchParams.append("created_by", params.created_by);
 
       const query = searchParams.toString();
       const res = await httpClient.get<AdminArticleResponse>(`/admin/articles${query ? `?${query}` : ""}`);

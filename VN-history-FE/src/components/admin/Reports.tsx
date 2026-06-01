@@ -10,12 +10,16 @@ import {
   useAssignReportMutation,
   useFlagReportMutation,
   useResolveReportMutation,
-  useRejectReportMutation
+  useRejectReportMutation,
+  useSaveReportNoteMutation,
+  useMarkFixedReportMutation,
 } from '../../hooks/api/useAdminReports';
+import { usePermissions } from '../../context/PermissionContext';
 
 
 
 const Reports: React.FC = () => {
+  const { isSuperAdmin } = usePermissions();
   const { data: reports = [] } = useAdminReportsQuery();
   const { data: adminsRaw = [] } = useAdminAdminsQuery();
 
@@ -23,10 +27,12 @@ const Reports: React.FC = () => {
   const flagReportMutation = useFlagReportMutation();
   const resolveReportMutation = useResolveReportMutation();
   const rejectReportMutation = useRejectReportMutation();
+  const saveNoteMutation = useSaveReportNoteMutation();
+  const markFixedMutation = useMarkFixedReportMutation();
 
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [adminNote, setAdminNote] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'new' | 'reviewing' | 'resolved' | 'flagged'>('new');
+  const [activeTab, setActiveTab] = useState<'new' | 'reviewing' | 'fixed' | 'resolved' | 'flagged'>('new');
   const [selectedAdmin, setSelectedAdmin] = useState<string>('');
 
   const navigate = useNavigate();
@@ -41,6 +47,7 @@ const Reports: React.FC = () => {
       if (activeTab === 'new') return report.status === 'new';
       if (activeTab === 'reviewing') return report.status === 'reviewing';
       if (activeTab === 'flagged') return report.status === 'flagged';
+      if (activeTab === 'fixed') return report.status === 'fixed';
       if (activeTab === 'resolved') return report.status === 'resolved' || report.status === 'rejected';
       return false;
     });
@@ -166,11 +173,31 @@ const Reports: React.FC = () => {
   const handleResolveReport = async () => {
     if (!selectedReport) return;
     try {
-      await resolveReportMutation.mutateAsync(selectedReport.id);
+      await resolveReportMutation.mutateAsync({ id: selectedReport.id, admin_note: adminNote || undefined });
       alert('Đã xử lý báo cáo');
     } catch (error) {
       console.log(error);
       alert('Xử lý báo cáo thất bại');
+    }
+  };
+
+  const handleSaveNote = async () => {
+    if (!selectedReport) return;
+    try {
+      await saveNoteMutation.mutateAsync({ id: selectedReport.id, admin_note: adminNote });
+      alert('Đã lưu ghi chú');
+    } catch (error) {
+      alert('Lưu ghi chú thất bại');
+    }
+  };
+
+  const handleMarkFixed = async () => {
+    if (!selectedReport) return;
+    try {
+      await markFixedMutation.mutateAsync({ id: selectedReport.id, admin_note: adminNote || undefined });
+      alert('Đã đánh dấu sửa xong, chờ super admin xác nhận');
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Thất bại');
     }
   };
 
@@ -219,40 +246,31 @@ const Reports: React.FC = () => {
           </button>
 
           <button
-            className={`tab ${
-              activeTab === 'reviewing'
-                ? 'active'
-                : ''
-            }`}
-            onClick={() =>
-              setActiveTab('reviewing')
-            }
+            className={`tab ${activeTab === 'reviewing' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reviewing')}
           >
             ĐANG XỬ LÝ
           </button>
-          
+
+          {isSuperAdmin && (
+            <button
+              className={`tab ${activeTab === 'fixed' ? 'active' : ''}`}
+              onClick={() => setActiveTab('fixed')}
+            >
+              CHỜ XÁC NHẬN
+            </button>
+          )}
+
           <button
-            className={`tab ${
-              activeTab === 'flagged'
-                ? 'active'
-                : ''
-            }`}
-            onClick={() =>
-              setActiveTab('flagged')
-            }
+            className={`tab ${activeTab === 'flagged' ? 'active' : ''}`}
+            onClick={() => setActiveTab('flagged')}
           >
             ĐÃ GẮN CỜ
           </button>
 
           <button
-            className={`tab ${
-              activeTab === 'resolved'
-                ? 'active'
-                : ''
-            }`}
-            onClick={() =>
-              setActiveTab('resolved')
-            }
+            className={`tab ${activeTab === 'resolved' ? 'active' : ''}`}
+            onClick={() => setActiveTab('resolved')}
           >
             ĐÃ XONG
           </button>
@@ -346,41 +364,48 @@ const Reports: React.FC = () => {
 
               {selectedReport?.status !== 'resolved' &&
                 selectedReport?.status !== 'rejected' && (
-
                 <div className="header-actions">
 
-                  <button
-                    className="btn-danger"
-                    onClick={handleRejectReport}
-                  >
-                    Từ chối
-                  </button>
-
-                  {selectedReport?.status !== 'flagged' && (
-                    <button
-                      className="btn-warning"
-                      onClick={handleFlagReport}
-                    >
-                      GẮN CỜ
-                    </button>
+                  {/* Admin được giao: chỉ thấy Mở bài sửa + Đã sửa xong */}
+                  {!isSuperAdmin && selectedReport?.status === 'reviewing' && (
+                    <>
+                      <button className="btn-info" onClick={handleOpenPostEdit}>
+                        Mở bài để sửa
+                      </button>
+                      <button className="btn-success" onClick={handleMarkFixed}>
+                        ĐÃ SỬA XONG
+                      </button>
+                    </>
                   )}
 
-                  <button
-                    className="btn-info"
-                    onClick={handleOpenPostEdit}
-                  >
-                    Mở bài để sửa
-                  </button>
-
-                  <button
-                    className="btn-success"
-                    onClick={handleResolveReport}
-                  >
-                    Xử lý xong
-                  </button>
+                  {/* Super admin: toàn quyền */}
+                  {isSuperAdmin && (
+                    <>
+                      <button className="btn-danger" onClick={handleRejectReport}>
+                        Từ chối
+                      </button>
+                      {selectedReport?.status !== 'flagged' && selectedReport?.status !== 'fixed' && (
+                        <button className="btn-warning" onClick={handleFlagReport}>
+                          GẮN CỜ
+                        </button>
+                      )}
+                      <button className="btn-info" onClick={handleOpenPostEdit}>
+                        Mở bài để sửa
+                      </button>
+                      {selectedReport?.status === 'fixed' && (
+                        <button className="btn-success" onClick={handleResolveReport}>
+                          XÁC NHẬN XONG
+                        </button>
+                      )}
+                      {selectedReport?.status !== 'fixed' && (
+                        <button className="btn-success" onClick={handleResolveReport}>
+                          Xử lý xong
+                        </button>
+                      )}
+                    </>
+                  )}
 
                 </div>
-
                 )}
 
             </div>
@@ -539,16 +564,18 @@ const Reports: React.FC = () => {
 
               <textarea
                 value={adminNote}
-                onChange={(e) =>
-                  setAdminNote(
-                    e.target.value
-                  )
-                }
-                placeholder={
-                  selectedReport.admin_note ||
-                  'Thêm ghi chú...'
-                }
+                onChange={(e) => setAdminNote(e.target.value)}
+                placeholder={selectedReport.admin_note || 'Thêm ghi chú...'}
+                style={{ color: '#333', background: '#fff' }}
               />
+              <button
+                className="btn-gold"
+                style={{ marginTop: '8px' }}
+                onClick={handleSaveNote}
+                disabled={saveNoteMutation.isPending}
+              >
+                {saveNoteMutation.isPending ? 'Đang lưu...' : 'Lưu ghi chú'}
+              </button>
 
             </section>
 

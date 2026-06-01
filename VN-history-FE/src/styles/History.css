@@ -102,9 +102,21 @@
 
 .target-cell {
   color: #2E2510;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .details-cell {
   color: #767676;
   font-style: italic;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.time-cell {
+  white-space: nowrap;
 }

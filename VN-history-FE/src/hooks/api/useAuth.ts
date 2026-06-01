@@ -13,6 +13,7 @@ export interface LoginResponse {
 
 export interface MeResponse {
   data: {
+    id: string;
     full_name: string;
     role: string;
     email: string;
