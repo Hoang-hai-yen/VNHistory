@@ -160,6 +160,12 @@ export default function ArticleDetailPage() {
                       {children}
                     </p>
                   ),
+                  img: ({ src, alt }) => (
+                    <span className="block text-center my-6">
+                      <img src={src} alt={alt} className="inline-block max-w-full rounded-sm shadow-md" />
+                      {alt && <span className="block text-[12px] text-[#888] italic mt-2">{alt}</span>}
+                    </span>
+                  ),
                 }}
               >
                 {articleData?.content || ""}

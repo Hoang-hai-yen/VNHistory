@@ -179,7 +179,10 @@ const PostPreview: React.FC = () => {
                   <p className="text-[15px] text-[#2c2c2c] leading-relaxed mb-6">{children}</p>
                 ),
                 img: ({ src, alt }) => (
-                  <img src={src} alt={alt} className="w-full rounded-sm my-6 shadow-md" />
+                  <span className="block text-center my-6">
+                    <img src={src} alt={alt} className="inline-block max-w-full rounded-sm shadow-md" />
+                    {alt && <span className="block text-[12px] text-[#888] italic mt-2">{alt}</span>}
+                  </span>
                 ),
               }}
             >
