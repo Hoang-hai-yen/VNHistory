@@ -8,6 +8,7 @@ import {
   usePublishArticleMutation,
   useRejectArticleMutation,
 } from "../../hooks/api/useAdminArticles";
+import { useMeQuery } from "../../hooks/api/useAuth";
 
 type PublishTab = "TẤT CẢ" | "XUẤT BẢN" | "CHỜ DUYỆT" | "BẢN NHÁP";
 
@@ -32,7 +33,13 @@ const Posts: React.FC = () => {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
 
-  const { data: allArticles = [] } = useAdminArticlesQuery({ limit: 200 });
+  const { data: meRes } = useMeQuery();
+  const isAdmin = meRes?.data?.role === "admin";
+  const myId = meRes?.data?.id;
+  const { data: allArticles = [] } = useAdminArticlesQuery({
+    limit: 200,
+    ...(isAdmin && myId ? { created_by: myId } : {}),
+  });
   const publishMutation = usePublishArticleMutation();
   const rejectMutation = useRejectArticleMutation();
 

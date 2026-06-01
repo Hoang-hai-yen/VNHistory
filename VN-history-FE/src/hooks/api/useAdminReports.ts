@@ -66,9 +66,9 @@ export function useFlagReportMutation() {
 
 export function useResolveReportMutation() {
   const queryClient = useQueryClient();
-  return useMutation<any, any, string>({
-    mutationFn: async (id) => {
-      const res = await httpClient.patch(`/admin/reports/${id}/resolve`, {});
+  return useMutation<any, any, { id: string; admin_note?: string }>({
+    mutationFn: async ({ id, admin_note }) => {
+      const res = await httpClient.patch(`/admin/reports/${id}/resolve`, { admin_note });
       return res.data;
     },
     onSuccess: () => {
@@ -83,6 +83,33 @@ export function useRejectReportMutation() {
   return useMutation<any, any, string>({
     mutationFn: async (id) => {
       const res = await httpClient.patch(`/admin/reports/${id}/reject`, {});
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminReports"] });
+      queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
+    },
+  });
+}
+
+export function useSaveReportNoteMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<any, any, { id: string; admin_note: string }>({
+    mutationFn: async ({ id, admin_note }) => {
+      const res = await httpClient.patch(`/admin/reports/${id}/save-note`, { admin_note });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminReports"] });
+    },
+  });
+}
+
+export function useMarkFixedReportMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<any, any, { id: string; admin_note?: string }>({
+    mutationFn: async ({ id, admin_note }) => {
+      const res = await httpClient.patch(`/admin/reports/${id}/mark-fixed`, { admin_note });
       return res.data;
     },
     onSuccess: () => {
