@@ -279,21 +279,11 @@ const CreatePost: React.FC = () => {
                 value={formData.type}
                 onChange={handleChange}
               >
-                <option value="event">
-                  Sự kiện
-                </option>
-
-                <option value="person">
-                  Nhân vật
-                </option>
-
-                <option value="place">
-                  Di sản
-                </option>
-
-                <option value="video">
-                  Khác
-                </option>
+                <option value="event">Sự kiện</option>
+                <option value="person">Nhân vật</option>
+                <option value="place">Di sản</option>
+                <option value="culture">Văn hóa</option>
+                <option value="video">Video / Khác</option>
               </select>
             </div>
 

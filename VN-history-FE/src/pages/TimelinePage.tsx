@@ -283,22 +283,22 @@ export default function TimelinePage() {
                                 >
                                   <div className="group relative aspect-[16/9] overflow-hidden rounded-sm border border-[#D4A017]/20 bg-[#1A1208] shadow-lg">
                                     <div className="absolute inset-0 z-10 bg-gradient-to-tr from-[#1A1208] to-transparent opacity-60" />
-                                    <div className="flex h-full w-full items-center justify-center transition-transform duration-700 group-hover:scale-110">
-                                      {event.type === "person" && (
-                                        <Users className="h-16 w-16 text-[#D4A017]/30" />
-                                      )}
-                                      {event.type === "event" && (
-                                        <Calendar className="h-16 w-16 text-[#D4A017]/30" />
-                                      )}
-                                      {event.type === "place" && (
-                                        <MapPin className="h-16 w-16 text-[#D4A017]/30" />
-                                      )}
-                                      {event.type === "video" && (
-                                        <Play className="h-16 w-16 text-[#D4A017]/30" />
-                                      )}
-                                    </div>
+                                    {event.cover_image_url ? (
+                                      <img
+                                        src={event.cover_image_url}
+                                        alt={event.title}
+                                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                      />
+                                    ) : (
+                                      <div className="flex h-full w-full items-center justify-center transition-transform duration-700 group-hover:scale-110">
+                                        {event.type === "person" && <Users className="h-16 w-16 text-[#D4A017]/30" />}
+                                        {event.type === "event" && <Calendar className="h-16 w-16 text-[#D4A017]/30" />}
+                                        {event.type === "place" && <MapPin className="h-16 w-16 text-[#D4A017]/30" />}
+                                        {event.type === "video" && <Play className="h-16 w-16 text-[#D4A017]/30" />}
+                                      </div>
+                                    )}
                                     <div className="absolute bottom-4 left-4 z-20 text-[10px] font-bold uppercase tracking-[2px] text-[#D4A017]">
-                                      Tư Liệu Hình Ảnh
+                                      {event.cover_image_url ? event.category_name : "Tư Liệu Hình Ảnh"}
                                     </div>
                                   </div>
                                 </div>

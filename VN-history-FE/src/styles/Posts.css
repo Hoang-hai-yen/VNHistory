@@ -92,10 +92,12 @@
 /* Badges */
 .type-badge {
   color: #aaa;
-  font-size: 14px;
+  font-size: 12px;
   padding: 4px 10px;
   border-radius: 4px;
   border: 1px solid currentColor;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 /* Status Tags */
