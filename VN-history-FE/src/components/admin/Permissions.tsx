@@ -37,7 +37,7 @@ const Permissions: React.FC = () => {
 
   const handleSave = async (role: string) => {
     try {
-      await updateMutation.mutateAsync({ role, ...localPerms[role] } as any);
+      await updateMutation.mutateAsync(localPerms[role]);
       alert("Lưu quyền thành công");
     } catch (error: any) {
       alert(error.response?.data?.message || "Lưu thất bại");
