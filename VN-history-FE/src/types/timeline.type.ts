@@ -27,5 +27,6 @@ export interface Event {
   article_year: number;
   year_display: string;
   category_name: string;
+  cover_image_url?: string;
   created_at: string;
 }
