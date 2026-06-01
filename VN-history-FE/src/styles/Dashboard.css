@@ -176,10 +176,12 @@
 
 /* Status tags style */
 .status-tag {
-  font-size: 14px;
+  font-size: 12px;
   padding: 4px 10px;
   border-radius: 20px;
   color: #fff;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .status-pending { background-color: #C5A028; }

@@ -80,19 +80,10 @@ const PostDetail: React.FC = () => {
   return (
     <div className="create-post-container">
 
-      <div className="create-post-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-
+      <div className="create-post-header">
         <h2 className="main-page-title">
           CHI TIẾT BÀI VIẾT
         </h2>
-
-        <button
-          className="btn-publish-now"
-          onClick={() => navigate('/post-edit', { state: { article } })}
-        >
-          CHỈNH SỬA
-        </button>
-
       </div>
 
       <div className="create-post-content">
@@ -231,6 +222,15 @@ const PostDetail: React.FC = () => {
                   marginTop: '10px',
                 }}
               />
+            </div>
+
+            <div style={{ marginTop: '20px' }}>
+              <button
+                className="btn-publish-now"
+                onClick={() => navigate('/post-edit', { state: { article } })}
+              >
+                CHỈNH SỬA
+              </button>
             </div>
 
           </div>
