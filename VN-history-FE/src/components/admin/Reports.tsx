@@ -32,7 +32,7 @@ const Reports: React.FC = () => {
 
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [adminNote, setAdminNote] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'new' | 'reviewing' | 'fixed' | 'resolved' | 'flagged'>('new');
+  const [activeTab, setActiveTab] = useState<'new' | 'reviewing' | 'fixed' | 'resolved'>('new');
   const [selectedAdmin, setSelectedAdmin] = useState<string>('');
 
   const navigate = useNavigate();
@@ -42,11 +42,16 @@ const Reports: React.FC = () => {
     return adminsRaw.filter((admin: any) => admin.is_active === 1);
   }, [adminsRaw]);
 
+  const counts = useMemo(() => ({
+    new: reports.filter((r) => r.status === 'new').length,
+    reviewing: reports.filter((r) => r.status === 'reviewing').length,
+    fixed: reports.filter((r) => r.status === 'fixed').length,
+  }), [reports]);
+
   const filteredReports = useMemo(() => {
     return reports.filter((report) => {
       if (activeTab === 'new') return report.status === 'new';
       if (activeTab === 'reviewing') return report.status === 'reviewing';
-      if (activeTab === 'flagged') return report.status === 'flagged';
       if (activeTab === 'fixed') return report.status === 'fixed';
       if (activeTab === 'resolved') return report.status === 'resolved' || report.status === 'rejected';
       return false;
@@ -242,14 +247,14 @@ const Reports: React.FC = () => {
               setActiveTab('new')
             }
           >
-            MỚI
+            MỚI {counts.new > 0 && <span style={{ marginLeft: 4, background: '#C5302A', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 10 }}>{counts.new}</span>}
           </button>
 
           <button
             className={`tab ${activeTab === 'reviewing' ? 'active' : ''}`}
             onClick={() => setActiveTab('reviewing')}
           >
-            ĐANG XỬ LÝ
+            ĐANG XỬ LÝ {counts.reviewing > 0 && <span style={{ marginLeft: 4, background: '#3A7AB0', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 10 }}>{counts.reviewing}</span>}
           </button>
 
           {isSuperAdmin && (
@@ -257,16 +262,9 @@ const Reports: React.FC = () => {
               className={`tab ${activeTab === 'fixed' ? 'active' : ''}`}
               onClick={() => setActiveTab('fixed')}
             >
-              CHỜ XÁC NHẬN
+              CHỜ XÁC NHẬN {counts.fixed > 0 && <span style={{ marginLeft: 4, background: '#C5A028', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 10 }}>{counts.fixed}</span>}
             </button>
           )}
-
-          <button
-            className={`tab ${activeTab === 'flagged' ? 'active' : ''}`}
-            onClick={() => setActiveTab('flagged')}
-          >
-            ĐÃ GẮN CỜ
-          </button>
 
           <button
             className={`tab ${activeTab === 'resolved' ? 'active' : ''}`}
@@ -384,11 +382,6 @@ const Reports: React.FC = () => {
                       <button className="btn-danger" onClick={handleRejectReport}>
                         Từ chối
                       </button>
-                      {selectedReport?.status !== 'flagged' && selectedReport?.status !== 'fixed' && (
-                        <button className="btn-warning" onClick={handleFlagReport}>
-                          GẮN CỜ
-                        </button>
-                      )}
                       <button className="btn-info" onClick={handleOpenPostEdit}>
                         Mở bài để sửa
                       </button>
