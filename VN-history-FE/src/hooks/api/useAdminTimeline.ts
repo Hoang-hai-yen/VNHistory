@@ -5,6 +5,8 @@ export interface AdminDynastyRaw {
   id: string;
   name: string;
   year_display: string;
+  year_start: number;
+  year_end: number;
   event_count: number;
 }
 

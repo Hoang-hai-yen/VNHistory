@@ -125,7 +125,7 @@ const Dashboard: React.FC = () => {
   const handleViewPost = async (id: string) => {
     try {
       const res = await httpClient.get<any>(`/admin/articles/${id}`);
-      navigate('/post-detail', {
+      navigate('/post-preview', {
         state: {
           article: res.data.data,
         },
@@ -449,7 +449,16 @@ const Dashboard: React.FC = () => {
               openReports.map((report: any) => (
                 <div key={report.id} className="report-item">
                   <div className="report-main">
-                    <p className="report-title">{report.title}</p>
+                    <p className="report-title" style={{ fontWeight: 500, fontSize: '13px', color: '#1c1c1c', marginBottom: '2px' }}>
+                      {report.article_title}
+                    </p>
+                    <p style={{ fontSize: '11px', color: '#888' }}>
+                      {report.error_type}
+                      {' · '}
+                      <span style={{ color: report.severity === 'high' ? '#c5302a' : report.severity === 'medium' ? '#C5A028' : '#666' }}>
+                        {report.severity === 'high' ? 'Nghiêm trọng' : report.severity === 'medium' ? 'Trung bình' : 'Thấp'}
+                      </span>
+                    </p>
                   </div>
                 </div>
               ))

@@ -103,7 +103,6 @@ const Sidebar: React.FC = () => {
       {/* Footer */}
       <footer className="sidebar-footer">
         <div className="user-profile">
-          <div className="avatar-circle">NM</div>
           <div>
             <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{user.name}</div>
             <div style={{ fontSize: '11px', color: '#666' }}>{user.role}</div>

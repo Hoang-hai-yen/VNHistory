@@ -63,7 +63,7 @@ const Posts: React.FC = () => {
   const handleViewPost = async (id: string) => {
     try {
       const res = await httpClient.get<any>(`/admin/articles/${id}`);
-      navigate("/post-detail", { state: { article: res.data.data } });
+      navigate("/post-preview", { state: { article: res.data.data } });
     } catch (error) { console.log(error); }
   };
 
@@ -159,7 +159,7 @@ const Posts: React.FC = () => {
           style={{
             flex: 1, minWidth: "220px", padding: "8px 12px",
             border: "1px solid #ddd", borderRadius: "6px",
-            fontSize: "13px", outline: "none",
+            fontSize: "13px", outline: "none", color: "#333", background: "#fff",
           }}
         />
         <select
@@ -168,7 +168,7 @@ const Posts: React.FC = () => {
           style={{
             padding: "8px 12px", border: "1px solid #ddd",
             borderRadius: "6px", fontSize: "13px",
-            background: "#fff", cursor: "pointer",
+            background: "#fff", cursor: "pointer", color: "#333",
           }}
         >
           <option value="">Tất cả loại</option>

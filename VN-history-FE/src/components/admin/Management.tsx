@@ -205,8 +205,6 @@ const Management: React.FC = () => {
               <tr key={user.id}>
                 {/* User */}
                 <td className="user-profile-cell">
-                  <div className="avatar-placeholder"></div>
-
                   <div className="user-info">
                     <div className="user-name">{user.name}</div>
 

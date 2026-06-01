@@ -232,7 +232,7 @@ export default function ReportPage() {
                 Nội dung bị lỗi <span className="text-[#8b1a1a]">*</span>
               </label>
               <textarea
-                className="min-h-[100px] w-full rounded-sm border border-[#2e2510] bg-[#0f0c04] p-3 text-[13px] leading-relaxed text-[#e8d9b0] placeholder:text-[#6b5e38] outline-none focus:border-[#c5a028]"
+                className="min-h-[100px] w-full rounded-sm border border-[#2e2510] bg-[#0f0c04] p-3 text-[13px] leading-relaxed text-[#1c1c1c] placeholder:text-[#999] outline-none focus:border-[#c5a028]"
                 placeholder="Mô tả đoạn nội dung bị sai hoặc trích dẫn phần cần kiểm tra..."
                 aria-invalid={!!errors.description}
                 {...register("description", {

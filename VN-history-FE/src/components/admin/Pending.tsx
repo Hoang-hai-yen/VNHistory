@@ -48,7 +48,7 @@ const Pending: React.FC = () => {
   const handleViewPost = async (id: string) => {
     try {
       const res = await httpClient.get<any>(`/admin/articles/${id}`);
-      navigate('/post-detail', {
+      navigate('/post-preview', {
         state: {
           article: res.data.data,
         },

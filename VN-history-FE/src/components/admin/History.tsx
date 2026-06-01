@@ -55,7 +55,6 @@ const History: React.FC = () => {
                       {new Date(log.created_at).toLocaleString("vi-VN")}
                     </td>
                     <td className="admin-cell">
-                      <div className="admin-avatar"></div>
                       <span>{log.admin_name}</span>
                     </td>
                     <td>
