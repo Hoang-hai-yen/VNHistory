@@ -21,9 +21,6 @@ const PostEdit: React.FC = () => {
   const submitReviewArticleMutation = useSubmitReviewArticleMutation();
   const { data: dynastiesRaw = [] } = useAdminTimelineQuery();
   const { data: categoriesRaw } = useCategories();
-  const categories = (categoriesRaw?.data || []).filter(
-    (c: any) => !formData.type || c.article_type === formData.type
-  );
 
   const [formData, setFormData] = useState({
     title: '',
@@ -41,6 +38,10 @@ const PostEdit: React.FC = () => {
     category_id: '',
     is_featured: false,
   });
+
+  const categories = (categoriesRaw?.data || []).filter(
+    (c: any) => !formData.type || c.article_type === formData.type
+  );
 
   useEffect(() => {
 
