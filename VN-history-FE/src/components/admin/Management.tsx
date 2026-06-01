@@ -407,31 +407,31 @@ const Management: React.FC = () => {
             </h3>
             <div className="form-group">
               <label>Họ tên</label>
-              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.name}</p>
+              <p style={{ color: '#333', margin: '4px 0 12px' }}>{selectedAdmin.name}</p>
             </div>
             <div className="form-group">
               <label>Email</label>
-              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.email}</p>
+              <p style={{ color: '#333', margin: '4px 0 12px' }}>{selectedAdmin.email}</p>
             </div>
             <div className="form-group">
               <label>Vai trò</label>
-              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.role}</p>
+              <p style={{ color: '#333', margin: '4px 0 12px' }}>{selectedAdmin.role}</p>
             </div>
             <div className="form-group">
               <label>Bài đã đăng</label>
-              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.postsCount}</p>
+              <p style={{ color: '#333', margin: '4px 0 12px' }}>{selectedAdmin.postsCount}</p>
             </div>
             <div className="form-group">
               <label>Báo cáo đã xử lý</label>
-              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.reportsHandled}</p>
+              <p style={{ color: '#333', margin: '4px 0 12px' }}>{selectedAdmin.reportsHandled}</p>
             </div>
             <div className="form-group">
               <label>Trạng thái</label>
-              <p style={{ color: '#fff', margin: '4px 0 12px' }}>{selectedAdmin.status}</p>
+              <p style={{ color: '#333', margin: '4px 0 12px' }}>{selectedAdmin.status}</p>
             </div>
             <div className="form-group">
               <label>Đăng nhập lần cuối</label>
-              <p style={{ color: '#fff', margin: '4px 0 12px' }}>
+              <p style={{ color: '#333', margin: '4px 0 12px' }}>
                 {selectedAdmin.lastLogin
                   ? new Date(selectedAdmin.lastLogin).toLocaleString('vi-VN')
                   : 'Chưa đăng nhập'}

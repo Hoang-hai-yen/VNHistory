@@ -1,11 +1,12 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../styles/TopBar.css";
 import { useSearch } from "../../context/SearchContext";
 
 const TopBar: React.FC = () => {
   const location = useLocation();
   const { searchText, setSearchText } = useSearch();
+  const navigate = useNavigate();
 
   // Hàm chuyển đổi path thành Title
   const getTitle = (path: string) => {
@@ -51,7 +52,7 @@ const TopBar: React.FC = () => {
           />
         </div>
 
-        <button className="btn-outline">+ BÀI VIẾT MỚI</button>
+        <button className="btn-outline" onClick={() => navigate('/create-post')}>+ BÀI VIẾT MỚI</button>
         {/* <button className="btn-primary">XUẤT BẢN NGAY</button> */}
         {/* <span className="dot"></span> */}
         {/* </div> */}

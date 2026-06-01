@@ -103,8 +103,10 @@
   padding: 4px 12px;
   border-radius: 20px;
   color: #fff;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
+  white-space: nowrap;
+  display: inline-block;
 }
 .status-pending { background-color: var(--gold-main); }
 .status-reviewing { background-color: var(--accent-blue); }
