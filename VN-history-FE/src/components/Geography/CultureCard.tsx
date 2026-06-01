@@ -13,14 +13,22 @@ export default function CultureCard({
       className="bg-white border border-[#e0dbd0] overflow-hidden group hover:border-[#B8860B] hover:shadow-lg transition-all duration-300"
     >
       <div className="aspect-video bg-[#1A1208] relative overflow-hidden">
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-linear-to-br from-[#0D1A08] via-[#1A2D0A] to-[#0D1A0A]">
-          <span className="text-4xl opacity-30 group-hover:scale-110 transition-transform duration-500">
-            {"\ud83d\udccd"}
-          </span>
-          <span className="text-[10px] tracking-[2px] text-[#C8941A]/50 uppercase font-medium">
-            {item.display.type_label}
-          </span>
-        </div>
+        {item.cover_image_url ? (
+          <img
+            src={item.cover_image_url}
+            alt={item.title}
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-linear-to-br from-[#0D1A08] via-[#1A2D0A] to-[#0D1A0A]">
+            <span className="text-4xl opacity-30 group-hover:scale-110 transition-transform duration-500">
+              {"\ud83d\udccd"}
+            </span>
+            <span className="text-[10px] tracking-[2px] text-[#C8941A]/50 uppercase font-medium">
+              {item.display.type_label}
+            </span>
+          </div>
+        )}
 
         <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[#8B1A1A]/90 text-white/95 text-[10px] px-2.5 py-1.5 rounded-full backdrop-blur-sm font-medium">
           <Calendar size={11} />

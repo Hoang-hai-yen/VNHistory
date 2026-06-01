@@ -23,6 +23,7 @@ import VideoDetailPage from "./pages/VideoDetailPage";
 import ReportPage from "./pages/ReportPage";
 import PostDetail from "./components/PostDetail";
 import PostEdit from "./components/PostEdit";
+import PostPreview from "./components/PostPreview";
 import { SearchProvider } from "./context/SearchContext";
 import PermissionGuard from "./components/admin/PermissionGuard";
 
@@ -61,6 +62,7 @@ function App() {
         <Route path="settings" element={<PermissionGuard permissionKey="settings.manage"><Settings /></PermissionGuard>} />
         <Route path="post-detail" element={<PostDetail />} />
         <Route path="post-edit" element={<PermissionGuard permissionKey="article.edit_own"><PostEdit /></PermissionGuard>} />
+        <Route path="post-preview" element={<PostPreview />} />
       </Route>
     </Routes>
     </SearchProvider>

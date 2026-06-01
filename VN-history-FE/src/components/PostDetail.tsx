@@ -224,12 +224,18 @@ const PostDetail: React.FC = () => {
               />
             </div>
 
-            <div style={{ marginTop: '20px' }}>
+            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button
                 className="btn-publish-now"
                 onClick={() => navigate('/post-edit', { state: { article } })}
               >
                 CHỈNH SỬA
+              </button>
+              <button
+                className="btn-save-draft"
+                onClick={() => navigate('/post-preview', { state: { article } })}
+              >
+                XEM
               </button>
             </div>
 

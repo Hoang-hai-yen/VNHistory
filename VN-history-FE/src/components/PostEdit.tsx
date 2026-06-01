@@ -188,6 +188,28 @@ const PostEdit: React.FC = () => {
             <div className="form-group">
               <label>NỘI DUNG</label>
 
+              <div style={{ marginBottom: '6px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = prompt('Nhập URL ảnh:');
+                    if (!url) return;
+                    const alt = prompt('Mô tả ảnh (alt text):', '') || '';
+                    const markdown = `\n![${alt}](${url})\n`;
+                    const ta = document.querySelector<HTMLTextAreaElement>('textarea[name="content"]');
+                    if (!ta) return;
+                    const start = ta.selectionStart;
+                    const end = ta.selectionEnd;
+                    const newContent = formData.content.slice(0, start) + markdown + formData.content.slice(end);
+                    setFormData(prev => ({ ...prev, content: newContent }));
+                    setTimeout(() => { ta.focus(); ta.selectionStart = ta.selectionEnd = start + markdown.length; }, 0);
+                  }}
+                  style={{ padding: '4px 12px', fontSize: '12px', border: '1px solid #C5A028', borderRadius: '4px', background: 'transparent', color: '#C5A028', cursor: 'pointer' }}
+                >
+                  🖼 Chèn ảnh
+                </button>
+              </div>
+
               <textarea
                 rows={15}
                 name="content"
@@ -307,6 +329,13 @@ const PostEdit: React.FC = () => {
                 </>
 
               )}
+              <button
+                className="btn-save-draft"
+                style={{ marginTop: '8px' }}
+                onClick={() => navigate('/post-preview', { state: { article: { ...article, ...formData } } })}
+              >
+                XEM TRƯỚC
+              </button>
 
             </div>
 

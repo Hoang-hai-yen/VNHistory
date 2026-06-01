@@ -69,15 +69,26 @@ const Timeline: React.FC = () => {
   // IDs đã có trong timeline để lọc khỏi danh sách chọn
   const existingArticleIds = useMemo(() => new Set(events.map(e => e.id)), [events]);
 
-  const availableArticles = useMemo(() =>
-    publishedArticles.filter((a: any) => !existingArticleIds.has(a.id)),
-    [publishedArticles, existingArticleIds]
-  );
+  const availableArticles = useMemo(() => {
+    return (publishedArticles as any[])
+      .filter((a) => {
+        if (existingArticleIds.has(a.id)) return false;
+        if (!activeDynasty) return true;
+        const ys = activeDynasty.year_start;
+        const ye = activeDynasty.year_end;
+        // Lọc bài viết nằm trong khoảng thời gian của triều đại
+        if (ys != null && ye != null) {
+          return a.year_start >= ys && a.year_start <= ye;
+        }
+        return true;
+      })
+      .sort((a, b) => (a.year_start ?? 0) - (b.year_start ?? 0));
+  }, [publishedArticles, existingArticleIds, activeDynasty]);
 
   const handleViewPost = async (id: string) => {
     try {
       const res = await httpClient.get<any>(`/admin/articles/${id}`);
-      navigate('/post-detail', { state: { article: res.data.data } });
+      navigate('/post-preview', { state: { article: res.data.data } });
     } catch (error) { console.log(error); }
   };
 
@@ -223,7 +234,7 @@ const Timeline: React.FC = () => {
                 onChange={(e) => setSelectedArticleId(e.target.value)}
                 style={{ width: '100%', padding: '8px', marginTop: '6px' }}
               >
-                <option value="">— Chọn bài viết đã xuất bản —</option>
+                <option value="">— {availableArticles.length} bài trong khoảng thời gian này —</option>
                 {availableArticles.map((a: any) => (
                   <option key={a.id} value={a.id}>
                     {a.title} ({a.year_display || ''})
