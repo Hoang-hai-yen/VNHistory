@@ -181,7 +181,7 @@ const Posts: React.FC = () => {
         {(keyword || typeFilter) && (
           <button
             onClick={() => { setKeyword(""); setTypeFilter(""); }}
-            style={{ padding: "8px 14px", border: "1px solid #ddd", borderRadius: "6px", fontSize: "13px", cursor: "pointer", background: "#f5f5f5" }}
+            style={{ padding: "8px 14px", border: "1px solid #C5A028", borderRadius: "6px", fontSize: "13px", cursor: "pointer", background: "#fff", color: "#C5A028", fontWeight: 500 }}
           >
             Xóa lọc
           </button>

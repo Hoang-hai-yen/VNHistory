@@ -4,6 +4,8 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import { useUpdateArticleMutation, useSubmitReviewArticleMutation } from '../hooks/api/useAdminArticles';
+import { useAdminTimelineQuery } from '../hooks/api/useAdminTimeline';
+import { useCategories } from '../hooks/api/useCategories';
 
 import '../styles/CreatePost.css';
 import '../styles/Posts.css';
@@ -17,6 +19,11 @@ const PostEdit: React.FC = () => {
 
   const updateArticleMutation = useUpdateArticleMutation();
   const submitReviewArticleMutation = useSubmitReviewArticleMutation();
+  const { data: dynastiesRaw = [] } = useAdminTimelineQuery();
+  const { data: categoriesRaw } = useCategories();
+  const categories = (categoriesRaw?.data || []).filter(
+    (c: any) => !formData.type || c.article_type === formData.type
+  );
 
   const [formData, setFormData] = useState({
     title: '',
@@ -255,6 +262,26 @@ const PostEdit: React.FC = () => {
                 <option value="place">Di sản</option>
                 <option value="culture">Văn hóa</option>
                 <option value="video">Video / Khác</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>TRIỀU ĐẠI</label>
+              <select name="dynasty_id" value={formData.dynasty_id} onChange={handleChange}>
+                <option value="">Chọn triều đại</option>
+                {dynastiesRaw.map((d: any) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>DANH MỤC</label>
+              <select name="category_id" value={formData.category_id} onChange={handleChange}>
+                <option value="">Chọn danh mục</option>
+                {categories.map((c: any) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
               </select>
             </div>
 
