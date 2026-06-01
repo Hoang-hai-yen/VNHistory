@@ -485,25 +485,6 @@ const Reports: React.FC = () => {
 
               <label className="gold-text">
 
-                ĐOẠN NỘI DUNG BỊ LỖI
-                (NGƯỜI DÙNG TRÍCH DẪN)
-
-              </label>
-
-              <blockquote className="error-quote">
-
-                "
-                {highlightText(selectedReport.quoted_text, searchText)}
-                "
-
-              </blockquote>
-
-            </section>
-
-            <section className="detail-section">
-
-              <label className="gold-text">
-
                 MÔ TẢ LỖI TỪ NGƯỜI DÙNG
 
               </label>
