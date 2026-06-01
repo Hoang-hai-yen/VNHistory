@@ -40,7 +40,7 @@ const PostEdit: React.FC = () => {
   });
 
   const categories = (categoriesRaw?.data || []).filter(
-    (c: any) => !formData.type || c.article_type === formData.type
+    (cat: any) => !formData.type || cat.article_type === formData.type
   );
 
   useEffect(() => {
