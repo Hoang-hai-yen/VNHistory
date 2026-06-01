@@ -8,7 +8,6 @@ import { useAdminAdminsQuery } from '../../hooks/api/useAdminAdmins';
 import {
   useAdminReportsQuery,
   useAssignReportMutation,
-  useFlagReportMutation,
   useResolveReportMutation,
   useRejectReportMutation,
   useSaveReportNoteMutation,
@@ -24,7 +23,6 @@ const Reports: React.FC = () => {
   const { data: adminsRaw = [] } = useAdminAdminsQuery();
 
   const assignReportMutation = useAssignReportMutation();
-  const flagReportMutation = useFlagReportMutation();
   const resolveReportMutation = useResolveReportMutation();
   const rejectReportMutation = useRejectReportMutation();
   const saveNoteMutation = useSaveReportNoteMutation();
@@ -152,28 +150,6 @@ const Reports: React.FC = () => {
     }
   };
 
-  const handleFlagReport = async () => {
-    if (!selectedReport) return;
-    try {
-      const isFlagged = !!selectedReport.admin_note;
-      if (!isFlagged) {
-        await flagReportMutation.mutateAsync({
-          id: selectedReport.id,
-          admin_note: adminNote,
-        });
-        alert("Đã gắn cờ");
-      } else {
-        await flagReportMutation.mutateAsync({
-          id: selectedReport.id,
-          admin_note: null,
-        });
-        alert("Đã gỡ cờ");
-      }
-    } catch (error) {
-      console.log(error);
-      alert('Thao tác thất bại');
-    }
-  };
 
   const handleResolveReport = async () => {
     if (!selectedReport) return;
